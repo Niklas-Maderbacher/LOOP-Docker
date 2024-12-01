@@ -1,0 +1,10 @@
+# https://magicstack.github.io/asyncpg/current/
+asyncpg~=0.29.0
+fastapi~=0.108.0
+SQLAlchemy~=1.4.0
+# https://www.uvicorn.org
+uvicorn~=0.25.0
+# https://pyjwt.readthedocs.io/en/stable/
+pyjwt
+
+alembic~=1.13.1

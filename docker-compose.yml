@@ -1,0 +1,34 @@
+services:
+  backend:
+    build: ./src/backend
+    command: |
+      bash -c 'while !</dev/tcp/db/5432; do sleep 1; done; uvicorn api.main:app --reload --workers 1 --host 0.0.0.0 --port 8000'
+    volumes:
+      - ./src/backend:/usr/src/backend/
+    ports:
+      - 8002:8000
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}/${POSTGRES_DB}
+  db:
+    image: postgres:15.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - 5432
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+  frontend:
+    build:
+      context: ./src/frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:
