@@ -5,6 +5,9 @@ SQLAlchemy~=1.4.0
 # https://www.uvicorn.org
 uvicorn~=0.25.0
 # https://pyjwt.readthedocs.io/en/stable/
-pyjwt
+python-multipart
+PyJWT~=2.10.1
+
+psycopg2-binary~=2.9.5
 
 alembic~=1.13.1
