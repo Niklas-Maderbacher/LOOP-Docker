@@ -1,0 +1,14 @@
+Done:
+- Frontend
+- backend alembic
+- docker-compose
+- .env
+
+Todo:
+- crud
+- api
+- db
+- prestart
+- security
+- test
+- main.py
