@@ -41,7 +41,7 @@ For windows:
 pip install <package-name>
 ```
 
-For arch-linux:
+For arch-based systems:
 
 ```bash
 sudo pacman -S python-<package-name>
