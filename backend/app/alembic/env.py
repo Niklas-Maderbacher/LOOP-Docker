@@ -2,6 +2,7 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
+from pydantic_core import MultiHostUrl
 from sqlalchemy import engine_from_config, pool
 
 # this is the Alembic Config object, which provides
@@ -18,7 +19,7 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from backend.app.db.models import SQLModel  # noqa
+from app.db.models import SQLModel  # noqa
 
 target_metadata = SQLModel.metadata
 
@@ -29,7 +30,16 @@ target_metadata = SQLModel.metadata
 
 
 def get_url():
-    return str(os.getenv("POSTGRES_SERVER") + ":" + os.getenv("POSTGRES_PORT"))
+    return str(
+        MultiHostUrl.build(
+            scheme="postgresql+psycopg",
+            username=os.getenv("POSTGRES_USER"),
+            password=os.getenv("POSTGRES_PASSWORD"),
+            host=os.getenv("POSTGRES_SERVER"),
+            port=int(os.getenv("POSTGRES_PORT")),
+            path=os.getenv("POSTGRES_DB"),
+        )
+    )
 
 
 def run_migrations_offline():

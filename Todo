@@ -12,3 +12,6 @@ Todo:
 - security
 - test
 - main.py
+
+TodoV2:
+- alembic on docker compose up
