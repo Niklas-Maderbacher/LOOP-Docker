@@ -51,6 +51,8 @@ services:
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     restart: always
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -72,7 +74,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
 
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health_check" ]
       interval: 10s
       timeout: 5s
       retries: 5
