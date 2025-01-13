@@ -1,6 +1,6 @@
 # FastAPI Project - Development
 
-## Formatting script files
+## Formatting script files (Windows only)
 
 1. Open the file in VS-Code.
 2. Look at the bottom-right corner and click on the CRLF.
