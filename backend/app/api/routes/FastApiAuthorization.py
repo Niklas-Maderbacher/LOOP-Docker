@@ -43,7 +43,7 @@ class UserInDB(User):
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Schema for the OAuth2 System
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/security/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/security/token")
 
 fake_users_db = {
     "zoezp": {
