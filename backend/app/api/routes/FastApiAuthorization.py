@@ -18,6 +18,20 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
+def add_admin_user():
+    with next(get_db()) as db:
+        new_user = User(
+            email="admin@example.com",
+            display_name="Admin User",
+            password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # Make sure to hash the password
+            is_admin=True,
+            is_email_verified=True
+        )
+        db.add(new_user)
+        db.commit()
+
+add_admin_user()
+
 # Model for Token with the access_token and the type of the token
 class Token(BaseModel):
     access_token: str
@@ -145,13 +159,6 @@ async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     return current_user
-
-# Return a list of attributes from the current user
-@router.get("/users/me/items/")
-async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
-    return [{"item_id": "Foo", "owner": current_user.email}]
 
 @router.get("/users/check/admin")
 async def read_own_items(
