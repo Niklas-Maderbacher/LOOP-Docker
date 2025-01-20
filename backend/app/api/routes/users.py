@@ -5,6 +5,7 @@ from typing import List
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+# test model
 class User(BaseModel):
     display_name: str = Field(..., min_length=1, max_length=50)
     password: str = Field(..., min_length=8, max_length=50)
@@ -17,10 +18,12 @@ class User(BaseModel):
 
 user_list: List[User] = []
 
+# returns all users
 @router.get("/get_all_users")
 async def get_all_users():
     return {"users": user_list}
 
+# path call to return user with specified name
 @router.get("/get_user/{display_name}")
 async def get_user(display_name: str):
     for user in user_list:
@@ -28,6 +31,8 @@ async def get_user(display_name: str):
             return {"item": user}
     raise HTTPException(status_code=404, detail="User not found")
 
+# creates a new user with model
+# requires admin account
 @router.post("/create_user", dependencies=[Depends(FastApiAuthorization.is_admin)])
 async def create_user(user: User):
     user_list.append(user)
