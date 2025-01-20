@@ -20,6 +20,8 @@ services:
   adminer:
     image: adminer
     restart: always
+    ports:
+      - ${ADMINER_PORT}:${ADMINER_PORT}
     depends_on:
       - db
     environment:
@@ -85,6 +87,8 @@ services:
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
     restart: always
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
     build:
       context: ./frontend
 volumes:
