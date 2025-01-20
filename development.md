@@ -2,7 +2,7 @@
 
 ## Formatting script files
 
-1. Open the file in VS-Code.
+1. Open script files located in ```LOOP-DOCKER/backend/scripts```
 2. Look at the bottom-right corner and click on the CRLF.
 3. Change it to LF.
 4. Save the file.
