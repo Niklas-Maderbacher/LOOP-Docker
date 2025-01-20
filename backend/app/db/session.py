@@ -1,3 +1,4 @@
+from collections.abc import Generator
 from sqlmodel import Session, create_engine, select
 
 from app.config.config import settings
@@ -13,3 +14,8 @@ engine = create_engine(DATABASE_URL)
 from sqlmodel import SQLModel
 
 SQLModel.metadata.create_all(engine)
+
+
+def get_db() -> Generator[Session, None, None]:
+    with Session(engine) as session:
+        yield session
