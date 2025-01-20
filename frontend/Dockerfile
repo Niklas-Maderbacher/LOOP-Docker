@@ -12,3 +12,5 @@ COPY ./ /app/
 ARG VITE_API_URL=${VITE_API_URL}
 
 RUN yarn run build
+
+CMD [ "yarn", "start" ]
