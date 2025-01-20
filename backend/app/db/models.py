@@ -23,6 +23,7 @@ class User(SQLModel, table=True):
     last_active: Optional[str] = Field(default=None)
     is_email_verified: bool = Field(default=False)
     mobile_number: Optional[str] = Field(default=None, max_length=20)
+    is_admin: bool = Field(default=False)
 
     user_at_projects: List["UserAtProject"] = Relationship(back_populates="user")
     issues_created: List["Issue"] = Relationship(back_populates="creator")
