@@ -9,8 +9,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values 
 import os
 from sqlmodel import select
-from db import User, UserAtProject
-from session import get_db
+from app.db.models import User, UserAtProject
+from app.db.session import get_db
 
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
