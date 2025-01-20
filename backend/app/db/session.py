@@ -3,8 +3,10 @@ import os
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.config.config import settings
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+
+DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URIs)
 
 # SQLAlchemy
 engine = create_engine(DATABASE_URL)
