@@ -3,13 +3,13 @@ from typing import List, Optional
 from pydantic import EmailStr
 from app.db.session import engine
 
-"""
+
 class Role(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=50, nullable=False)
 
-    users_at_project: List["UserAtProject"] = Relationship(back_populates="role")
-"""
+    # users_at_project: List["UserAtProject"] = Relationship(back_populates="role")
+
 
 class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -40,7 +40,6 @@ class Project(SQLModel, table=True):
     # issues: List["Issue"] = Relationship(back_populates="project")
     # user_at_projects: List["UserAtProject"] = Relationship(back_populates="project")
 
-"""
 class UserAtProject(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     project_id: int = Field(foreign_key="project.id", primary_key=True)
@@ -49,7 +48,7 @@ class UserAtProject(SQLModel, table=True):
     # user: "User" = Relationship(back_populates="user_at_projects")
     # project: "Project" = Relationship(back_populates="user_at_projects")
     # role: "Role" = Relationship(back_populates="users_at_project")
-
+"""
 
 class Sprint(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
