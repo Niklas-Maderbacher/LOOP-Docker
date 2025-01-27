@@ -48,7 +48,6 @@ class UserAtProject(SQLModel, table=True):
     # user: "User" = Relationship(back_populates="user_at_projects")
     # project: "Project" = Relationship(back_populates="user_at_projects")
     # role: "Role" = Relationship(back_populates="users_at_project")
-"""
 
 class Sprint(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -121,7 +120,7 @@ class Issue(SQLModel, table=True):
     # priority: "Priority" = Relationship(back_populates="issues")
     # project: "Project" = Relationship(back_populates="issues")
     # attachments: List["Attachment"] = Relationship(back_populates="issue")
-"""
+
 
 ##########################################################
 # export PYTHONPATH=$PWD -on MAC //set PYTHONPATH=%CD% -on Windows
