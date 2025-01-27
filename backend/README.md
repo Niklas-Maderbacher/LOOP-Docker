@@ -138,7 +138,7 @@ $ docker compose exec backend bash
 * After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
 
 ```console
-$ alembic revision --autogenerate -m "Add column last_name to User model"
+$ alembic revision --autogenerate -m "my text"
 ```
 
 * Commit to the git repository the files generated in the alembic directory.
@@ -149,7 +149,7 @@ $ alembic revision --autogenerate -m "Add column last_name to User model"
 $ alembic upgrade head
 ```
 
-If you don't want to use migrations at all, uncomment the lines in the file at `./backend/app/core/db.py` that end in:
+If you don't want to use migrations at all, uncomment the lines in the file at `./backend/app/db/models.py` that end in:
 
 ```python
 SQLModel.metadata.create_all(engine)
