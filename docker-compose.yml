@@ -91,5 +91,7 @@ services:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     build:
       context: ./frontend
+    depends_on:
+      - backend
 volumes:
   postgres_data:
