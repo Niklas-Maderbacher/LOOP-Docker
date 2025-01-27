@@ -125,6 +125,6 @@ class Issue(SQLModel, table=True):
 """
 
 ##########################################################
-# export PYTHONPATH=$PWD
+# export PYTHONPATH=$PWD -on MAC //set PYTHONPATH=%CD% -on Windows
 # alembic upgrade head
 # alembic revision --autogenerate -m "Add mit neue tabelle6"
