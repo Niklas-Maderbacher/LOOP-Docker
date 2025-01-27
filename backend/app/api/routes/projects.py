@@ -1,5 +1,4 @@
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel, Field
 from typing import List
 
 from app.api.routes import FastApiAuthorization
@@ -9,7 +8,7 @@ import app.crud.project as crud_project
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
-@router.get("/", response_model=List[Project])
+@router.get("/", response_model=List[Project], status_code=200)
 async def get_all_projects(session: SessionDep):
     """returns all projects in db
 
@@ -21,7 +20,7 @@ async def get_all_projects(session: SessionDep):
     """
     return list(crud_project.get_all_projects(session))
 
-@router.post("/", response_model=Project, dependencies=[Depends(FastApiAuthorization.is_admin)])
+@router.post("/", response_model=Project, dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
 async def create_project(session: SessionDep, project: Project):
     """adds a new project to the db based on the Project model, requires admin permissions
 
@@ -38,4 +37,4 @@ async def create_project(session: SessionDep, project: Project):
     db_project = crud_project.create_project(session, project)
     if not db_project:
         raise HTTPException(status_code=400, detail="Failed to create project")
-    return HTTPException(status_code=201, detail="Project created")
+    return db_project
