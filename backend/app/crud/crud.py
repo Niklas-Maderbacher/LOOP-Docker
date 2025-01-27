@@ -17,9 +17,9 @@ def add_admin_user():
         db.commit()
 
 # gets user from database To-Do
-def get_user(user_email: str):
-    with get_db() as db:
-        user = db.exec(select(User).where(User.email == user_email))
+def get_user(email: str):
+    with next(get_db()) as db:
+        user = db.query(User).filter(User.email == email).first()
     return user
 
 # def get_project_role(user_email, project_id):
