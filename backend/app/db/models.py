@@ -29,9 +29,9 @@ class User(SQLModel, table=True):
     mobile_number: Optional[str] = Field(default=None, max_length=20)
     is_admin: bool = Field(default=False)
 
-    user_at_projects: List["UserAtProject"] = Relationship(back_populates="user")
-    issues_created: List["Issue"] = Relationship(back_populates="creator")
-    issues_responsible: List["Issue"] = Relationship(back_populates="responsible_user")
+    # user_at_projects: List["UserAtProject"] = Relationship(back_populates="user")
+    # issues_created: List["Issue"] = Relationship(back_populates="creator")
+    # issues_responsible: List["Issue"] = Relationship(back_populates="responsible_user")
 
 
 class Project(SQLModel, table=True):
@@ -42,9 +42,9 @@ class Project(SQLModel, table=True):
     archived_at: Optional[str] = Field(default=None)
     github_token: Optional[str] = Field(default=None, max_length=70)
 
-    sprints: List["Sprint"] = Relationship(back_populates="project")
-    issues: List["Issue"] = Relationship(back_populates="project")
-    user_at_projects: List["UserAtProject"] = Relationship(back_populates="project")
+    # sprints: List["Sprint"] = Relationship(back_populates="project")
+    # issues: List["Issue"] = Relationship(back_populates="project")
+    # user_at_projects: List["UserAtProject"] = Relationship(back_populates="project")
 
 
 class UserAtProject(SQLModel, table=True):
@@ -52,9 +52,9 @@ class UserAtProject(SQLModel, table=True):
     project_id: int = Field(foreign_key="project.id", primary_key=True)
     role_id: int = Field(foreign_key="role.id")
 
-    user: "User" = Relationship(back_populates="user_at_projects")
-    project: "Project" = Relationship(back_populates="user_at_projects")
-    role: "Role" = Relationship(back_populates="users_at_project")
+    # user: "User" = Relationship(back_populates="user_at_projects")
+    # project: "Project" = Relationship(back_populates="user_at_projects")
+    # role: "Role" = Relationship(back_populates="users_at_project")
 
 
 class Sprint(SQLModel, table=True):
@@ -64,29 +64,29 @@ class Sprint(SQLModel, table=True):
     start_date: Optional[str] = Field(default=None)
     end_date: Optional[str] = Field(default=None)
 
-    project: "Project" = Relationship(back_populates="sprints")
-    issues: List["Issue"] = Relationship(back_populates="sprint")
+    # project: "Project" = Relationship(back_populates="sprints")
+    # issues: List["Issue"] = Relationship(back_populates="sprint")
 
 
 class Priority(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=30, nullable=False)
 
-    issues: List["Issue"] = Relationship(back_populates="priority")
+    #issues: List["Issue"] = Relationship(back_populates="priority")
 
 
 class State(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=50, nullable=False)
 
-    issues: List["Issue"] = Relationship(back_populates="state")
+    #issues: List["Issue"] = Relationship(back_populates="state")
 
 
 class Category(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=30, nullable=False)
 
-    issues: List["Issue"] = Relationship(back_populates="category")
+    #issues: List["Issue"] = Relationship(back_populates="category")
 
 
 class Attachment(SQLModel, table=True):
@@ -94,7 +94,7 @@ class Attachment(SQLModel, table=True):
     issue_id: int = Field(foreign_key="issue.id")
     link: str = Field(nullable=False)
 
-    issue: "Issue" = Relationship(back_populates="attachments")
+    # issue: "Issue" = Relationship(back_populates="attachments")
 
 
 class Issue(SQLModel, table=True):
@@ -120,14 +120,14 @@ class Issue(SQLModel, table=True):
     finisher_id: Optional[int] = Field(foreign_key="user.id")
     parent_issue_id: Optional[int] = Field(foreign_key="issue.id")
 
-    category: "Category" = Relationship(back_populates="issues")
-    sprint: "Sprint" = Relationship(back_populates="issues")
-    state: "State" = Relationship(back_populates="issues")
-    creator: "User" = Relationship(back_populates="issues_created")
-    responsible_user: "User" = Relationship(back_populates="issues_responsible")
-    priority: "Priority" = Relationship(back_populates="issues")
-    project: "Project" = Relationship(back_populates="issues")
-    attachments: List["Attachment"] = Relationship(back_populates="issue")
+    # category: "Category" = Relationship(back_populates="issues")
+    # sprint: "Sprint" = Relationship(back_populates="issues")
+    # state: "State" = Relationship(back_populates="issues")
+    # creator: "User" = Relationship(back_populates="issues_created")
+    # responsible_user: "User" = Relationship(back_populates="issues_responsible")
+    # priority: "Priority" = Relationship(back_populates="issues")
+    # project: "Project" = Relationship(back_populates="issues")
+    # attachments: List["Attachment"] = Relationship(back_populates="issue")
 
 
 ##########################################################
