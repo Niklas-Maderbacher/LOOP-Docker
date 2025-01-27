@@ -63,6 +63,16 @@ services:
         condition: service_completed_successfully
     env_file:
       - .env
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+        - path: ./backend/pyproject.toml
+          action: rebuild
     environment:
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
