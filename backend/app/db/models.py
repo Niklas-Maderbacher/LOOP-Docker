@@ -1,17 +1,21 @@
 import uuid
 
 from pydantic import EmailStr
-from sqlmodel import Field, Relationship, SQLModel  
+from sqlmodel import Field, Relationship, SQLModel
 from sqlalchemy import Numeric, TIMESTAMP
 from sqlalchemy.sql import func
 from typing import List, Optional
 from pydantic import EmailStr
+
+from app.db.session import engine
+
 
 class Role(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=50, nullable=False)
 
     users_at_project: List["UserAtProject"] = Relationship(back_populates="role")
+
 
 class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -29,6 +33,7 @@ class User(SQLModel, table=True):
     issues_created: List["Issue"] = Relationship(back_populates="creator")
     issues_responsible: List["Issue"] = Relationship(back_populates="responsible_user")
 
+
 class Project(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=100, nullable=False)
@@ -41,6 +46,7 @@ class Project(SQLModel, table=True):
     issues: List["Issue"] = Relationship(back_populates="project")
     user_at_projects: List["UserAtProject"] = Relationship(back_populates="project")
 
+
 class UserAtProject(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     project_id: int = Field(foreign_key="project.id", primary_key=True)
@@ -49,6 +55,7 @@ class UserAtProject(SQLModel, table=True):
     user: "User" = Relationship(back_populates="user_at_projects")
     project: "Project" = Relationship(back_populates="user_at_projects")
     role: "Role" = Relationship(back_populates="users_at_project")
+
 
 class Sprint(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -60,11 +67,13 @@ class Sprint(SQLModel, table=True):
     project: "Project" = Relationship(back_populates="sprints")
     issues: List["Issue"] = Relationship(back_populates="sprint")
 
+
 class Priority(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=30, nullable=False)
 
     issues: List["Issue"] = Relationship(back_populates="priority")
+
 
 class State(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -72,11 +81,13 @@ class State(SQLModel, table=True):
 
     issues: List["Issue"] = Relationship(back_populates="state")
 
+
 class Category(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=30, nullable=False)
 
     issues: List["Issue"] = Relationship(back_populates="category")
+
 
 class Attachment(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -84,6 +95,7 @@ class Attachment(SQLModel, table=True):
     link: str = Field(nullable=False)
 
     issue: "Issue" = Relationship(back_populates="attachments")
+
 
 class Issue(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -116,6 +128,7 @@ class Issue(SQLModel, table=True):
     priority: "Priority" = Relationship(back_populates="issues")
     project: "Project" = Relationship(back_populates="issues")
     attachments: List["Attachment"] = Relationship(back_populates="issue")
+
 
 ##########################################################
 # export PYTHONPATH=$PWD
