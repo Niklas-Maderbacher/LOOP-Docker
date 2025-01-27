@@ -21,7 +21,7 @@ class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     email: EmailStr = Field(unique=True, index=True, max_length=320)
     display_name: str = Field(max_length=100, nullable=False)
-    password: str = Field(max_length=30, nullable=False)
+    password: str = Field(max_length=100, nullable=False)
     microsoft_account: bool = Field(default=False)
     archived: Optional[str] = Field(default=None)
     last_active: Optional[str] = Field(default=None)
