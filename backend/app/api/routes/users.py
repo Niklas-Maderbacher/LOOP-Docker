@@ -7,6 +7,9 @@ from app.api.deps import SessionDep
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
+
+# legacy
+
 # test model
 class User(BaseModel):
     display_name: str = Field(..., min_length=1, max_length=50)
