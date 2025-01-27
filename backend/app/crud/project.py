@@ -1,34 +1,32 @@
 from typing import List
-from sqlmodel import Session, select
+
+from sqlmodel import Session
 from app.db.models import Project
 
 def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Project]:
-    """function returns all projects from db
+    """Returns all projects from the database.
 
     Args:
-        db (Session): database session
-        skip (int, optional): how many values should be skipped before returning values (paging). Defaults to 0.
-        limit (int, optional): how many values should be returned at max. Defaults to 50.
+        db (Session): Database session
+        skip (int, optional): Number of records to skip. Defaults to 0.
+        limit (int, optional): Maximum number of records to return. Defaults to 50.
 
     Returns:
-        List[Project]: List of projects found in the db of type Project.
+        List[Project]: List of Project objects
     """
-    statement = select(Project).offset(skip).limit(limit)
-    projects = db.exec(statement).all()
-    return projects
+    return db.query(Project).offset(skip).limit(limit).all()
 
 def create_project(db: Session, project: Project) -> Project:
-    """functions creates a new db entry of type Project
+    """Creates a new project in the database.
 
     Args:
-        db (Session): db session
-        project (Project): the project object that should be inserted
+        db (Session): Database session
+        project (Project): Project instance to create
 
     Returns:
-        Project: the project object that got inserted
+        Project: The created project instance
     """
-    db_project = Project(**project.model_dump())
-    db.add(db_project)
+    db.add(project)
     db.commit()
-    db.refresh(db_project)
-    return db_project
+    db.refresh(project)
+    return project
