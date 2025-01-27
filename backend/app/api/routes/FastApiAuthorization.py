@@ -10,7 +10,7 @@ from dotenv import load_dotenv, dotenv_values
 import os
 from sqlmodel import select
 from app.db.models import User
-from app.crud.crud import add_admin_user, get_user
+from app.crud.user import get_user, get_project_role
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -89,8 +89,9 @@ def is_admin(user: User = Depends(get_current_user)):
     return user
 
 def is_product_owner(project_id: int, user: User = Depends(get_current_user)):
-    project_role = get_project_role(user.user_id, project_id)  # Retrieve project role
-    if project_role != 0:
+    project_role = get_project_role(user.id, project_id)  # Retrieve project role
+    print(f"projectrole {project_role}")
+    if project_role != 1:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return user
 
@@ -117,7 +118,7 @@ async def login_for_access_token(
 async def get_current_active_user(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    if current_user.disabled:
+    if current_user.archived:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
