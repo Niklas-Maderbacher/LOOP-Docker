@@ -1,21 +1,15 @@
-import uuid
-
-from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
-from sqlalchemy import Numeric, TIMESTAMP
-from sqlalchemy.sql import func
 from typing import List, Optional
 from pydantic import EmailStr
-
 from app.db.session import engine
 
-
+"""
 class Role(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=50, nullable=False)
 
     users_at_project: List["UserAtProject"] = Relationship(back_populates="role")
-
+"""
 
 class User(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
@@ -46,7 +40,7 @@ class Project(SQLModel, table=True):
     # issues: List["Issue"] = Relationship(back_populates="project")
     # user_at_projects: List["UserAtProject"] = Relationship(back_populates="project")
 
-
+"""
 class UserAtProject(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     project_id: int = Field(foreign_key="project.id", primary_key=True)
@@ -128,9 +122,9 @@ class Issue(SQLModel, table=True):
     # priority: "Priority" = Relationship(back_populates="issues")
     # project: "Project" = Relationship(back_populates="issues")
     # attachments: List["Attachment"] = Relationship(back_populates="issue")
-
+"""
 
 ##########################################################
-# export PYTHONPATH=$PWD
+# export PYTHONPATH=$PWD -on MAC //set PYTHONPATH=%CD% -on Windows
 # alembic upgrade head
 # alembic revision --autogenerate -m "Add mit neue tabelle6"
