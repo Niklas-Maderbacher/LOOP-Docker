@@ -91,5 +91,9 @@ services:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     build:
       context: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+        restart: true
 volumes:
   postgres_data:

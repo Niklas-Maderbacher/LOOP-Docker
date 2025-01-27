@@ -9,28 +9,13 @@ from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values 
 import os
 from sqlmodel import select
-from app.db.models import User, UserAtProject
-from app.api.deps import get_db
-
+from app.db.models import User
+from app.crud.crud import add_admin_user, get_user
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
-def add_admin_user():
-    with next(get_db()) as db:
-        new_user = User(
-            email="admin@example.com",
-            display_name="Admin User",
-            password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # Make sure to hash the password
-            is_admin=True,
-            is_email_verified=True
-        )
-        db.add(new_user)
-        db.commit()
-
-add_admin_user()
 
 # Model for Token with the access_token and the type of the token
 class Token(BaseModel):
@@ -49,22 +34,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Schema for the OAuth2 System
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/security/token")
 
-# gets user from database To-Do
-def get_user(user_email: str):
-    with get_db() as db:
-        user = db.exec(select(User).where(User.email == user_email))
-    return user
-
-def get_project_role(user_email, project_id):
-    with get_db() as db:
-        user = db.exec(select(User).where(User.email == user_email)).first()
-        role = db.exec(select(UserAtProject).where(
-        (UserAtProject.project_id == project_id) & 
-        (UserAtProject.user_id == user.user_id)
-        ))
-
-    return role.role_id
-
 # Method to verify if a password and a hashed_password are the same, auto hashes the plain password using pwd_context 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -74,7 +43,7 @@ def authenticate_user(email: str, password: str):
     user = get_user(email)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password):
         return False
     return user
 
@@ -130,7 +99,7 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     # checks the hashed passwords and the email with the db
-    user = authenticate_user(form_data.email, form_data.password)
+    user = authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
