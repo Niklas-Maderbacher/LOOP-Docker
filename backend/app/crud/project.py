@@ -1,6 +1,5 @@
 from typing import List
-
-from sqlalchemy.orm import Session
+from sqlmodel import Session, select
 from app.db.models import Project
 
 def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Project]:
@@ -12,9 +11,11 @@ def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Projec
         limit (int, optional): how many values should be returned at max. Defaults to 50.
 
     Returns:
-        List[User]: List of projects found int the db of type Project.
+        List[Project]: List of projects found in the db of type Project.
     """
-    return db.query(Project).offset(skip).limit(limit).all()
+    statement = select(Project).offset(skip).limit(limit)
+    projects = db.exec(statement).all()
+    return projects
 
 def create_project(db: Session, project: Project) -> Project:
     """functions creates a new db entry of type Project
