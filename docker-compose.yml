@@ -92,6 +92,8 @@ services:
     build:
       context: ./frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+        restart: true
 volumes:
   postgres_data:
