@@ -9,8 +9,8 @@ from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values 
 import os
 from sqlmodel import select
-from app.db.models import User, UserAtProject
-from app.crud.crud import add_admin_user, get_user, get_project_role
+from app.db.models import User
+from app.crud.crud import add_admin_user, get_user
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
