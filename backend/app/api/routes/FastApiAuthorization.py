@@ -10,25 +10,12 @@ from dotenv import load_dotenv, dotenv_values
 import os
 from sqlmodel import select
 from app.db.models import User, UserAtProject
-from app.api.deps import get_db
-
+from app.crud.crud import add_admin_user, get_user, get_project_role
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
-
-def add_admin_user():
-    with next(get_db()) as db:
-        new_user = User(
-            email="admin@example.com",
-            display_name="Admin User",
-            password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # Make sure to hash the password
-            is_admin=True,
-            is_email_verified=True
-        )
-        db.add(new_user)
-        db.commit()
 
 add_admin_user()
 
@@ -48,22 +35,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Schema for the OAuth2 System
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/security/token")
-
-# gets user from database To-Do
-def get_user(user_email: str):
-    with get_db() as db:
-        user = db.exec(select(User).where(User.email == user_email))
-    return user
-
-def get_project_role(user_email, project_id):
-    with get_db() as db:
-        user = db.exec(select(User).where(User.email == user_email)).first()
-        role = db.exec(select(UserAtProject).where(
-        (UserAtProject.project_id == project_id) & 
-        (UserAtProject.user_id == user.user_id)
-        ))
-
-    return role.role_id
 
 # Method to verify if a password and a hashed_password are the same, auto hashes the plain password using pwd_context 
 def verify_password(plain_password, hashed_password):
