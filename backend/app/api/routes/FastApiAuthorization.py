@@ -8,12 +8,29 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values 
 import os
+from sqlmodel import select
+from app.db.models import User, UserAtProject
+from app.db.session import get_db
 
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+
+def add_admin_user():
+    with next(get_db()) as db:
+        new_user = User(
+            email="admin@example.com",
+            display_name="Admin User",
+            password="$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",  # Make sure to hash the password
+            is_admin=True,
+            is_email_verified=True
+        )
+        db.add(new_user)
+        db.commit()
+
+add_admin_user()
 
 # Model for Token with the access_token and the type of the token
 class Token(BaseModel):
@@ -22,22 +39,9 @@ class Token(BaseModel):
 
 # TokenData Model with username as string
 class TokenData(BaseModel):
-    username: str | None = None
-
-
-# Model for a User, includes username, email and a flag if the account is disabled
-class User(BaseModel):
-    user_id: int
-    username: str
     email: str | None = None
-    disabled: bool | None = None
-    is_admin: bool
 
 router = APIRouter(prefix="/security", tags=["Security"])
-
-# Model for a User in the Database with the hashed_password of the user
-class UserInDB(User):
-    hashed_password: str
 
 # Model for the en- and decryption with CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -45,60 +49,29 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Schema for the OAuth2 System
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/security/token")
 
-fake_users_db = {
-    "zoezp": {
-        "user_id": 1,
-        "username": "zoezp",
-        "full_name": "Zoe Zorn-Pauli",
-        "email": "zoe.zornpauli@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-        "is_admin": True, 
-    },
-    "BJ": {
-        "user_id": 2,
-        "username": "BJ",
-        "full_name": "Julian Bierbaum",
-        "email": "Julian.Bierbaum@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-        "is_admin": False, 
-    }
-}
-
-fake_user_project_role_db = {
-    "1_1": {  
-        "username": "zoezp",
-        "role": "product_owner",
-        "project_id": 1,
-    },
-    "2_1": {  
-        "username": "BJ",
-        "role": "developer",
-        "project_id": 1,
-    }
-}
-
 # gets user from database To-Do
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(user_email: str):
+    with get_db() as db:
+        user = db.exec(select(User).where(User.email == user_email))
+    return user
 
-def get_project_role(db, user_id, project_id):
-    key = f"{user_id}_{project_id}"  
-    if key in db:  
-        return db[key]["role"] 
-    else:
-        return None
+def get_project_role(user_email, project_id):
+    with get_db() as db:
+        user = db.exec(select(User).where(User.email == user_email)).first()
+        role = db.exec(select(UserAtProject).where(
+        (UserAtProject.project_id == project_id) & 
+        (UserAtProject.user_id == user.user_id)
+        ))
+
+    return role.role_id
 
 # Method to verify if a password and a hashed_password are the same, auto hashes the plain password using pwd_context 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 # checks if the user exists and is authenticated
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+def authenticate_user(email: str, password: str):
+    user = get_user(email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -129,14 +102,14 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         # gets the user name from the token
-        username: str = payload.get("sub")
-        if username is None:
+        email: str = payload.get("sub")
+        if email is None:
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(email=email)
     except InvalidTokenError:
         raise credentials_exception
     # Retrieve user from the db using the username
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user(email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
@@ -147,8 +120,8 @@ def is_admin(user: User = Depends(get_current_user)):
     return user
 
 def is_product_owner(project_id: int, user: User = Depends(get_current_user)):
-    project_role = get_project_role(fake_user_project_role_db, user.user_id, project_id)  # Retrieve project role
-    if project_role != "product_owner":
+    project_role = get_project_role(user.user_id, project_id)  # Retrieve project role
+    if project_role != 0:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return user
 
@@ -156,19 +129,19 @@ def is_product_owner(project_id: int, user: User = Depends(get_current_user)):
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
-    # checks the hashed passwords and the username with the db
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    # checks the hashed passwords and the email with the db
+    user = authenticate_user(form_data.email, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     # Set access token expiration time
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    # Create a new access token with user's username as the subject (sub)
+    # Create a new access token with user's email as the subject (sub)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.email}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
@@ -187,21 +160,14 @@ async def read_users_me(
 ):
     return current_user
 
-# Return a list of attributes from the current user
-@router.get("/users/me/items/")
-async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
-    return [{"item_id": "Foo", "owner": current_user.username}]
-
 @router.get("/users/check/admin")
 async def read_own_items(
     current_user: Annotated[User, Depends(is_admin)],
 ):
-    return [{"admin_state": current_user.is_admin, "user": current_user.username}]
+    return [{"admin_state": current_user.is_admin, "user": current_user.email}]
 
 @router.get("/users/check/product_owner")
 async def read_own_items(
     current_user: Annotated[User, Depends(is_product_owner)],
 ):
-    return [{"product_owner_state": True, "user": current_user.username}]
+    return [{"product_owner_state": True, "user": current_user.email}]
