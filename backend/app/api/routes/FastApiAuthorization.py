@@ -17,8 +17,6 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-add_admin_user()
-
 # Model for Token with the access_token and the type of the token
 class Token(BaseModel):
     access_token: str
