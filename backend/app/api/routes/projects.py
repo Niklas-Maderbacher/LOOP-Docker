@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from app.api.routes import FastApiAuthorization
+import app.crud.project as crud_project; 
+from app.api.deps import SessionDep
 
 from typing import List
 
@@ -27,3 +29,11 @@ async def get_all_projects():
 async def create_project(project: Project):
     project_list.append(project)
     return HTTPException(status_code=201, detail="Project created")
+
+# update user role
+@router.patch("/{project_id}/users/{user_id}/role")
+async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role_id: int):
+    if crud_project.update_user_role(session, project_id, user_id, new_role_id) == None:
+        return HTTPException(status_code=500)
+    else:
+        return HTTPException(status_code=200)
