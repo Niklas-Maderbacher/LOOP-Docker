@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.api.routes import FastApiAuthorization
-from app.api.deps import SessionDep
 
 from typing import List
 
