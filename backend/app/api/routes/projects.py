@@ -1,6 +1,3 @@
-from fastapi import APIRouter, HTTPException, Depends
-
-from typing import List
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
