@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from app.api.routes import FastApiAuthorization
+from app.crud import project
 
 from typing import List
 
@@ -27,3 +28,14 @@ async def get_all_projects():
 async def create_project(project: Project):
     project_list.append(project)
     return HTTPException(status_code=201, detail="Project created")
+
+# unarchives an archived project
+# requires admin account
+@router.post("/unarchive_project/{project_id}", dependencies=[Depends(FastApiAuthorization.is_admin)])
+async def create_project(project_id: int):
+    result = project.unarchive_project(project_id)
+
+    if result is None:
+        raise HTTPException(status_code=400, detail="Could not unarchive project")
+    
+    return HTTPException(status_code=201, detail=result)
