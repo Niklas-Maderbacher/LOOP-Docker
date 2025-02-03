@@ -5,6 +5,7 @@ from app.api.routes import FastApiAuthorization
 from app.api.deps import SessionDep
 from app.db.models import Project
 import app.crud.project as crud_project
+from app.api.schemas.project import ProjectCreate
 
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
@@ -21,7 +22,7 @@ async def get_all_projects(session: SessionDep):
     return list(crud_project.get_all_projects(session))
 
 @router.post("/", response_model=Project, dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
-async def create_project(session: SessionDep, project: Project):
+async def create_project(session: SessionDep, project: ProjectCreate):
     """adds a new project to the db based on the Project model, requires admin permissions
 
     Args:
