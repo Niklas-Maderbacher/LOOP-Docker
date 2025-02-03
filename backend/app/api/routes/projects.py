@@ -39,3 +39,4 @@ async def create_project(session: SessionDep, project: ProjectCreate):
     if not db_project:
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
+
