@@ -1,9 +1,14 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
-from app.api.routes import FastApiAuthorization
 from typing import List
 
+from app.api.routes import FastApiAuthorization
+from app.api.deps import SessionDep
+
 router = APIRouter(prefix="/users", tags=["Users"])
+
+
+# legacy
 
 # test model
 class User(BaseModel):
