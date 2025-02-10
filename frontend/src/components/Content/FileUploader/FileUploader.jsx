@@ -18,7 +18,7 @@ const FileUpload = () => {
     // Adds files to the state and immediately starts uploading them.
     const addFiles = (files) => {
         const newUploads = files.map((file) => ({
-            id: `${file.name}-${Date.now()}-${Math.random()}`,
+            id: `${file.name}-${Date.now()}`,
             file,
             progress: 0,
             status: "uploading",
