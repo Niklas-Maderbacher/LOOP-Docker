@@ -39,5 +39,20 @@ def get_image(image_name):
     return send_from_directory(image_dir, image_name)
 
 
+@app.route("/image/<image_name>", methods=["DELETE"])
+def del_image(image_name):
+    return_msg = ""
+    status_code = 0
+    try:
+        os.remove(os.path.join(image_dir, image_name))
+        return_msg = "Success \n"
+        status_code = 204
+    except Exception as e:
+        return_msg = e + "\n"
+        status_code = 400
+
+    return return_msg, status_code
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.getenv("IMAGE_SERVER_PORT")))
