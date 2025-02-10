@@ -19,7 +19,7 @@ docker compose -f docker-compose.yml up --build
 
 * Now you can open your browser and interact with these URLs:
 
-Frontend, built with Docker, with routes handled based on the path: http://localhost:5173
+Frontend, built with Docker, with routes handled based on the path: http://localhost:3000
 
 Backend, JSON based web API based on OpenAPI: http://localhost:8000
 
@@ -46,7 +46,7 @@ docker compose logs backend
 
 The Docker Compose files are configured so that each of the services is available in a different port in `localhost`.
 
-For the backend and frontend, they use the same port that would be used by their local development server, so, the backend is at `http://localhost:8000` and the frontend at `http://localhost:5173`.
+For the backend and frontend, they use the same port that would be used by their local development server, so, the backend is at `http://localhost:8000` and the frontend at `http://localhost:3000`.
 
 This way, you could turn off a Docker Compose service and start its local development service, and everything would keep working, because it all uses the same ports.
 
@@ -108,7 +108,7 @@ The production or staging URLs would use these same paths, but with your own dom
 
 Development URLs, for local development.
 
-Frontend: http://localhost:5173
+Frontend: http://localhost:3000
 
 Backend: http://localhost:8000
 
