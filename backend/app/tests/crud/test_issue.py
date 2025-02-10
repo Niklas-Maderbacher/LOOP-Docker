@@ -3,7 +3,7 @@ from app.db.models import Issue
 from app.crud.issue import update_story_point
 
 def test_update_story_point_existing_issue(db: Session) -> None:
-    issue = Issue(id=1, title="Test Issue", story_points=3)
+    issue = Issue(id=1, project_id=1, name="Test Issue", story_points=3)
     db.add(issue)
     db.commit()
     db.refresh(issue)
