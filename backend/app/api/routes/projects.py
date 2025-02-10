@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List
-
+from typing import Optional
+from datetime import datetime
 from app.api.routes import FastApiAuthorization
 from app.api.deps import SessionDep
 from app.db.models import Project
@@ -39,3 +40,22 @@ async def create_project(session: SessionDep, project: ProjectCreate):
     if not db_project:
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
+
+
+@router.put("/{project_id}/archive", response_model=Optional[Project], dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=200)
+async def archive_project(session: SessionDep, project_id: int):
+    """Archives a project by setting its archived_at field to the current date."""
+    db_project = session.query(Project).filter(Project.id == project_id).first()
+    
+    if not db_project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if not crud_project.is_not_archived(db_project):
+        raise HTTPException(status_code=400, detail="Project is already archived")
+
+    updated_project = crud_project.archive_project(session, project_id)
+    
+    if updated_project == "already_archived":
+        raise HTTPException(status_code=400, detail="Project is already archived")
+    
+    return updated_project
