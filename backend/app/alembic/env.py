@@ -2,11 +2,7 @@ import os
 from logging.config import fileConfig
 
 from alembic import context
-from pydantic_core import MultiHostUrl
-from sqlmodel import SQLModel
 from sqlalchemy import engine_from_config, pool
-
-from app.config.config import settings
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -22,7 +18,8 @@ fileConfig(config.config_file_name)
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from app.db.models import *  # noqa
+from app.db.models import SQLModel  # noqa
+from app.config.config import settings  # noqa
 
 target_metadata = SQLModel.metadata
 
