@@ -33,7 +33,7 @@ const FileUpload = () => {
         formData.append("files", fileItem.file);
 
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:8000/api/v1/file_upload/");
+        xhr.open("POST", "http://localhost:5000/image");
 
         xhr.upload.onprogress = (event) => {
             if (event.lengthComputable) {
@@ -50,9 +50,7 @@ const FileUpload = () => {
             if (xhr.status === 200) {
                 setUploads((prevUploads) =>
                     prevUploads.map((item) =>
-                        item.id === fileItem.id
-                            ? { ...item, status: "uploaded", progress: 100 }
-                            : item
+                        item.id === fileItem.id ? { ...item, status: "uploaded", progress: 100 } : item
                     )
                 );
             } else {
