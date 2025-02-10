@@ -100,6 +100,15 @@ Depending on your workflow, you could want to exclude it from Git, for example i
 
 One way to do it could be to add each environment variable to your CI/CD system, and updating the `docker-compose.yml` file to read that specific env var instead of reading the `.env` file.
 
+## Adminer
+
+Login credentials:
+
+- Server: **db!!!!** not localhost as stated in .env file. The server is mapped from localhost to db!!
+- Username: POSTGRES_USER located in .env file
+- Password: POSTGRES_PASSWORD located in .env file
+- Database: POSTGRES_DB located in .env file
+
 ## URLs
 
 The production or staging URLs would use these same paths, but with your own domain.
