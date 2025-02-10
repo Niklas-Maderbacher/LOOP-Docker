@@ -17,4 +17,3 @@ async def update_issue_story_points(session: SessionDep, issue_id: int, update_d
         raise HTTPException(status_code=204)
 
     return updated_issue
-
