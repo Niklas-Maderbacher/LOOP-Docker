@@ -10,6 +10,6 @@ DATABASE_URL = str(settings.SQLALCHEMY_DATABASE_URI)
 engine = create_engine(DATABASE_URL)
 
 # creating tables using SQLModel
-
+from app.db.models import *
 from sqlmodel import SQLModel
-
+SQLModel.metadata.create_all(engine)

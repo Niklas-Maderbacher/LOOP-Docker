@@ -11,14 +11,10 @@
 
 * Build the docker container:
 
-```bash
-docker compose -f docker-compose.yml build
-```
-
 * Start the local stack with Docker Compose:
 
 ```bash
-docker compose -f docker-compose.yml up
+docker compose -f docker-compose.yml up --build
 ```
 
 * Now you can open your browser and interact with these URLs:

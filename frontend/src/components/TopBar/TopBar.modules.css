@@ -1,0 +1,216 @@
+.top-bar {
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    padding: 0 16px;
+    height: 80px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    min-width: 480px;
+}
+
+.top-bar .logo {
+    font-size: 30px;
+    font-weight: bold;
+    font-style: none;
+    text-decoration: none;
+    color: white;
+}
+
+.top-bar a {
+    text-decoration: none;
+}
+
+.top-bar .search {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    margin: 0 16px;
+}
+
+.top-bar .search input {
+    width: 60%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.top-bar .search input:focus {
+    outline: none;
+    border: none;
+}
+
+.top-bar .navigation {
+    display: flex;
+    gap: 16px;
+}
+
+.top-bar .navigation a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.top-bar .navigation a:hover {
+    text-decoration: underline;
+}
+
+.top-bar .navigation a:focus {
+    color: coral;
+    text-decoration: underline;
+}
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+}
+
+.hamburger-menu span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+}
+
+.dropdown-navigation {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 16px;
+    background-color: coral;
+    padding: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    z-index: 1000;
+}
+
+.dropdown-navigation a {
+    display: block;
+    color: white;
+    text-decoration: none;
+    padding: 8px 0;
+    font-size: 14px;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 16px;
+    border-bottom: 1px solid hsl(0, 0%, 20%);
+    text-align: left;
+}
+
+th {
+    background-color: hsl(0, 0%, 20%);
+    font-weight: bold;
+}
+
+tr:hover {
+    background-color: hsl(0, 0%, 25%);
+}
+
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    background-color: coral;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: black;
+}
+
+.profile-modal {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    background-color: hsl(0, 0%, 20%);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    min-width: 150px;
+}
+
+.profile-modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-modal-content a {
+    padding: 10px;
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.profile-modal-content a:hover {
+    background-color: hsl(0, 0%, 30%);
+}
+
+@media (max-width: 768px) {
+    .top-bar .navigation {
+        display: none;
+    }
+
+    .hamburger-menu {
+        display: flex;
+    }
+}
+
+.top-bar .profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 30px;
+}
+
+.top-bar .profile a {
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.top-bar .profile .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    color: hsl(16, 100%, 66%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.top-bar .profile .name {
+    font-size: 14px;
+}

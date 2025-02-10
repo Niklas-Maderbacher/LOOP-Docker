@@ -1,7 +1,6 @@
 import uuid
 from typing import Any
-
 from sqlmodel import Session, select
+from app.api.deps import get_db
+from app.db.models import User, UserAtProject
 
-# from backend.app.security.security import get_password_hash, verify_password
-from backend.app.db.models import TemplateShowcase

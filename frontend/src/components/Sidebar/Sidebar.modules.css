@@ -1,0 +1,110 @@
+.sidebar {
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    width: 250px;
+    background-color: hsl(0, 0%, 13%);
+    height: 100vh;
+    position: fixed;
+    top: 80px;
+    left: 0;
+    padding: 16px 0;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+    transition: width 0.3s ease;
+}
+
+.sidebar.shrink {
+    width: 80px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar ul li {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    font-size: 16px;
+    color: hsl(0, 0%, 65%);
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.sidebar ul li:hover {
+    background-color: coral;
+    color: black;
+}
+
+.sidebar ul li:focus,
+.sidebar ul li:active {
+    background-color: coral;
+}
+
+.sidebar.shrink ul li .text {
+    display: none;
+}
+
+.sidebar.shrink ul li {
+    justify-content: center;
+}
+
+.sidebar #shrinkButton {
+  background-color: hsl(0, 0%, 13%);
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 30px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.3s ease;
+  margin: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.sidebar #shrinkButton.rotated {
+  transform: rotate(-90deg);
+}
+
+.sidebar.shrink ~ .content {
+  margin-left: 80px;
+}
+
+.sidebar.shrink ~ .projects {
+  margin-left: 80px;
+}
+
+.sidebar.shrink ~ #shrinkButton {
+  margin: 0;
+}
+
+.sidebar .icon {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-size: 1.25em;
+    color: hsl(0, 0%, 100%);
+}
+
+.sidebar .text {
+    font-size: 15px;
+}
+
+.sidebar ul li a {
+    display: block;
+    
+    text-decoration: none;
+    color: inherit;
+    background: none;
+    width: 200px;
+    height: 20px;
+    box-sizing: border-box;
+}
+

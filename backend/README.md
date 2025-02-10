@@ -127,6 +127,12 @@ As during local development your app directory is mounted as a volume inside the
 
 Make sure you create a "revision" of your models and that you "upgrade" your database with that revision every time you change them. As this is what will update the tables in your database. Otherwise, your application will have errors.
 
+* When running localy on UNIX like OS:
+
+```bash
+export PYTHONPATH=/home/Niklas/Documents/ITP/Mock4AHIT/Loop/LOOP-Docker/backend:$PYTHONPATH
+```
+
 * Start an interactive session in the backend container:
 
 ```console
@@ -138,7 +144,7 @@ $ docker compose exec backend bash
 * After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
 
 ```console
-$ alembic revision --autogenerate -m "Add column last_name to User model"
+$ alembic revision --autogenerate -m "my text"
 ```
 
 * Commit to the git repository the files generated in the alembic directory.
@@ -149,7 +155,7 @@ $ alembic revision --autogenerate -m "Add column last_name to User model"
 $ alembic upgrade head
 ```
 
-If you don't want to use migrations at all, uncomment the lines in the file at `./backend/app/core/db.py` that end in:
+If you don't want to use migrations at all, uncomment the lines in the file at `./backend/app/db/models.py` that end in:
 
 ```python
 SQLModel.metadata.create_all(engine)

@@ -1,0 +1,127 @@
+.projects {
+    margin-top: 50px;
+    margin-left: 250px;
+    padding: 16px;
+    background-color: hsl(0, 0%, 7%);
+    height: 100%;
+    color: white;
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-bottom: 70px;
+    transition: margin-left 0.3s ease, color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.add-project-btn {
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    padding: 10px 20px;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.add-project-btn:hover {
+    background-color: coral;
+    color: black;
+}
+
+.search {
+    width: 100%; /* Nimmt die volle Breite ein */
+    display: flex;
+    justify-content: left;
+    margin-top: 20px; /* Abstand nach oben */
+}
+
+.search input {
+    width: 60%;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.search input:focus {
+    outline: none;
+    border: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: hsl(0, 0%, 20%);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+}
+
+.modal-content input {
+    padding: 8px;
+    border: 1px solid hsl(0, 0%, 50%);
+    border-radius: 5px;
+    background: hsl(0, 0%, 15%);
+    color: white;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+.modal-buttons button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.modal-buttons button:first-child {
+    background-color: coral;
+    color: black;
+}
+
+.modal-buttons button:last-child {
+    background-color: gray;
+    color: white;
+}
+
+.modal-buttons button:hover {
+    opacity: 0.8;
+}
+
+
+@media (max-width: 768px) {
+    .projects {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .add-project-btn {
+        margin-top: 10px;
+        width: 100%;
+    }
+}
