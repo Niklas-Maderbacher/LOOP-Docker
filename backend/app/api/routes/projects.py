@@ -46,34 +46,21 @@ async def create_project(session: SessionDep, project: ProjectCreate):
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
 
+@router.put("/unarchive_project/{project_id}", dependencies=[Depends(FastApiAuthorization.is_admin)])
+async def create_project(session: SessionDep, project_id: int):
+    """unarchives a specific project in the database, requires admin permission
 
-# test model
-class Project(BaseModel):
-    name: str = Field(..., min_length=1, max_length=50)
-    start_date: str | None = None
-    end_date: str | None = None
-    archived_at: str | None = None
-    github_token: str | None = None
+    Args:
+        session (SessionDep): db session
+        project_id (int): the id of the project to unarchive
 
-project_list: List[Project] = []
+    Raises:
+        HTTPException: 400 on fail, 201 on success
 
-# returns all projects
-@router.get("/get_all_projects")
-async def get_all_projects():
-    return {"projects": project_list}
-
-# creates a new project using project model
-# requires admin account
-@router.post("/create_project", dependencies=[Depends(FastApiAuthorization.is_admin)])
-async def create_project(project: Project):
-    project_list.append(project)
-    return HTTPException(status_code=201, detail="Project created")
-
-# unarchives an archived project
-# requires admin account
-@router.post("/unarchive_project/{project_id}", dependencies=[Depends(FastApiAuthorization.is_admin)])
-async def create_project(project_id: int):
-    result = project.unarchive_project(project_id)
+    Returns:
+        HTTPException: status code 201 (success)
+    """
+    result = project.unarchive_project(session, project_id)
 
     if result is None:
         raise HTTPException(status_code=400, detail="Could not unarchive project")

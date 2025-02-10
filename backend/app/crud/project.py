@@ -38,28 +38,28 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
     db.refresh(db_project)
     return db_project
 
-from typing import Any
-from sqlmodel import Session, select
-from app.api.deps import get_db
-from app.db.models import User, Project
-from datetime import datetime
+def unarchive_project(db: Session, project_id: int):
+    """Unarchives a project in the database
 
-def unarchive_project(project_id):
-    with next(get_db()) as db:
-        # Get project based on the id
-        project = db.query(Project).filter(Project.id == project_id).first()
+    Args:
+        db (Session): Database session
+        project_id (int): Id of the project to unarchive
 
-        # If no project is found
-        if not project:
-            return None # Or raise custom exception
-        
-        # If project is not archived
-        if not project.archived_at:
-            return None # Or raise custom exception
-        
-        project.archived_at = None
-        db.add(project)
-        db.commit()
-        db.refresh(project)
+    Returns:
+        Project: The updated project instance
+        None: When no project is found or project is not archived
+    """
+    db_project = db.query(Project).filter(Project.id == project_id).first()
 
-        return {"message": "Project unarchived successfully", "project_id": project.id}
+    if not db_project:
+        return None
+    
+    if not db_project.archived_at:
+        return None
+    
+    db_project.archived_at = None
+    db.add(db_project)
+    db.commit()
+    db.refresh(db_project)
+
+    return db_project
