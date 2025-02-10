@@ -1,7 +1,9 @@
 services:
   db:
-    image: postgres:12
+    image: postgres
     restart: always
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
@@ -9,10 +11,11 @@ services:
       start_period: 30s
       timeout: 10s
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - app-db-data:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
+      - PG_DATA=/var/lib/postgresql/data
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
@@ -63,6 +66,16 @@ services:
         condition: service_completed_successfully
     env_file:
       - .env
+    develop:
+      watch:
+        - path: ./backend
+          action: sync
+          target: /app
+          ignore:
+            - ./backend/.venv
+            - .venv
+        - path: ./backend/pyproject.toml
+          action: rebuild
     environment:
       - FRONTEND_HOST=${FRONTEND_HOST?Variable not set}
       - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS}
@@ -91,5 +104,9 @@ services:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     build:
       context: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+        restart: true
 volumes:
-  postgres_data:
+  app-db-data:
