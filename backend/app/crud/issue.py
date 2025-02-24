@@ -1,6 +1,5 @@
 from app.db.models import Issue
-from sqlmodel import Session, select
-
+from sqlmodel import Session
 
 def create_issue(session: Session, user: Issue) -> Issue:
     issue_db = Issue(
@@ -31,6 +30,7 @@ def create_issue(session: Session, user: Issue) -> Issue:
     session.commit()
     session.refresh(issue_db)
 
+    return issue_db
 
 def get_issues(db: Session, skip: int = 0, limit: int = 50) -> list[Issue]:
 
@@ -40,7 +40,7 @@ def get_issues(db: Session, skip: int = 0, limit: int = 50) -> list[Issue]:
 def get_issue(session: Session, id: int) -> Issue:
     issue_db = session.query(Issue).filter(Issue.id == id).one()
 
-    issue = Issue(
+    issue_db = Issue(
         id=issue_db.id,
         id=issue_db.id,
         name=issue_db.name,
