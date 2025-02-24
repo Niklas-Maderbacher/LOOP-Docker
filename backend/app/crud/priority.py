@@ -2,7 +2,7 @@ from app.db.models import Priority
 from sqlmodel import Session
 
 
-def set_priority_update(session: Session, issue_id: int, new_priority: str):
+def update_priority(session: Session, issue_id: int, new_priority: str):
     
     statement = select(Priority).where(Priority.name == new_priority)
     priority = session.exec(statement).first()
