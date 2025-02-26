@@ -160,3 +160,5 @@ cython_debug/
 # image server
 file_server/attachments/*
 
+# uv
+uv.lock
