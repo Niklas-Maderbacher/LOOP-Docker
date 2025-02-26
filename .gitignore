@@ -157,5 +157,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# image server
+file_server/attachments/*
+
 # uv
 uv.lock
