@@ -97,16 +97,18 @@ services:
     build:
       context: ./backend
 
-  image-server:
+  file_server:
     restart: always
     build:
-      context: ./image-server
+      context: ./file_server
+    volumes:
+      - ./file_server/attachments:/file_server/attachments
     ports:
-      - ${IMAGE_SERVER_PORT}:${IMAGE_SERVER_PORT}
+      - ${FILE_SERVER_PORT}:${FILE_SERVER_PORT}
     env_file:
       - .env
     environment:
-      - IMAGE_SERVER_PORT=${IMAGE_SERVER_PORT}
+      - FILE_SERVER_PORT=${FILE_SERVER_PORT}
 
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
