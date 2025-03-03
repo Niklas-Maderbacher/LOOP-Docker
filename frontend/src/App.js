@@ -25,6 +25,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Content isSidebarShrunk={isSidebarShrunk} />}></Route>
           <Route path="/projects" element={<Projects isSidebarShrunk={isSidebarShrunk} />}></Route>
+          {/* Integrate Backlog(Add Issue Only)*/}
           <Route path="/backlog" element={<Backlog isSidebarShrunk={isSidebarShrunk}/>}></Route>
           <Route path="/tasks" element={<h1>In progress</h1>}></Route>
           <Route path="/reports" element={<h1>In progress</h1>}></Route>

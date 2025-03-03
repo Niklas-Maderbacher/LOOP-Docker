@@ -2,9 +2,11 @@ import './Backlog.modules.css';
 import React, { useState } from 'react';
 
 function Backlog() {
-    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
-    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    // State variables to control opening and closing of modals and to store new issue data
+    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
+    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
 
+    // Initializes state for the new issue
     const [newIssue, setNewIssue] = useState({ 
         issueType: "", 
         name: "", 
@@ -16,28 +18,31 @@ function Backlog() {
         story_points: "" 
     });
 
+    // Function to open the modal for selecting the issue type
     function handleOpenSelectIType() {
         setIsSelectITypeOpen(true);
     }
 
+    // Function to handle input field changes
     function handleInputChange(event) {
         const { name, value } = event.target;
         
         setNewIssue((prevIssue) => {
             let newValue = value;
     
-            // Story Points nur für story, epic, subtask
+            // Story Points field validation: only allows numbers
             if (name === "story_points") {
-                newValue = value.replace(/[^0-9]/g, ""); // Entfernt alle Nicht-Zahlen
+                newValue = value.replace(/[^0-9]/g, "");  // Removes non-numeric characters
                 if (newValue !== "" && parseInt(newValue) < 1) {
-                    newValue = "1"; // Setzt min. Wert auf 1
+                    newValue = "1"; // Sets minimum value to 1
                 }
             }
     
-            return { ...prevIssue, [name]: newValue };
+            return { ...prevIssue, [name]: newValue };  // Returns updated issue state
         });
     }
 
+    // Function to close the issue type selection modal and reset the form state
     function handleCloseSelectIType() {
         setIsSelectITypeOpen(false);
         setNewIssue({ 
@@ -52,15 +57,17 @@ function Backlog() {
         });
     }
 
+    // Function to handle the submission of the issue type selection
     function handleSubmitIssueType() {
         if (!newIssue.issueType) {
-            alert("Choose the type of your issue!");
+            alert("Choose the type of your issue!"); // Shows an alert if no issue type is selected
             return;
         }
         setIsSelectITypeOpen(false);
-        setIsIssueFormOpen(true);
+        setIsIssueFormOpen(true); // Opens the form to create the new issue
     }
 
+    // Function to close the issue creation form and reset the form state
     function handleCloseIssueForm() {
         setIsIssueFormOpen(false);
         setNewIssue({ 
@@ -75,13 +82,14 @@ function Backlog() {
         });
     }
 
+    // Function to handle the submission of the issue creation form
     function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
-            alert("Please fill in all required fields: name and description.");
+            alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
             return;
         }
-        setIsIssueFormOpen(false)
-        // Hier den API-Call einfügen
+        setIsIssueFormOpen(false);
+        // Add API call to create the issue here
         setNewIssue({ 
             issueType: "", 
             name: "", 
@@ -96,11 +104,12 @@ function Backlog() {
 
     return (
         <div className="Backlog">
+            {/* Button to open the issue type selection modal */}
             <button className="add-issue-btn" onClick={handleOpenSelectIType}>
                 Create Issue
             </button>
 
-            {/* Modal für die Auswahl des Issue-Typs */}
+            {/* Modal for selecting the issue type */}
             {isSelectITypeOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
@@ -125,13 +134,13 @@ function Backlog() {
                 </div>
             )}
 
-            {/* Modal für die Erstellung des Issues */}
+            {/* Modal for inputting issue details */}
             {isIssueFormOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Create new {newIssue.issueType}</h2>
                         
-                        {/* Name */}
+                        {/* Input for the issue name */}
                         <input 
                             type="text" 
                             name="name" 
@@ -140,7 +149,7 @@ function Backlog() {
                             onChange={handleInputChange} 
                         />
 
-                        {/* Kategorie */}
+                        {/* Dropdown for selecting the category */}
                         <select
                             className='issue-dropdown' 
                             name="category_id" 
@@ -148,11 +157,11 @@ function Backlog() {
                             onChange={handleInputChange}
                         >
                             <option value="">Category ↓</option>
-                            <option value="1">Kategorie A</option>
-                            <option value="2">Kategorie B</option>
+                            <option value="1">Category A</option>
+                            <option value="2">Category B</option>
                         </select>
 
-                        {/* Sprint */}
+                        {/* Dropdown for selecting the sprint */}
                         <select
                             className='issue-dropdown' 
                             name="sprint_id" 
@@ -164,7 +173,7 @@ function Backlog() {
                             <option value="2">Sprint 2</option>
                         </select>
 
-                        {/* Verantwortlicher */}
+                        {/* Dropdown for selecting the responsible person */}
                         <select
                             className='issue-dropdown' 
                             name="responsible_id" 
@@ -176,7 +185,7 @@ function Backlog() {
                             <option value="2">Anna</option>
                         </select>
 
-                        {/* Priorität */}
+                        {/* Dropdown for selecting the priority */}
                         <select
                             className='issue-dropdown' 
                             name="priority_id" 
@@ -189,7 +198,7 @@ function Backlog() {
                             <option value="3">High</option>
                         </select>
 
-                        {/* Beschreibung */}
+                        {/* Input for the issue description */}
                         <input 
                             type="text"
                             name="description" 
@@ -197,7 +206,8 @@ function Backlog() {
                             value={newIssue.description} 
                             onChange={handleInputChange} 
                         />
-                        {/* Parent-Issue nur anzeigen, wenn Subtask */}
+
+                        {/* Parent Issue dropdown shown only for Subtasks */}
                         {newIssue.issueType === "subtask" && (
                             <select
                                 className='issue-dropdown'
@@ -210,10 +220,11 @@ function Backlog() {
                                 <option value="2">Parent Issue 2</option>
                             </select>
                         )}
-                        {/* Story Points nur anzeigen, wenn nötig */}
+
+                        {/* Story Points field shown only for Epic or Subtask */}
                         {["epic", "subtask"].includes(newIssue.issueType) && (
                             <input 
-                                type="text"  // Textfeld, damit kein Zähler angezeigt wird
+                                type="text"  // Text input to prevent the number input spinner
                                 name="story_points" 
                                 placeholder="Story Points (optional)" 
                                 value={newIssue.story_points} 
