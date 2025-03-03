@@ -1,0 +1,52 @@
+import './Backlog.modules.css';
+import React, { useState } from 'react';
+
+function Priortiy_Dropdown() {
+    const [isPriorityDropdownOpen, setIsPriorityDropdownOpen] = useState(false);
+    const [newIssue, setNewIssue] = useState({ priority_id: "" });
+
+    function handleOpenPriorityDropdown() {
+        setIsPriorityDropdownOpen(true);
+    }
+
+    function handleClosePriorityDropdown() {
+        setIsPriorityDropdownOpen(false);
+    }
+
+    function handlePriorityChange(event) {
+        setNewIssue({ ...newIssue, priority_id: event.target.value });
+    }
+
+    return (
+        <div className="Backlog">
+            <button className="set-priority-btn" onClick={handleOpenPriorityDropdown}>
+                Set Priority
+            </button>
+
+            {isPriorityDropdownOpen && (
+                <div className="priority-modal">
+                    <div className="priority-modal-content">
+                        <h2>Select Priority</h2>
+                        <select
+                            className='priority-dropdown'
+                            name="priority_id"
+                            value={newIssue.priority_id}
+                            onChange={handlePriorityChange}
+                        >
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                        <div className="modal-buttons">
+                            <button onClick={handleClosePriorityDropdown}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
+
+export default Backlog;
+
+

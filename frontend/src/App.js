@@ -5,6 +5,7 @@ import TopBar from './components/TopBar/TopBar.jsx'
 import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Content from './components/Content/Content.jsx'
 import Projects from './components/Projects/Projects.jsx';
+import Priority_Dropdown from './components/Priority_Dropdown/Priority_Dropdown.jsx';
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
 
 
