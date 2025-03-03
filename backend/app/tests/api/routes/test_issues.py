@@ -22,7 +22,7 @@ def session_fixture(engine):
         yield session
 
 @pytest.fixture(name="client")
-def client_fixture(session):
+def client_fixture(session, test_issues):
     def get_session_override():
         return session
 
@@ -57,7 +57,7 @@ def test_issues_fixture(session):
 
 # API Tests
 class TestIssueApi:
-    def test_update_issue_success(self, client, session):
+    def test_update_issue_success(self, client, session, test_issues):
         # Test successful update via API
         response = client.patch(
             "/issues/2",
@@ -72,7 +72,7 @@ class TestIssueApi:
         updated_issue = session.query(Issue).filter(Issue.id == 2).first()
         assert updated_issue.story_points == 10
     
-    def test_update_issue_negative_points(self, client):
+    def test_update_issue_negative_points(self, client, test_issues):
         response = client.patch(
             "/issues/1",
             json={"new_story_point_value": -3}
@@ -81,7 +81,7 @@ class TestIssueApi:
         assert response.status_code == 400
         assert "Story points need to be positive integer" in response.json()["detail"]
     
-    def test_update_nonexistent_issue(self, client):
+    def test_update_nonexistent_issue(self, client, test_issues):
         response = client.patch(
             "/issues/999",
             json={"new_story_point_value": 5}
@@ -90,7 +90,7 @@ class TestIssueApi:
         assert response.status_code == 204
         assert response.content == b''  # Empty response for 204
     
-    def test_invalid_story_point_type(self, client):
+    def test_invalid_story_point_type(self, client, test_issues):
         # Test with non-integer story point
         response = client.patch(
             "/issues/1",

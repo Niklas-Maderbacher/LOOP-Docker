@@ -60,19 +60,19 @@ def test_issues_fixture(session):
 
 # CRUD Tests
 class TestIssueCrud:
-    def test_update_story_point_existing(self, session):
+    def test_update_story_point_existing(self, session, test_issues):
         # Test updating an existing issue
         updated = update_story_point(session, issue_id=1, updated_story_point=13)
         assert updated is not None
         assert updated.story_points == 13
         assert updated.name == "First Issue"
     
-    def test_update_story_point_nonexistent(self, session):
+    def test_update_story_point_nonexistent(self, session, test_issues):
         # Test updating a non-existent issue
         result = update_story_point(session, issue_id=999, updated_story_point=7)
         assert result is None
     
-    def test_update_story_point_exception(self, session, monkeypatch):
+    def test_update_story_point_exception(self, session, monkeypatch, test_issues):
         # Test exception handling by forcing an error
         def mock_query(*args, **kwargs):
             raise ValueError("Simulated database error")
