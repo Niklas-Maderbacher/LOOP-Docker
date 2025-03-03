@@ -1,6 +1,4 @@
-from typing import Any
-from sqlmodel import Session, select
-from app.api.deps import get_db
+from sqlmodel import Session
 from app.db.models import Issue
 
 # Updates the story points of an issue, returns None if the issue to be changed doesn't exist in the database
