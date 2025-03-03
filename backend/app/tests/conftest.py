@@ -1,43 +1,60 @@
 # /app/tests/conftest.py
-
-import pytest
-from sqlalchemy.orm import Session
-from app.api.deps import get_db
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel
+from sqlmodel import SQLModel
+from app.api.deps import get_db
+from app.api.routes.FastApiAuthorization import get_current_user
+from app.db.models import User
 from app.main import app
-from app.api.deps import SessionDep
-from test_db import get_test_engine, get_test_session
+from datetime import datetime
+
+# ✅ Use an in-memory SQLite database for testing
+SQLALCHEMY_DATABASE_URL = "sqlite:///test.db"  # ✅ Use a file-based DB (more stable)
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
 
 @pytest.fixture(scope="function")
-def db() -> Session:
-    db_session = next(get_db())  # Use your app's session
+def db():
+    """Creates a new database session and ensures tables exist."""
+    SQLModel.metadata.create_all(engine)  
+    session = TestingSessionLocal()
     try:
-        yield db_session
+        yield session  
     finally:
-        db_session.close()
+        session.rollback()
+        session.close()
+        SQLModel.metadata.drop_all(bind=engine)  
 
-# Create test engine and setup/teardown
-@pytest.fixture(name="engine")
-def engine_fixture():
-    engine = get_test_engine()
-    yield engine
-    SQLModel.metadata.drop_all(engine)
-
-@pytest.fixture(name="session")
-def session_fixture(engine):
-    with Session(engine) as session:
-        yield session
-
-@pytest.fixture(name="client")
-def client_fixture(session, db):
-    def get_session_override():
-        yield db
-
-    app.dependency_overrides = {
-        SessionDep: get_test_session,
-    }
+@pytest.fixture(scope="function")
+def client(db):
+    """Provides a FastAPI test client using the same session as the test."""
     
+    def override_get_db():
+        SQLModel.metadata.create_all(engine)
+        yield db  # ✅ Use the same session from the test fixture
+
+    app.dependency_overrides[get_db] = override_get_db
     return TestClient(app)
+
+
+@pytest.fixture
+def test_superuser(db):
+    """Creates a superuser in the test database."""
+    user = User(id=1, username="superuser", email="superuser@example.com", display_name="Super User", password="dSDDSADSA", created_at=datetime.now(), is_admin=True)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
+
+@pytest.fixture
+def client_with_superuser(client, test_superuser, db):
+    """Override `get_current_active_superuser` to return an admin user."""
     
-    app.dependency_overrides = {}
+    def override_get_current_user():
+        return db.merge(test_superuser)
+    
+    app.dependency_overrides[get_current_user] = override_get_current_user
+    return client
