@@ -1,8 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
 from app.crud.issue import update_story_point
 from app.api.schemas.issue import StoryPointUpdate 
 from app.api.deps import SessionDep
-
 
 router = APIRouter(prefix="/issues", tags=["Issues"])
 
@@ -13,7 +12,7 @@ async def update_issue_story_points(session: SessionDep, issue_id: int, update_d
 
     updated_issue = update_story_point(session, issue_id, update_data.new_story_point_value)
 
-    if not updated_issue:
-        raise HTTPException(status_code=204)
+    if updated_issue is None:
+        return Response(status_code=204)
 
     return updated_issue

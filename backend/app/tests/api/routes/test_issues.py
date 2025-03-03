@@ -1,39 +1,5 @@
-import pytest
-from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel
-
-from app.main import app
-from app.api.deps import SessionDep
 from app.db.models import Issue
-
-# Import the test configuration
-from test_db import get_test_engine, get_test_session
-
-# Create test engine and setup/teardown
-@pytest.fixture(name="engine")
-def engine_fixture():
-    engine = get_test_engine()
-    yield engine
-    SQLModel.metadata.drop_all(engine)
-
-@pytest.fixture(name="session")
-def session_fixture(engine):
-    with Session(engine) as session:
-        yield session
-
-@pytest.fixture(name="client")
-def client_fixture(session, test_issues):
-    def get_session_override():
-        return session
-
-    app.dependency_overrides = {
-        SessionDep: get_test_session,
-    }
-    
-    with TestClient(app) as client:
-        yield client
-    
-    app.dependency_overrides = {}
+import pytest
 
 # Test data fixtures
 @pytest.fixture(name="test_issues")
@@ -60,21 +26,20 @@ class TestIssueApi:
     def test_update_issue_success(self, client, session, test_issues):
         # Test successful update via API
         response = client.patch(
-            "/issues/2",
+            "/api/v1/issues/2",
             json={"new_story_point_value": 10}
         )
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["story_points"] == 10
         
-        # Verify database was updated
         updated_issue = session.query(Issue).filter(Issue.id == 2).first()
         assert updated_issue.story_points == 10
     
     def test_update_issue_negative_points(self, client, test_issues):
         response = client.patch(
-            "/issues/1",
+            "/api/v1/issues/1",
             json={"new_story_point_value": -3}
         )
         
@@ -83,7 +48,7 @@ class TestIssueApi:
     
     def test_update_nonexistent_issue(self, client, test_issues):
         response = client.patch(
-            "/issues/999",
+            "/api/v1/issues/999",
             json={"new_story_point_value": 5}
         )
         
@@ -93,7 +58,7 @@ class TestIssueApi:
     def test_invalid_story_point_type(self, client, test_issues):
         # Test with non-integer story point
         response = client.patch(
-            "/issues/1",
+            "/api/v1/issues/1",
             json={"new_story_point_value": "invalid"}
         )
         
@@ -101,6 +66,6 @@ class TestIssueApi:
     
     def test_missing_required_field(self, client):
         # Test with missing required field
-        response = client.patch("/issues/1", json={})
+        response = client.patch("/api/v1/issues/1", json={})
         
         assert response.status_code == 422

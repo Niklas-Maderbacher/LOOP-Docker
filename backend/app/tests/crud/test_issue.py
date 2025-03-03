@@ -1,42 +1,7 @@
 import pytest
-from sqlmodel import Session
 from app.db.models import Issue
 from app.crud.issue import update_story_point
-from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel
-
-from app.main import app
-from app.api.deps import SessionDep
 from app.db.models import Issue
-
-# Import the test configuration
-from test_db import get_test_engine, get_test_session
-
-# Create test engine and setup/teardown
-@pytest.fixture(name="engine")
-def engine_fixture():
-    engine = get_test_engine()
-    yield engine
-    SQLModel.metadata.drop_all(engine)
-
-@pytest.fixture(name="session")
-def session_fixture(engine):
-    with Session(engine) as session:
-        yield session
-
-@pytest.fixture(name="client")
-def client_fixture(session):
-    def get_session_override():
-        return session
-
-    app.dependency_overrides = {
-        SessionDep: get_test_session,
-    }
-    
-    with TestClient(app) as client:
-        yield client
-    
-    app.dependency_overrides = {}
 
 # Test data fixtures
 @pytest.fixture(name="test_issues")
