@@ -41,7 +41,9 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
 
 
 def update_user_role(db: Session, project_id: int, user_id: int, new_role_id: int):
-    """_summary_
+    """
+    updates a user's role within a project
+    checks whether the specified new role and user exist
 
     Args:
         db (Session): Database session
@@ -50,7 +52,7 @@ def update_user_role(db: Session, project_id: int, user_id: int, new_role_id: in
         new_role_id (int): Id of the new user role
 
     Returns:
-        useratproject: _description_
+        useratproject | none: returns the updated UserAtProject object if the update was successful, otherwise none
     """
     if not db.query(Role).filter(Role.id == new_role_id).first():
         return None
