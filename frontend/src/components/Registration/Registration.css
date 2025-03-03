@@ -1,0 +1,45 @@
+
+.registration-container {
+  font-family: "Chivo Mono", monospace, Arial, sans-serif;
+  background-color: hsl(0, 0%, 13%);
+  color: white;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.registration-container h2 {
+  text-align: center;
+}
+
+.registration-container input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.registration-container button {
+  width: 100%;
+  padding: 8px;
+  background-color: coral;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.registration-container button:hover {
+  background-color: hsl(16, 100%, 66%);
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+}
