@@ -6,12 +6,12 @@ from app.crud.project import unarchive_project
 
 # creates new archived project and testing to archive it 
 def test_unarchive_project_success(db: Session) -> None:
-    project = Project(id=1, name='Projekt1', archived_at=datetime(2025, 2, 10))
+    project = Project(id=999, name='Projekt1', archived_at=datetime(2025, 2, 10))
     db.add(project)
     db.commit()
     db.refresh(project)
 
-    updated_project = unarchive_project(db, project_id=1)
+    updated_project = unarchive_project(db, project_id=999)
 
     assert updated_project is not None
     assert updated_project.archived_at is None
@@ -24,7 +24,7 @@ def test_unarchive_project_not_found(db: Session) -> None:
 
 # creates unarchived project and tests to unarchive it 
 def test_unarchive_project_already_unarchived(db: Session) -> None:
-    project = Project(id=2, name='Projekt2', archived_at=None)
+    project = Project(id=99, name='Projekt2', archived_at=None)
     db.add(project)
     db.commit()
     db.refresh(project)
