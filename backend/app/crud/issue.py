@@ -4,9 +4,7 @@ from app.db.models import Issue
 def update_story_point(db: Session, issue_id: int, updated_story_point: int):
     try:
         issue = db.query(Issue).filter(Issue.id == issue_id).first()
-        
-        print(f"DEBUG: Found issue? {issue is not None}")
-        
+
         if not issue:  # Issue does not exist
             return None  
 
