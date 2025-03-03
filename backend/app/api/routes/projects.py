@@ -46,8 +46,8 @@ async def create_project(session: SessionDep, project: ProjectCreate):
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
 
-@router.put("/unarchive_project/{project_id}", dependencies=[Depends(FastApiAuthorization.is_admin)])
-async def create_project(session: SessionDep, project_id: int):
+@router.put("/unarchive-project/{project_id}", dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
+async def unarchive_project(session: SessionDep, project_id: int):
     """unarchives a specific project in the database, requires admin permission
 
     Args:
@@ -65,5 +65,5 @@ async def create_project(session: SessionDep, project_id: int):
     if result is None:
         raise HTTPException(status_code=400, detail="Could not unarchive project")
     
-    return HTTPException(status_code=201, detail=result)
+    return result
 
