@@ -1,95 +1,106 @@
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import MagicMock
-from fastapi import HTTPException
+from sqlmodel import Session, SQLModel
+
 from app.main import app
-from app.api.routes.issues import router
 from app.api.deps import SessionDep
 from app.db.models import Issue
 
-client = TestClient(app)
+# Import the test configuration
+from test_db import get_test_engine, get_test_session
 
-@pytest.fixture
-def mock_db_session():
-    return MagicMock()
+# Create test engine and setup/teardown
+@pytest.fixture(name="engine")
+def engine_fixture():
+    engine = get_test_engine()
+    yield engine
+    SQLModel.metadata.drop_all(engine)
 
-@pytest.fixture(autouse=True)
-def override_dependencies():
-    # Mock the database session
-    app.dependency_overrides[SessionDep] = MagicMock()
+@pytest.fixture(name="session")
+def session_fixture(engine):
+    with Session(engine) as session:
+        yield session
 
-    yield  # Run tests
+@pytest.fixture(name="client")
+def client_fixture(session):
+    def get_session_override():
+        return session
 
-    app.dependency_overrides = {}  # Cleanup after tests
-
-def mock_update_story_points(session, issue_id, new_story_point_value):
-    issue = session.query(Issue).filter(Issue.id == issue_id).first()
-    if not issue:
-        raise HTTPException(status_code=404, detail="Issue not found")
-    if new_story_point_value < 0:
-        raise HTTPException(status_code=400, detail="Story points must be a positive integer")
-    issue.story_points = new_story_point_value
-    session.commit()
-    session.refresh(issue)
-    return issue
-
-def test_update_story_points_success(mock_db_session, monkeypatch):
-    # Mock the update_story_points function
-    monkeypatch.setattr(router, "update_story_points", mock_update_story_points)
-    monkeypatch.setattr("app.api.deps.get_db", lambda: mock_db_session)
-
-    # Mock the database query to return a test issue
-    test_issue = Issue(id=1, project_id=1, name="Test Issue", story_points=3)
-    mock_db_session.query.return_value.filter.return_value.first.return_value = test_issue
-
-    # Make the PATCH request
-    response = client.patch(
-        "/api/v1/issues/1",
-        json={"new_story_point_value": 5}
-    )
-
-    # Assert the response
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "project_id": 1,
-        "name": "Test Issue",
-        "story_points": 5
+    app.dependency_overrides = {
+        SessionDep: get_test_session,
     }
+    
+    with TestClient(app) as client:
+        yield client
+    
+    app.dependency_overrides = {}
 
-def test_update_non_existing_issue(mock_db_session, monkeypatch):
-    # Mock the update_story_points function
-    monkeypatch.setattr(router, "update_story_points", mock_update_story_points)
-    monkeypatch.setattr("app.api.deps.get_db", lambda: mock_db_session)
+# Test data fixtures
+@pytest.fixture(name="test_issues")
+def test_issues_fixture(session):
+    # Create multiple test issues
+    issues = [
+        Issue(id=1, project_id=1, name="First Issue", story_points=3),
+        Issue(id=2, project_id=1, name="Second Issue", story_points=5),
+        Issue(id=3, project_id=2, name="Third Issue", story_points=8),
+    ]
+    
+    for issue in issues:
+        session.add(issue)
+    
+    session.commit()
+    
+    for issue in issues:
+        session.refresh(issue)
+    
+    return issues
 
-    # Mock the database query to return None (issue not found)
-    mock_db_session.query.return_value.filter.return_value.first.return_value = None
-
-    # Make the PATCH request
-    response = client.patch(
-        "/api/v1/issues/999",
-        json={"new_story_point_value": 5}
-    )
-
-    # Assert the response
-    assert response.status_code == 404
-    assert response.json() == {"detail": "Issue not found"}
-
-def test_negative_story_points(mock_db_session, monkeypatch):
-    # Mock the update_story_points function
-    monkeypatch.setattr(router, "update_story_points", mock_update_story_points)
-    monkeypatch.setattr("app.api.deps.get_db", lambda: mock_db_session)
-
-    # Mock the database query to return a test issue
-    test_issue = Issue(id=1, project_id=1, name="Test Issue", story_points=3)
-    mock_db_session.query.return_value.filter.return_value.first.return_value = test_issue
-
-    # Make the PATCH request with negative story points
-    response = client.patch(
-        "/api/v1/issues/1",
-        json={"new_story_point_value": -5}
-    )
-
-    # Assert the response
-    assert response.status_code == 400
-    assert response.json() == {"detail": "Story points must be a positive integer"}
+# API Tests
+class TestIssueApi:
+    def test_update_issue_success(self, client, session):
+        # Test successful update via API
+        response = client.patch(
+            "/issues/2",
+            json={"new_story_point_value": 10}
+        )
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert data["story_points"] == 10
+        
+        # Verify database was updated
+        updated_issue = session.query(Issue).filter(Issue.id == 2).first()
+        assert updated_issue.story_points == 10
+    
+    def test_update_issue_negative_points(self, client):
+        response = client.patch(
+            "/issues/1",
+            json={"new_story_point_value": -3}
+        )
+        
+        assert response.status_code == 400
+        assert "Story points need to be positive integer" in response.json()["detail"]
+    
+    def test_update_nonexistent_issue(self, client):
+        response = client.patch(
+            "/issues/999",
+            json={"new_story_point_value": 5}
+        )
+        
+        assert response.status_code == 204
+        assert response.content == b''  # Empty response for 204
+    
+    def test_invalid_story_point_type(self, client):
+        # Test with non-integer story point
+        response = client.patch(
+            "/issues/1",
+            json={"new_story_point_value": "invalid"}
+        )
+        
+        assert response.status_code == 422  # Validation error
+    
+    def test_missing_required_field(self, client):
+        # Test with missing required field
+        response = client.patch("/issues/1", json={})
+        
+        assert response.status_code == 422
