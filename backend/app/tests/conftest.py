@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel
 from app.main import app
 from app.api.deps import SessionDep
-from app.db.models import Issue
+from test_db import get_test_engine, get_test_session
 
 @pytest.fixture(scope="function")
 def db() -> Session:
@@ -16,10 +16,6 @@ def db() -> Session:
         yield db_session
     finally:
         db_session.close()
-
-
-# Import the test configuration
-from test_db import get_test_engine, get_test_session
 
 # Create test engine and setup/teardown
 @pytest.fixture(name="engine")

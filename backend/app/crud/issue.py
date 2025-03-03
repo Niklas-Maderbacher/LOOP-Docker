@@ -10,6 +10,7 @@ def update_story_point(db: Session, issue_id: int, updated_story_point: int):
 
         issue.story_points = updated_story_point
         db.commit()
+        print(f"Updated issue {issue_id}: {issue.story_points}")
         db.refresh(issue)
         
         return issue
