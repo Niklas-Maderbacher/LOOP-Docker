@@ -81,7 +81,6 @@ function Backlog() {
             return;
         }
         setIsIssueFormOpen(false)
-        console.log("Issue wird gesendet:", newIssue);
         // Hier den API-Call einfügen
         setNewIssue({ 
             issueType: "", 
@@ -198,7 +197,19 @@ function Backlog() {
                             value={newIssue.description} 
                             onChange={handleInputChange} 
                         />
-
+                        {/* Parent-Issue nur anzeigen, wenn Subtask */}
+                        {newIssue.issueType === "subtask" && (
+                            <select
+                                className='issue-dropdown'
+                                name="parent_issue_id"
+                                value={newIssue.parent_issue_id}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Parent Issue</option>
+                                <option value="1">Parent Issue 1</option>
+                                <option value="2">Parent Issue 2</option>
+                            </select>
+                        )}
                         {/* Story Points nur anzeigen, wenn nötig */}
                         {["epic", "subtask"].includes(newIssue.issueType) && (
                             <input 
