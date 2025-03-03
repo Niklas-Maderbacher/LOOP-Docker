@@ -29,7 +29,27 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+.archive-project-btn {
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    padding: 10px 10px;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-top: 5px;
+}
+
 .add-project-btn:hover {
+    background-color: coral;
+    color: black;
+}
+
+.archive-project-btn:hover {
     background-color: coral;
     color: black;
 }
