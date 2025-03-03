@@ -19,8 +19,14 @@ function App() {
   return (
     <div>
       <BrowserRouter>
+        <TopBar />
+          <Sidebar isSidebarShrunk={isSidebarShrunk} toggleSidebar={toggleSidebar} />
         <Routes>
-          <Route path="/" element={<Registration />} />
+          <Route path="/" element={<Content isSidebarShrunk={isSidebarShrunk} />}></Route> 
+          <Route path="/projects" element={<Projects isSidebarShrunk={isSidebarShrunk} />}></Route>
+          <Route path="/backlog" element={<h1>In progress</h1>}></Route>
+          <Route path="/tasks" element={<h1>In progress</h1>}></Route>
+          <Route path="/reports" element={<h1>In progress</h1>}></Route> 
         </Routes>
       </BrowserRouter>
     </div>
