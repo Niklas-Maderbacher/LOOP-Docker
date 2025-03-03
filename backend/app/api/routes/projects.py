@@ -40,9 +40,23 @@ async def create_project(session: SessionDep, project: ProjectCreate):
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
 
-# update user role
 @router.put("/{project_id}/users/{user_id}/role", status_code=200)
 async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role_id: int):
+    """
+    updates user role
+
+    Args:
+        session (SessionDep): db session
+        project_id (int): Id of the project
+        user_id (int): Id of the user
+        new_role_id (int): Id of the new user role
+
+    Raises:
+        HTTPException: 400 on fail
+
+    Returns:
+        UserAtProject: updated UserAtProject object
+    """
     project_user_role = crud_project.update_user_role(session, project_id, user_id, new_role_id)
     if not project_user_role:
         raise HTTPException(status_code=400, detail="can not update user role")
