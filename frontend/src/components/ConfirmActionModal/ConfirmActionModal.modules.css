@@ -1,0 +1,32 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background: hsl(0, 0, 25);
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+button {
+    margin: 10px;
+    height: 30px;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+}
+
+button:focus
+button:active {
+    outline: none;
+}

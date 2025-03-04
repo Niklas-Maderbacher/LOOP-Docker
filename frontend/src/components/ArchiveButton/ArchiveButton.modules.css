@@ -1,0 +1,18 @@
+.archive-button {
+    background-color: transparent;
+    border: none;
+    outline: none;
+}
+
+.archive-button:focus
+.archive-button:active {
+    outline: none;
+}
+
+.archive-unarchive-image {
+    fill: white;
+}
+
+.archive-button:hover .archive-unarchive-image {
+    transform: scale(1.2);
+}

@@ -1,15 +1,25 @@
 import './Projects.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import ArchiveButton from '../ArchiveButton/ArchiveButton.jsx';
+import axios from 'axios';
 
 function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [projects, setProjects] = useState([
-        { name: "Project Alpha", key: "ALPHA", type: "Software", lead: "Alice" },
-        { name: "Project Beta", key: "BETA", type: "Marketing", lead: "Bob" },
-        { name: "Project Gamma", key: "GAMMA", type: "Design", lead: "Charlie" }
-    ]);
-
+    const [projects, setProjects] = useState([]);
     const [newProject, setNewProject] = useState({ name: "", key: "", type: "", lead: "", description: "" });
+
+    useEffect(() => {
+        async function fetchProjects() {
+            try {
+                const response = await axios.get('http://localhost:8000/api/v1/projects/'); // Adjust with your API endpoint
+                setProjects(response.data);
+            } catch (error) {
+                console.error("There was an error fetching the projects!", error);
+            }
+        }
+    
+        fetchProjects();
+    }, []);    
 
     function handleOpenModal() {
         setIsModalOpen(true);
@@ -47,17 +57,21 @@ function Projects() {
                             <th>Key</th>
                             <th>Type</th>
                             <th>Lead</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {projects.map((project, index) => (
-                            <tr key={index}>
-                                <td>{project.name}</td>
-                                <td>{project.key}</td>
-                                <td>{project.type}</td>
-                                <td>{project.lead}</td>
-                            </tr>
-                        ))}
+                    {projects.map((project) => (
+                        <tr key={project.id}>
+                            <td>{project.name}</td>
+                            <td>{project.key}</td>
+                            <td>{project.type}</td>
+                            <td>{project.lead}</td>
+                            <td>
+                                <ArchiveButton projectName={project.name} actionType={"archive"} />
+                            </td>
+                        </tr>
+                    ))}
                     </tbody>
                 </table>
             </div>
