@@ -32,4 +32,3 @@ def test_unarchive_project_already_unarchived(db: Session) -> None:
     updated_project = unarchive_project(db, project_id=2)
 
     assert updated_project is None
-
