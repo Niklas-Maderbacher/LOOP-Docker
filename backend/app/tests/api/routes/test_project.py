@@ -33,12 +33,3 @@ def test_unarchive_project_without_permission(db:SessionDep, client):
 
     assert response.status_code == 403
     assert response.json() == {"detail": "Not enough permissions"}
-
-def test_user_role_success(db:Session, client, project):
-    return
-
-def test_user_role_withoutPermission(db:Session, client):
-    return
-
-def test_user_wrongUserID(db:Session, client):
-    return
