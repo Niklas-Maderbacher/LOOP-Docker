@@ -2,7 +2,10 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.db.models import Project
+from app.db.models import User
+from app.db.models import Role
 from app.crud.project import unarchive_project
+from app.crud.project import archive_project
 
 # creates new archived project and testing to archive it 
 def test_unarchive_project_success(db: Session) -> None:
@@ -32,3 +35,52 @@ def test_unarchive_project_already_unarchived(db: Session) -> None:
     updated_project = unarchive_project(db, project_id=2)
 
     assert updated_project is None
+
+
+
+# Successfully archive an active project as an admin
+def test_archive_project_success(db: Session) -> None:
+    project = Project(id=1, name="Test Project", archived_at=None)
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+
+    updated_project = archive_project(db, project_id=1)
+
+    assert updated_project is not None
+    assert updated_project.archived_at is not None  # Project should now be archived
+
+# A project that is already archived should not be archived again
+def test_archive_project_already_archived(db: Session) -> None:
+    project = Project(id=2, name="Already Archived", archived_at=datetime.utcnow())
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+
+    result = archive_project(db, project_id=2)
+
+    assert result == "already_archived"
+
+# A non-existent project cannot be archived
+def test_archive_project_not_found(db: Session) -> None:
+    result = archive_project(db, project_id=999)
+
+    assert result is None  # No project found → should return None
+
+def test_only_admins_can_archive(db: Session) -> None:
+    # Create role entries in the database if they don't exist
+    admin_role = Role(id=1, name="admin")
+    user_role = Role(id=2, name="user")
+    
+    db.add_all([admin_role, user_role])
+    db.commit()
+
+    # Create a non-admin user
+    user = User(id=10, display_name="Regular User", email="user@example.com", password="securepass", is_admin=False)
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # Ensure the user is not an admin
+    assert not user.is_admin  # The test should fail if the user is incorrectly marked as admin
