@@ -34,3 +34,23 @@ def test_unarchive_project_without_permission(db:SessionDep, client):
     assert response.status_code == 403
     assert response.json() == {"detail": "Not enough permissions"}
 
+def test_archive_project_with_permission(db: SessionDep, client_with_superuser):
+    db_project = Project(name="Test", start_date="2025-02-02", archived_at=None)
+    db.add(db_project)
+    db.commit()
+    db.refresh(db_project)
+
+    response = client_with_superuser.put(f"/api/v1/projects/{db_project.id}/archive", headers={"Authorization": "Bearer test_token"})
+
+    assert response.status_code == 200
+
+def test_archive_project_without_permission(db: SessionDep, client):
+    db_project = Project(name="Test", start_date="2025-02-02", archived_at=None)
+    db.add(db_project)
+    db.commit()
+    db.refresh(db_project)
+
+    response = client.put(f"/api/v1/projects/{db_project.id}/archive", headers={"Authorization": "Bearer test_token"})
+
+    assert response.status_code == 403
+    assert response.json() == {"detail": "Not enough permissions"}
