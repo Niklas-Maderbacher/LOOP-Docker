@@ -44,6 +44,7 @@ def test_archive_project_1(db: Session):
 
     assert archived_project is not None
 
+# creates an archived project
 def test_archive_project_2(db: Session):
     project = Project(id=4, name='Projekt4', archived_at=datetime(2025, 2, 10))
     db.add(project)
@@ -54,6 +55,7 @@ def test_archive_project_2(db: Session):
 
     assert archived_project is "already_archived"
 
+# creates a project, check if it's archived
 def test_is_not_archived_1(db: Session):
     project = Project(id=5, name='Projekt5', archived_at=None)
     db.add(project)
@@ -64,6 +66,7 @@ def test_is_not_archived_1(db: Session):
 
     assert checked_project is True
 
+# creates an archived project, check if it's archived
 def test_is_not_archived_2(db: Session):
     project = Project(id=6, name='Projekt6', archived_at=datetime(2025, 2, 10))
     db.add(project)
