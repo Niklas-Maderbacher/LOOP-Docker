@@ -15,7 +15,6 @@ api_router.include_router(health_check.router)
 api_router.include_router(projects.router)
 api_router.include_router(issue.router)
 api_router.include_router(FastApiAuthorization.router)
-api_router.include_router(issues.router)
 # add more routers here:
 # api_router.include_router(IMPORTED_ROUTER.router)
 
