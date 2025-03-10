@@ -12,6 +12,8 @@ from app.db.models import Project
 import app.crud.project as crud_project
 from app.api.schemas.project import ProjectCreate
 
+from app.enums.role import Role
+
 router = APIRouter(prefix="/projects", tags=["Projects"])
 
 
@@ -69,8 +71,8 @@ async def unarchive_project(session: SessionDep, project_id: int):
     return result
 
 
-@router.put("/{project_id}/users/{user_id}/role", status_code=200)
-async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role_id: int):
+@router.put("/{project_id}/users/{user_id}/role", dependencies=[Depends(FastApiAuthorization.is_product_owner)], status_code=200)
+async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role: Role):
     """
     updates user role
 
@@ -86,7 +88,7 @@ async def update_user_role(session: SessionDep, project_id: int, user_id: int, n
     Returns:
         UserAtProject: updated UserAtProject object
     """
-    project_user_role = crud_project.update_user_role(session, project_id, user_id, new_role_id)
+    project_user_role = crud_project.update_user_role(session, project_id, user_id, new_role)
     if not project_user_role:
         raise HTTPException(status_code=400, detail="can not update user role")
     return project_user_role
