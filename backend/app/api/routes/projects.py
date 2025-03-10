@@ -91,7 +91,7 @@ async def update_user_role(session: SessionDep, project_id: int, user_id: int, n
         raise HTTPException(status_code=400, detail="can not update user role")
     return project_user_role
 
-@router.put("/{project_id}/archive", response_model=Optional[Project], dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=200)
+@router.put("/archive-project/{project_id}", response_model=Optional[Project], dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
 async def archive_project(session: SessionDep, project_id: int):
     """Archives a project by setting its archived_at field to the current date."""
     db_project = session.query(Project).filter(Project.id == project_id).first()

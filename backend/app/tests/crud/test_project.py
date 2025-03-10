@@ -76,3 +76,34 @@ def test_is_not_archived_2(db: Session):
     checked_project = is_not_archived(project)
 
     assert checked_project is False
+
+# creates new project and testing to archive it 
+def test_archive_project_success(db: Session) -> None:
+    project = Project(id=999, name='Projekt1')
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+
+    updated_project = archive_project(db, project_id=999)
+
+    assert updated_project is not None
+    assert updated_project.archived_at is not None
+
+
+# tests to archive project which doesn't exist 
+def test_archive_project_not_found(db: Session) -> None:
+    updated_project = unarchive_project(db, project_id=999)
+
+    assert updated_project is None
+
+# creates archived project and tests to archive it 
+def test_archive_project_already_archived(db: Session) -> None:
+    project = Project(id=99, name='Projekt2', archived_at=datetime(2025, 2, 10))
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+
+    updated_project = archive_project(db, project_id=2)
+
+    assert updated_project is None
+
