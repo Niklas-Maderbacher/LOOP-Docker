@@ -1,20 +1,20 @@
-from typing import Any
-from sqlmodel import Session, select
-from app.api.deps import get_db
+from sqlmodel import Session
 from app.db.models import Issue
 
-# Updates the story points of an issue, returns None if the issue to be changed doesn't exist in the database
-def update_story_point(db: Session, issue_id:int, updated_story_point:int):
+def update_story_point(db: Session, issue_id: int, updated_story_point: int):
     try:
         issue = db.query(Issue).filter(Issue.id == issue_id).first()
 
+        if not issue:  # Issue does not exist
+            return None  
+
         issue.story_points = updated_story_point
-
         db.commit()
+        print(f"Updated issue {issue_id}: {issue.story_points}")
         db.refresh(issue)
-
+        
         return issue
 
     except Exception as e:
         db.rollback()
-        return {"error": f"An error occurred: {str(e)}"}, 500   
+        return {"error": f"An error occurred: {str(e)}"}, 500

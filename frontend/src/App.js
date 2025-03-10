@@ -6,6 +6,7 @@ import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Content from './components/Content/Content.jsx'
 import Projects from './components/Projects/Projects.jsx';
 import Registration from './components/Registration/Registration.jsx';
+import LoginPage from './components/LoginPage/LoginPage.jsx'
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
 
 
@@ -19,8 +20,15 @@ function App() {
   return (
     <div>
       <BrowserRouter>
+        <TopBar />
+          <Sidebar isSidebarShrunk={isSidebarShrunk} toggleSidebar={toggleSidebar} />
         <Routes>
-          <Route path="/" element={<Registration />} />
+          <Route path="/" element={<Content isSidebarShrunk={isSidebarShrunk} />}></Route> 
+          <Route path="/projects" element={<Projects isSidebarShrunk={isSidebarShrunk} />}></Route>
+          <Route path="/backlog" element={<h1>In progress</h1>}></Route>
+          <Route path="/tasks" element={<h1>In progress</h1>}></Route>
+          <Route path="/reports" element={<h1>In progress</h1>}></Route>
+          <Route path="/login" element={<LoginPage></LoginPage>}></Route>
         </Routes>
       </BrowserRouter>
     </div>
