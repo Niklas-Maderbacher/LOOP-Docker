@@ -97,6 +97,19 @@ services:
     build:
       context: ./backend
 
+  file_server:
+    restart: always
+    build:
+      context: ./file_server
+    volumes:
+      - ./file_server/attachments:/file_server/attachments
+    ports:
+      - ${FILE_SERVER_PORT}:${FILE_SERVER_PORT}
+    env_file:
+      - .env
+    environment:
+      - FILE_SERVER_PORT=${FILE_SERVER_PORT}
+
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
     restart: always
@@ -108,5 +121,6 @@ services:
       backend:
         condition: service_healthy
         restart: true
+
 volumes:
   app-db-data:
