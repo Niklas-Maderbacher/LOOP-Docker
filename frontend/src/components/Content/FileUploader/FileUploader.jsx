@@ -10,7 +10,7 @@ export const CardContent = ({ children, className = "" }) => {
     return <div className={`card-content ${className}`}>{children}</div>;
 };
 
-const FileUpload = ({ apiEndpoint = "http://172.31.180.49:5000/dump", maxFileSize = 50 }) => {
+const FileUpload = ({ apiEndpoint = "http://172.31.180.49:5000/dump", maxFileSize = 100 }) => {
     // Each upload is an object with a unique id, the file itself, progress, status, and error message.
     // status: 'pending' | 'uploading' | 'uploaded' | 'error' | 'invalid'
     const [uploads, setUploads] = useState([]);
@@ -78,10 +78,12 @@ const FileUpload = ({ apiEndpoint = "http://172.31.180.49:5000/dump", maxFileSiz
             }
 
             const formData = new FormData();
-            formData.append("files", fileItem.file);
+            formData.append("file", fileItem.file);  // Changed key name to "file"
+            formData.append("project_id", 10);       // Add project_id
+            formData.append("issue_id", 10);         // Add issue_id
 
             const xhr = new XMLHttpRequest();
-            
+
             // Store the xhr reference for cleanup
             activeXhrRefs.current[fileItem.id] = xhr;
             
