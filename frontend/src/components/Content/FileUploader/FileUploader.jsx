@@ -10,7 +10,7 @@ export const CardContent = ({ children, className = "" }) => {
     return <div className={`card-content ${className}`}>{children}</div>;
 };
 
-const FileUpload = ({ apiEndpoint = "http://localhost:5000/image", maxFileSize = 50 }) => {
+const FileUpload = ({ apiEndpoint = "http://172.31.180.49:5000/dump", maxFileSize = 50 }) => {
     // Each upload is an object with a unique id, the file itself, progress, status, and error message.
     // status: 'pending' | 'uploading' | 'uploaded' | 'error' | 'invalid'
     const [uploads, setUploads] = useState([]);
