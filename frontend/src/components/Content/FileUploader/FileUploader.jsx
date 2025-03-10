@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { UploadCloud, X } from "lucide-react";
+import { UploadCloud, X, Send } from "lucide-react";
 import './FileUploader.modules.css';
 
 export const Card = ({ children, className = "" }) => {
@@ -12,65 +12,98 @@ export const CardContent = ({ children, className = "" }) => {
 
 const FileUpload = () => {
     // Each upload is an object with a unique id, the file itself, progress, and status.
-    // status: 'uploading' | 'uploaded' | 'error'
+    // status: 'pending' | 'uploading' | 'uploaded' | 'error'
     const [uploads, setUploads] = useState([]);
+    const [isUploading, setIsUploading] = useState(false);
 
-    // Adds files to the state and immediately starts uploading them.
     const addFiles = (files) => {
         const newUploads = files.map((file) => ({
             id: `${file.name}-${Date.now()}`,
             file,
             progress: 0,
-            status: "uploading",
+            status: "pending",
         }));
         setUploads((prev) => [...prev, ...newUploads]);
-        newUploads.forEach(uploadFile);
     };
 
     // Uses XMLHttpRequest to upload a single file and update its progress.
     const uploadFile = (fileItem) => {
-        const formData = new FormData();
-        formData.append("files", fileItem.file);
+        return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append("files", fileItem.file);
 
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://localhost:5000/image");
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://localhost:5000/image");
 
-        xhr.upload.onprogress = (event) => {
-            if (event.lengthComputable) {
-                const percent = Math.round((event.loaded / event.total) * 100);
-                setUploads((prevUploads) =>
-                    prevUploads.map((item) =>
-                        item.id === fileItem.id ? { ...item, progress: percent } : item
-                    )
-                );
-            }
-        };
+            xhr.upload.onprogress = (event) => {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    setUploads((prevUploads) =>
+                        prevUploads.map((item) =>
+                            item.id === fileItem.id ? { ...item, progress: percent } : item
+                        )
+                    );
+                }
+            };
 
-        xhr.onload = () => {
-            if (xhr.status === 200) {
-                setUploads((prevUploads) =>
-                    prevUploads.map((item) =>
-                        item.id === fileItem.id ? { ...item, status: "uploaded", progress: 100 } : item
-                    )
-                );
-            } else {
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    setUploads((prevUploads) =>
+                        prevUploads.map((item) =>
+                            item.id === fileItem.id ? { ...item, status: "uploaded", progress: 100 } : item
+                        )
+                    );
+                    resolve();
+                } else {
+                    setUploads((prevUploads) =>
+                        prevUploads.map((item) =>
+                            item.id === fileItem.id ? { ...item, status: "error" } : item
+                        )
+                    );
+                    reject(new Error(`Upload failed with status ${xhr.status}`));
+                }
+            };
+
+            xhr.onerror = () => {
                 setUploads((prevUploads) =>
                     prevUploads.map((item) =>
                         item.id === fileItem.id ? { ...item, status: "error" } : item
                     )
                 );
-            }
-        };
+                reject(new Error("Network error occurred"));
+            };
 
-        xhr.onerror = () => {
-            setUploads((prevUploads) =>
-                prevUploads.map((item) =>
-                    item.id === fileItem.id ? { ...item, status: "error" } : item
-                )
-            );
-        };
+            xhr.send(formData);
+        });
+    };
 
-        xhr.send(formData);
+    // Triggered when confirm button is clicked
+    const handleConfirmUpload = async () => {
+        const pendingUploads = uploads.filter(item => item.status === "pending");
+        
+        if (pendingUploads.length === 0) return;
+
+        setIsUploading(true);
+
+        // Mark all pending files as uploading
+        setUploads(prevUploads =>
+            prevUploads.map(item =>
+                item.status === "pending" ? { ...item, status: "uploading" } : item
+            )
+        );
+
+        // Upload each file
+        const uploadPromises = pendingUploads.map(fileItem => {
+            return uploadFile(fileItem);
+        });
+
+        try {
+            await Promise.all(uploadPromises);
+        } catch (error) {
+            console.error("Some uploads failed:", error);
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     // Called when files are selected using the file input.
@@ -96,6 +129,9 @@ const FileUpload = () => {
             prevUploads.filter((fileItem) => fileItem.id !== id)
         );
     };
+
+    // Check if there are any pending files to upload
+    const hasPendingFiles = uploads.some(item => item.status === "pending");
 
     return (
         <Card>
@@ -125,9 +161,24 @@ const FileUpload = () => {
                             {item.status === "error" && (
                                 <span className="error-msg">Upload failed</span>
                             )}
+                            {item.status === "pending" && (
+                                <span className="pending-msg">Ready to upload</span>
+                            )}
                         </div>
                     ))}
                 </div>
+                
+                {/* Confirm button */}
+                {hasPendingFiles && (
+                    <button 
+                        onClick={handleConfirmUpload} 
+                        disabled={isUploading} 
+                        className="confirm-upload-btn"
+                    >
+                        <Send size={16} />
+                        <span>{isUploading ? "Uploading..." : "Confirm Upload"}</span>
+                    </button>
+                )}
             </CardContent>
         </Card>
     );
