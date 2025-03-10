@@ -1,0 +1,12 @@
+.content {
+    margin-top: 50px;
+    margin-left: 250px;
+    padding: 16px;
+    background-color: hsl(0, 0%, 7%);
+    height: 100%;
+    color: white;
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-bottom: 70px;
+    transition: margin-left 0.3s ease, color 0.3s ease;
+}

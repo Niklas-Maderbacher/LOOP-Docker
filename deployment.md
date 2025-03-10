@@ -19,7 +19,7 @@ docker compose -f docker-compose.yml up --build
 
 * Now you can open your browser and interact with these URLs:
 
-Frontend, built with Docker, with routes handled based on the path: http://localhost:5173
+Frontend, built with Docker, with routes handled based on the path: http://localhost:3000
 
 Backend, JSON based web API based on OpenAPI: http://localhost:8000
 
@@ -46,7 +46,7 @@ docker compose logs backend
 
 The Docker Compose files are configured so that each of the services is available in a different port in `localhost`.
 
-For the backend and frontend, they use the same port that would be used by their local development server, so, the backend is at `http://localhost:8000` and the frontend at `http://localhost:5173`.
+For the backend and frontend, they use the same port that would be used by their local development server, so, the backend is at `http://localhost:8000` and the frontend at `http://localhost:3000`.
 
 This way, you could turn off a Docker Compose service and start its local development service, and everything would keep working, because it all uses the same ports.
 
@@ -100,6 +100,15 @@ Depending on your workflow, you could want to exclude it from Git, for example i
 
 One way to do it could be to add each environment variable to your CI/CD system, and updating the `docker-compose.yml` file to read that specific env var instead of reading the `.env` file.
 
+## Adminer
+
+Login credentials:
+
+- Server: **db!!!!** not localhost as stated in .env file. The server is mapped from localhost to db!!
+- Username: POSTGRES_USER located in .env file
+- Password: POSTGRES_PASSWORD located in .env file
+- Database: POSTGRES_DB located in .env file
+
 ## URLs
 
 The production or staging URLs would use these same paths, but with your own domain.
@@ -108,7 +117,7 @@ The production or staging URLs would use these same paths, but with your own dom
 
 Development URLs, for local development.
 
-Frontend: http://localhost:5173
+Frontend: http://localhost:3000
 
 Backend: http://localhost:8000
 
