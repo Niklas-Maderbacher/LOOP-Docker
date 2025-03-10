@@ -1,8 +1,8 @@
-"""Add mit neue tabelle6
+"""Initial migration
 
-Revision ID: e43a94b09b2b
+Revision ID: 5a0bade23385
 Revises: 
-Create Date: 2025-01-27 16:17:52.966199
+Create Date: 2025-03-03 15:15:28.517312
 
 """
 from alembic import op
@@ -11,7 +11,7 @@ import sqlmodel.sql.sqltypes
 
 
 # revision identifiers, used by Alembic.
-revision = 'e43a94b09b2b'
+revision = '5a0bade23385'
 down_revision = None
 branch_labels = None
 depends_on = None

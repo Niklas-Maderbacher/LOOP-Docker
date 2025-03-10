@@ -1,38 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from datetime import datetime
+from fastapi import APIRouter, HTTPException, Depends
+from app.api.routes import FastApiAuthorization
+from app.crud.priority import update_priority  
 
-from app.database import get_db
-from app.schemas import IssueUpdatePriority
-from app.models import Issue, User, Priority
-from app.crud import update_priority
 
-router = APIRouter()
 
-@router.post("/update-priority/")
-def update_issue_priority(issue_id: int, user_id: int, priority_name: str, db: Session = Depends(get_db)):
+router = APIRouter(prefix="/issues", tags=["Issues"])
+
+@router.post("/update-priority")
+def update_issue_priority(issue_id: int, user_id: int, priority_name: str):
     """
-    Updates the priority of an issue by creating a new entry with updated priority_id, version, updated_at, and updater_id.
+    Ruft die CRUD-Funktion auf, um die Priorität eines Issues in der Datenbank zu aktualisieren.
     """
-    # Check if issue exists
-    issue = db.query(Issue).filter(Issue.id == issue_id).first()
-    if not issue:
-        raise HTTPException(status_code=404, detail="Issue not found")
-    
-    # Check if user exists
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Check if priority exists
-    priority = db.query(Priority).filter(Priority.name == priority_name).first()
-    if not priority:
-        raise HTTPException(status_code=404, detail="Priority not found")
-    
-    # Call the CRUD function to create the new issue entry with updated priority
-    new_issue = update_priority(db, issue, user_id, priority.id)
-    
-    if not new_issue:
+    # Aufrufen der CRUD-Funktion zum Aktualisieren der Priorität des Issues
+    updated_issue = update_priority(issue_id, user_id, priority_name)
+
+    if not updated_issue:
         raise HTTPException(status_code=400, detail="Failed to update priority")
-    
-    return new_issue
+
+    return updated_issue
