@@ -33,3 +33,4 @@ def test_unarchive_project_without_permission(db:SessionDep, client):
 
     assert response.status_code == 403
     assert response.json() == {"detail": "Not enough permissions"}
+
