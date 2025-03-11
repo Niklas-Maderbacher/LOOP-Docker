@@ -3,6 +3,7 @@ from typing import Any
 from sqlmodel import Session, select
 from app.api.deps import get_db
 from app.db.models import User, UserAtProject
+from passlib.context import CryptContext
 
 def get_project_role(id, project_id):
     with next(get_db()) as db:
@@ -40,3 +41,30 @@ def get_user(email: str):
         user = db.query(User).filter(User.email == email).first()
     return user
 
+
+
+db_session = next(get_db())
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return password_context.hash(password)
+
+def register_user(email: str, display_name: str, password: str) -> User:
+    with db_session as db:
+        existing_user = db.query(User).filter(User.email == email).first()
+        if existing_user:
+            raise ValueError("User already exists with this email")
+        
+        hashed_password = hash_password(password)
+        new_user = User(
+            email=email,
+            display_name=display_name,
+            password=hashed_password,
+            is_email_verified=False,
+            is_admin=False
+        )
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        
+        return new_user
