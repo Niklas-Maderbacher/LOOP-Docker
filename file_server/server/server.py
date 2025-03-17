@@ -7,6 +7,7 @@ from colorama import Fore, Style
 
 from create_dir import SAVE_DIR, create_project_dir, create_project_issue_dir
 from save import save_file
+from logging_helper import get_cur_time
 
 app = Flask(__name__)
 CORS(app)
@@ -15,9 +16,12 @@ CORS(app)
 @app.route("/dump", methods=["POST"])
 def insert_file():
     if "file" not in request.files:
-        # logs
+        # logs error
         print(
-            Fore.RED + "Received no file in request. Stopping" + Style.RESET_ALL,
+            Fore.RED
+            + get_cur_time()
+            + "Received no file in request. Stopping"
+            + Style.RESET_ALL,
             file=sys.stdout,
         )
         return Response(response="No file in request", status=415)
@@ -28,9 +32,10 @@ def insert_file():
     project_id = request.form.get("project_id")
     issue_id = request.form.get("issue_id")
 
-    # logs
+    # logs success
     print(
         Fore.GREEN
+        + get_cur_time()
         + "Received file "
         + filename
         + " with project id "
@@ -42,15 +47,18 @@ def insert_file():
     )
 
     if file.filename == "":
-        # logs
+        # logs error
         print(
-            Fore.RED + "The received file has no name. Stopping" + Style.RESET_ALL,
+            Fore.RED
+            + get_cur_time()
+            + "The received file has no name. Stopping"
+            + Style.RESET_ALL,
             file=sys.stdout,
         )
         return Response(response="File has no name", status=409)
         # return 409  # 409 Conflict
     if file:
-        # logs inside package
+        # logs exist inside package
         # create dirs
         create_project_dir(project_id)
         create_project_issue_dir(project_id, issue_id)
@@ -71,13 +79,43 @@ def get_file(project_id, issue_id, file_name):
 
     # Ensure the directory exists
     if not os.path.exists(directory):
+        # logs error
+        print(
+            Fore.RED
+            + get_cur_time()
+            + "The directory "
+            + directory
+            + " does not exist"
+            + Style.RESET_ALL,
+            file=sys.stdout,
+        )
         abort(404, description="Directory not found")
 
     # Ensure the requested file exists
     file_path = os.path.join(directory, file_name)
     if not os.path.isfile(file_path):
+        # logs error
+        print(
+            Fore.RED
+            + get_cur_time()
+            + "The file "
+            + file_name
+            + " does not exist"
+            + Style.RESET_ALL,
+            file=sys.stdout,
+        )
         abort(404, description="File not found")
 
+    # logs success
+    print(
+        Fore.GREEN
+        + get_cur_time()
+        + "The file "
+        + file_name
+        + " exists and can be displayed"
+        + Style.RESET_ALL,
+        file=sys.stdout,
+    )
     # Send the file from the directory
     return send_from_directory(directory, file_name)
 
@@ -85,8 +123,39 @@ def get_file(project_id, issue_id, file_name):
 @app.route("/files/<project_id>/<issue_id>/<file_name>", methods=["DELETE"])
 def del_file(project_id, issue_id, file_name):
     try:
+        # logs attempt
+        print(
+            Fore.YELLOW
+            + get_cur_time()
+            + "Trying to delete file "
+            + file_name
+            + " in project directory "
+            + project_id
+            + " in issue directory "
+            + issue_id
+            + Style.RESET_ALL,
+            file=sys.stdout,
+        )
         os.remove(os.path.join(SAVE_DIR, project_id, issue_id, file_name))
     except Exception as e:
-        return Response(e, status=400)
+        # logs error
+        print(
+            Fore.RED
+            + get_cur_time()
+            + "Could not delete file "
+            + file_name
+            + Style.RESET_ALL,
+            file=sys.stdout,
+        )
+        return Response("An exception occured", status=400)
 
+    # logs success
+    print(
+        Fore.GREEN
+        + get_cur_time()
+        + "Successfully deleted file "
+        + file_name
+        + Style.RESET_ALL,
+        file=sys.stdout,
+    )
     return Response("success", 200)
