@@ -1,14 +1,14 @@
 from sqlmodel import Field, Relationship, SQLModel
+from sqlalchemy import Column
 from typing import List, Optional
 from pydantic import EmailStr
 from app.db.session import engine
 
+from sqlmodel import SQLModel, Field
+from sqlalchemy.dialects.postgresql import ENUM
+from app.enums.role import Role
 
-class Role(SQLModel, table=True):
-    id: int = Field(default=None, primary_key=True)
-    name: str = Field(max_length=50, nullable=False)
 
-    # users_at_project: List["UserAtProject"] = Relationship(back_populates="role")
 
 
 class User(SQLModel, table=True):
@@ -43,7 +43,8 @@ class Project(SQLModel, table=True):
 class UserAtProject(SQLModel, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
     project_id: int = Field(foreign_key="project.id", primary_key=True)
-    role_id: int = Field(foreign_key="role.id")
+    role: Role = Field(sa_column=Column(ENUM(Role, name="role_enum", create_type=True), nullable=False, default=Role.USER))
+
 
     # user: "User" = Relationship(back_populates="user_at_projects")
     # project: "Project" = Relationship(back_populates="user_at_projects")

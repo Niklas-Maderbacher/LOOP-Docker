@@ -130,7 +130,7 @@ Make sure you create a "revision" of your models and that you "upgrade" your dat
 * When running localy on UNIX like OS:
 
 ```bash
-export PYTHONPATH=/home/Niklas/Documents/ITP/Mock4AHIT/Loop/LOOP-Docker/backend:$PYTHONPATH
+export PYTHONPATH=<full_path_to_your_project>:$PYTHONPATH
 ```
 
 * Start an interactive session in the backend container:
@@ -139,7 +139,7 @@ export PYTHONPATH=/home/Niklas/Documents/ITP/Mock4AHIT/Loop/LOOP-Docker/backend:
 $ docker compose exec backend bash
 ```
 
-* Alembic is already configured to import your SQLModel models from `./backend/app/models.py`.
+* Alembic is already configured to import your SQLModel models from `./backend/app/db/models.py`.
 
 * After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
 
