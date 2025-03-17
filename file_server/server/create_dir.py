@@ -53,9 +53,9 @@ def create_project_issue_dir(project_id: str, issue_id: str):
         Fore.YELLOW
         + "Skipping - Issue directory with id "
         + issue_id
-        + "in project directory "
+        + " in project directory "
         + project_id
-        + "already exists"
+        + " already exists"
         + Style.RESET_ALL,
         file=sys.stdout,
     )
