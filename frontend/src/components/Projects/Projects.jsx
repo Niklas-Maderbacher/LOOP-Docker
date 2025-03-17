@@ -15,6 +15,8 @@ function Projects() {
         setIsModalOpen(true);
     }
 
+    const [message, setMessage] = useState(null);
+
     function handleCloseModal() {
         setIsModalOpen(false);
         setNewProject({ name: "", key: "", type: "", lead: "", description: "" });
@@ -29,12 +31,43 @@ function Projects() {
         handleCloseModal();
     }
 
+    async function handleArchive() {
+        // TODO add parameter for project_id
+        try {
+        //     const response = await fetch(`/api/v1/projects/archive/${projectId}`, {
+        //         method: "PUT",
+        //         headers: {
+        //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        //             "Content-Type": "application/json",
+        //         },
+        //     });
+
+        //     if (!response.ok) {
+        //         throw new Error("Failed to archive project");
+            // }
+
+            setMessage("Button not yet functioning!");
+
+            // // Remove archived project from state
+            // setProjects(projects.filter(project => project.id !== projectId));
+
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                setMessage(null);
+            }, 3000);
+        } catch (error) {
+            console.error("Error:", error);
+            setMessage("Error archiving project ❌");
+        }
+    }
+
     return (
         <div className="projects">
             <h1>Projects</h1>
             <button className="add-project-btn" onClick={handleOpenModal}>
-                Create Project
+                Create Project  
             </button>
+
             <div className="search">
                 <input type="text" placeholder="Search..." />
             </div>
@@ -56,6 +89,10 @@ function Projects() {
                                 <td>{project.key}</td>
                                 <td>{project.type}</td>
                                 <td>{project.lead}</td>
+                                <button className="archive-project-btn" onClick={() => handleArchive()}>
+                                    Archive
+                                </button>
+                                {message && <div className="message-box">{message}</div>}
                             </tr>
                         ))}
                     </tbody>
