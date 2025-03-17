@@ -223,7 +223,7 @@ function Backlog() {
                         )}
 
                         {/* Story Points field shown only for Epic or Subtask */}
-                        {["epic", "subtask"].includes(newIssue.issueType) && (
+                        {["story", "subtask"].includes(newIssue.issueType) && (
                             <input 
                                 type="text"  // Text input to prevent the number input spinner
                                 name="story_points" 
