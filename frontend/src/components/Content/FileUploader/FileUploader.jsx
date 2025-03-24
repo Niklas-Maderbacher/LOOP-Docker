@@ -2,6 +2,12 @@ import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, X, Send, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import './FileUploader.modules.css';
 
+const fileServerIP = process.env.REACT_APP_FILE_SERVER_IP;
+const fileServerPort = process.env.REACT_APP_FILE_SERVER_PORT;
+
+const apiEndpoint = `http://${fileServerIP}:${fileServerPort}/dump`;
+const deleteEndpoint = `http://${fileServerIP}:${fileServerPort}/attachments`;
+
 export const Card = ({ children, className = "" }) => {
     return <div className={`card ${className}`}>{children}</div>;
 };
@@ -10,9 +16,9 @@ export const CardContent = ({ children, className = "" }) => {
     return <div className={`card-content ${className}`}>{children}</div>;
 };
 
-const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSize = 100 }) => {
+const FileUpload = ({ maxFileSize = 100 }) => {
     // Each upload is an object with a unique id, the file itself, progress, status, and error message.
-    // status: 'pending' | 'uploading' | 'uploaded' | 'error' | 'invalid'
+    // status: 'pending' | 'uploading' | 'uploaded' | 'error' | 'invalid' | 'deleting' | 'deleted'
     const [uploads, setUploads] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
@@ -56,7 +62,9 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
                 progress: 0,
                 status: validation.valid ? "pending" : "invalid",
                 error: validation.valid ? null : validation.error,
-                response: null
+                response: null,
+                projectId: 10,
+                issueId: 10
             };
         });
 
@@ -79,8 +87,8 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
 
             const formData = new FormData();
             formData.append("file", fileItem.file);  // Changed key name to "file"
-            formData.append("project_id", 10);       // Add project_id
-            formData.append("issue_id", 10);         // Add issue_id
+            formData.append("project_id", fileItem.projectId);  // Add project_id
+            formData.append("issue_id", fileItem.issueId);      // Add issue_id
 
             const xhr = new XMLHttpRequest();
 
@@ -177,6 +185,91 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
         });
     };
 
+    // Delete a file from the server
+    const deleteFile = (fileItem) => {
+        return new Promise((resolve, reject) => {
+            // Set the file status to deleting
+            setUploads((prevUploads) =>
+                prevUploads.map((item) =>
+                    item.id === fileItem.id ? { ...item, status: "deleting" } : item
+                )
+            );
+
+            // Construct delete URL format: /attachments/project/issue/file_name
+            const deleteUrl = `${deleteEndpoint}/${fileItem.projectId}/${fileItem.issueId}/${encodeURIComponent(fileItem.file.name)}`;
+            
+            const xhr = new XMLHttpRequest();
+            
+            // Store the xhr reference for cleanup
+            activeXhrRefs.current[fileItem.id] = xhr;
+            
+            xhr.open("DELETE", deleteUrl);
+            
+            xhr.onload = () => {
+                // Clean up xhr reference
+                delete activeXhrRefs.current[fileItem.id];
+                
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    setUploads((prevUploads) =>
+                        prevUploads.map((item) =>
+                            item.id === fileItem.id ? { 
+                                ...item, 
+                                status: "deleted",
+                                message: "File deleted successfully"
+                            } : item
+                        )
+                    );
+                    
+                    // After displaying success message, remove the file from list after a delay
+                    setTimeout(() => {
+                        setUploads((prevUploads) =>
+                            prevUploads.filter((item) => item.id !== fileItem.id)
+                        );
+                    }, 3000);
+                    
+                    resolve();
+                } else {
+                    let errorMsg;
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        errorMsg = response?.message || `Delete failed with status ${xhr.status}`;
+                    } catch (e) {
+                        errorMsg = `Delete failed with status ${xhr.status}`;
+                    }
+                    
+                    setUploads((prevUploads) =>
+                        prevUploads.map((item) =>
+                            item.id === fileItem.id ? { 
+                                ...item, 
+                                status: "error",
+                                error: errorMsg
+                            } : item
+                        )
+                    );
+                    reject(new Error(errorMsg));
+                }
+            };
+            
+            xhr.onerror = () => {
+                // Clean up xhr reference
+                delete activeXhrRefs.current[fileItem.id];
+                
+                setUploads((prevUploads) =>
+                    prevUploads.map((item) =>
+                        item.id === fileItem.id ? { 
+                            ...item, 
+                            status: "error",
+                            error: "Network error occurred while deleting"
+                        } : item
+                    )
+                );
+                reject(new Error("Network error occurred"));
+            };
+            
+            xhr.send();
+        });
+    };
+
     // Retry a failed upload
     const handleRetryUpload = (fileItemId) => {
         // Reset the file to pending status
@@ -252,17 +345,26 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
         }
     };
 
-    // Remove the file from the state.
-    const handleRemoveFile = (id) => {
+    // Remove the file from the state and delete from server if already uploaded
+    const handleRemoveFile = async (fileItem) => {
         // If there's an active upload, abort it
-        if (activeXhrRefs.current[id]) {
-            activeXhrRefs.current[id].abort();
-            delete activeXhrRefs.current[id];
+        if (activeXhrRefs.current[fileItem.id]) {
+            activeXhrRefs.current[fileItem.id].abort();
+            delete activeXhrRefs.current[fileItem.id];
         }
         
-        setUploads((prevUploads) =>
-            prevUploads.filter((fileItem) => fileItem.id !== id)
-        );
+        if (fileItem.status === "uploaded") {
+            try {
+                await deleteFile(fileItem);
+            } catch (error) {
+                console.error(`Error deleting ${fileItem.file.name}:`, error);
+            }
+        } else {
+            // For files that weren't uploaded or failed, just remove them from the state
+            setUploads((prevUploads) =>
+                prevUploads.filter((item) => item.id !== fileItem.id)
+            );
+        }
     };
 
     // Get file size in a human-readable format
@@ -312,9 +414,9 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
                                         <span className="file-name">{item.file.name}</span>
                                         <span className="file-size">{formatFileSize(item.file.size)}</span>
                                     </div>
-                                    {item.status !== "uploading" && (
+                                    {item.status !== "uploading" && item.status !== "deleting" && (
                                         <button 
-                                            onClick={() => handleRemoveFile(item.id)} 
+                                            onClick={() => handleRemoveFile(item)} 
                                             className="remove-btn"
                                             aria-label={`Remove ${item.file.name}`}
                                         >
@@ -327,6 +429,13 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
                                     <div className="progress-container" role="progressbar" aria-valuenow={item.progress} aria-valuemin="0" aria-valuemax="100">
                                         <div className="progress-fill" style={{ width: `${item.progress}%` }}></div>
                                         <span className="progress-text">{item.progress}%</span>
+                                    </div>
+                                )}
+                                
+                                {item.status === "deleting" && (
+                                    <div className="progress-container" role="status">
+                                        <div className="progress-fill indeterminate"></div>
+                                        <span className="progress-text">Deleting...</span>
                                     </div>
                                 )}
                                 
@@ -362,6 +471,13 @@ const FileUpload = ({ apiEndpoint = "http://172.31.182.85:5000/dump", maxFileSiz
                                     <div className="status-container success">
                                         <CheckCircle size={16} />
                                         <span className="success-msg">Upload complete</span>
+                                    </div>
+                                )}
+                                
+                                {item.status === "deleted" && (
+                                    <div className="status-container success">
+                                        <CheckCircle size={16} />
+                                        <span className="success-msg">{item.message || "File deleted successfully"}</span>
                                     </div>
                                 )}
                             </div>
