@@ -1,5 +1,7 @@
+from typing import List
 from sqlmodel import Session
 from app.db.models import Issue
+from app.api.schemas import IssueGet
 
 def update_story_point(db: Session, issue_id: int, updated_story_point: int):
     try:
@@ -50,9 +52,18 @@ def create_issue(session: Session, user: Issue) -> Issue:
 
     return issue_db
 
-def get_issues(db: Session, skip: int = 0, limit: int = 50) -> list[Issue]:
-
-    return db.query(Issue).offset(skip).limit(limit).all()
+def get_issues(db: Session) -> List[IssueGet]:
+    issues = db.query(Issue).all()
+    
+    return [
+        IssueGet(
+            name=issue.title, 
+            priority_id=issue.priority, 
+            story_points=issue.story_points, 
+            responsible_user_id=issue.assignee
+        )
+        for issue in issues
+    ]
 
 
 def get_issue(session: Session, id: int) -> Issue:
