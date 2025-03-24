@@ -8,6 +8,8 @@ const fileServerPort = process.env.REACT_APP_FILE_SERVER_PORT;
 const apiEndpoint = `http://${fileServerIP}:${fileServerPort}/dump`;
 const deleteEndpoint = `http://${fileServerIP}:${fileServerPort}/attachments`;
 
+// story: LOOP-33
+
 /**
  * A reusable card component for wrapping content.
  * @component
