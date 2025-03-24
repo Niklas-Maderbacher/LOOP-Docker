@@ -22,6 +22,7 @@ dependencies = [
     "pydantic-settings<3.0.0,>=2.2.1",
     "pyjwt<3.0.0,>=2.8.0",
     "sentry-sdk==2.19.2",
+    "requests<3.0.0,>=2.31.0",
 ]
 
 [tool.uv]

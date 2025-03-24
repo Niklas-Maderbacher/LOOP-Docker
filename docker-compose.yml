@@ -87,6 +87,8 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER?Variable not set}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
+      - FILE_SERVER_IP=${FILE_SERVER_IP}
+      - FILE_SERVER_PORT=${FILE_SERVER_PORT}
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health_check" ]

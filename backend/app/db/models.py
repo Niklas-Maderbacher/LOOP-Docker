@@ -85,7 +85,8 @@ class Category(SQLModel, table=True):
 class Attachment(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     issue_id: int = Field(foreign_key="issue.id")
-    link: str = Field(nullable=False)
+    project_id: int = Field(foreign_key="project.id")
+    filename: str = Field(nullable=False)
 
     # issue: "Issue" = Relationship(back_populates="attachments")
 
