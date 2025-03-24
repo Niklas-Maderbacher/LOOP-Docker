@@ -8,30 +8,49 @@ const fileServerPort = process.env.REACT_APP_FILE_SERVER_PORT;
 const apiEndpoint = `http://${fileServerIP}:${fileServerPort}/dump`;
 const deleteEndpoint = `http://${fileServerIP}:${fileServerPort}/attachments`;
 
+/**
+ * A reusable card component for wrapping content.
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Content to be rendered inside the card
+ * @param {string} [props.className=""] - Additional CSS classes for styling
+ * @returns {JSX.Element} Card component
+ */
 export const Card = ({ children, className = "" }) => {
     return <div className={`card ${className}`}>{children}</div>;
 };
 
+/**
+ * A container component for card content with proper padding and spacing.
+ * @component
+ * @param {Object} props - Component props
+ * @param {React.ReactNode} props.children - Content to be rendered inside the card content area
+ * @param {string} [props.className=""] - Additional CSS classes for styling
+ * @returns {JSX.Element} CardContent component
+ */
 export const CardContent = ({ children, className = "" }) => {
     return <div className={`card-content ${className}`}>{children}</div>;
 };
 
+/**
+ * Main file upload component with drag-and-drop functionality, progress tracking,
+ * and server communication capabilities.
+ * @component
+ * @param {Object} props - Component props
+ * @param {number} [props.maxFileSize=100] - Maximum allowed file size in megabytes
+ * @returns {JSX.Element} FileUpload component
+ */
 const FileUpload = ({ maxFileSize = 100 }) => {
-    // Each upload is an object with a unique id, the file itself, progress, status, and error message.
-    // status: 'pending' | 'uploading' | 'uploaded' | 'error' | 'invalid' | 'deleting' | 'deleted'
     const [uploads, setUploads] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const activeXhrRefs = useRef({});
 
-    // Convert MB to bytes
     const maxFileSizeBytes = maxFileSize * 1024 * 1024;
 
-    // Clean up any ongoing uploads when component unmounts
     useEffect(() => {
         return () => {
-            // Abort all active uploads when component unmounts
             Object.values(activeXhrRefs.current).forEach(xhr => {
                 if (xhr) {
                     xhr.abort();
@@ -40,7 +59,13 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         };
     }, []);
 
-    // Validate files
+    /**
+     * Validates a file against size constraints.
+     * @param {File} file - File object to validate
+     * @returns {Object} Validation result
+     * @property {boolean} valid - Indicates if the file is valid
+     * @property {string|null} error - Error message if invalid
+     */
     const validateFile = (file) => {
         if (file.size > maxFileSizeBytes) {
             return {
@@ -51,7 +76,10 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         return { valid: true };
     };
 
-    // Adds files to the state without starting upload
+    /**
+     * Adds files to the upload queue and performs initial validation.
+     * @param {FileList} files - List of files to add to the upload queue
+     */
     const addFiles = (files) => {
         const newUploads = Array.from(files).map((file) => {
             const validation = validateFile(file);
@@ -70,29 +98,29 @@ const FileUpload = ({ maxFileSize = 100 }) => {
 
         setUploads((prev) => [...prev, ...newUploads]);
         
-        // Reset the file input so the same files can be selected again
         if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     };
 
-    // Uses XMLHttpRequest to upload a single file and update its progress.
+    /**
+     * Handles file upload to the server using XMLHttpRequest.
+     * @param {Object} fileItem - File item from the uploads state
+     * @returns {Promise} Promise that resolves when upload completes
+     */
     const uploadFile = (fileItem) => {
         return new Promise((resolve, reject) => {
-            // Skip invalid files
             if (fileItem.status === "invalid") {
                 resolve();
                 return;
             }
 
             const formData = new FormData();
-            formData.append("file", fileItem.file);  // Changed key name to "file"
-            formData.append("project_id", fileItem.projectId);  // Add project_id
-            formData.append("issue_id", fileItem.issueId);      // Add issue_id
+            formData.append("file", fileItem.file);
+            formData.append("project_id", fileItem.projectId);
+            formData.append("issue_id", fileItem.issueId);
 
             const xhr = new XMLHttpRequest();
-
-            // Store the xhr reference for cleanup
             activeXhrRefs.current[fileItem.id] = xhr;
             
             xhr.open("POST", apiEndpoint);
@@ -109,14 +137,12 @@ const FileUpload = ({ maxFileSize = 100 }) => {
             };
 
             xhr.onload = () => {
-                // Clean up xhr reference
                 delete activeXhrRefs.current[fileItem.id];
                 
                 let response = null;
                 try {
                     response = JSON.parse(xhr.responseText);
                 } catch (e) {
-                    // If it's not JSON, store the raw response
                     response = xhr.responseText || "No response data";
                 }
 
@@ -149,7 +175,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
             };
 
             xhr.onerror = () => {
-                // Clean up xhr reference
                 delete activeXhrRefs.current[fileItem.id];
                 
                 setUploads((prevUploads) =>
@@ -165,7 +190,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
             };
 
             xhr.onabort = () => {
-                // Clean up xhr reference
                 delete activeXhrRefs.current[fileItem.id];
                 
                 setUploads((prevUploads) =>
@@ -185,28 +209,27 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         });
     };
 
-    // Delete a file from the server
+    /**
+     * Deletes a file from the server and updates the uploads state.
+     * @param {Object} fileItem - File item to delete
+     * @returns {Promise} Promise that resolves when deletion completes
+     */
     const deleteFile = (fileItem) => {
         return new Promise((resolve, reject) => {
-            // Set the file status to deleting
             setUploads((prevUploads) =>
                 prevUploads.map((item) =>
                     item.id === fileItem.id ? { ...item, status: "deleting" } : item
                 )
             );
 
-            // Construct delete URL format: /attachments/project/issue/file_name
             const deleteUrl = `${deleteEndpoint}/${fileItem.projectId}/${fileItem.issueId}/${encodeURIComponent(fileItem.file.name)}`;
             
             const xhr = new XMLHttpRequest();
-            
-            // Store the xhr reference for cleanup
             activeXhrRefs.current[fileItem.id] = xhr;
             
             xhr.open("DELETE", deleteUrl);
             
             xhr.onload = () => {
-                // Clean up xhr reference
                 delete activeXhrRefs.current[fileItem.id];
                 
                 if (xhr.status >= 200 && xhr.status < 300) {
@@ -220,7 +243,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                         )
                     );
                     
-                    // After displaying success message, remove the file from list after a delay
                     setTimeout(() => {
                         setUploads((prevUploads) =>
                             prevUploads.filter((item) => item.id !== fileItem.id)
@@ -251,7 +273,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
             };
             
             xhr.onerror = () => {
-                // Clean up xhr reference
                 delete activeXhrRefs.current[fileItem.id];
                 
                 setUploads((prevUploads) =>
@@ -270,9 +291,11 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         });
     };
 
-    // Retry a failed upload
+    /**
+     * Handles retry of failed uploads by resetting the file status and progress.
+     * @param {string} fileItemId - ID of the file item to retry
+     */
     const handleRetryUpload = (fileItemId) => {
-        // Reset the file to pending status
         setUploads(prevUploads =>
             prevUploads.map(item =>
                 item.id === fileItemId ? { ...item, status: "pending", progress: 0, error: null } : item
@@ -280,7 +303,9 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         );
     };
 
-    // Triggered when confirm button is clicked
+    /**
+     * Initiates upload of all pending files and manages upload state.
+     */
     const handleConfirmUpload = async () => {
         const pendingUploads = uploads.filter(item => item.status === "pending");
         
@@ -288,18 +313,15 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         
         setIsUploading(true);
         
-        // Mark all pending files as uploading
         setUploads(prevUploads =>
             prevUploads.map(item =>
                 item.status === "pending" ? { ...item, status: "uploading" } : item
             )
         );
         
-        // Upload each file
         const uploadPromises = pendingUploads.map(fileItem => {
             return uploadFile(fileItem).catch(error => {
                 console.error(`Error uploading ${fileItem.file.name}:`, error);
-                // We're catching errors here so Promise.all continues with other uploads
                 return null;
             });
         });
@@ -314,14 +336,12 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         }
     };
 
-    // Called when files are selected using the file input.
     const handleFileChange = (event) => {
         if (event.target.files && event.target.files.length > 0) {
             addFiles(event.target.files);
         }
     };
 
-    // Drag and drop handlers
     const handleDragEnter = (event) => {
         event.preventDefault();
         setDragActive(true);
@@ -336,7 +356,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         event.preventDefault();
     };
 
-    // Called when files are dropped onto the drop area.
     const handleDrop = (event) => {
         event.preventDefault();
         setDragActive(false);
@@ -345,9 +364,11 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         }
     };
 
-    // Remove the file from the state and delete from server if already uploaded
+    /**
+     * Removes a file from the upload queue and cancels any active upload.
+     * @param {Object} fileItem - File item to remove
+     */
     const handleRemoveFile = async (fileItem) => {
-        // If there's an active upload, abort it
         if (activeXhrRefs.current[fileItem.id]) {
             activeXhrRefs.current[fileItem.id].abort();
             delete activeXhrRefs.current[fileItem.id];
@@ -360,14 +381,17 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                 console.error(`Error deleting ${fileItem.file.name}:`, error);
             }
         } else {
-            // For files that weren't uploaded or failed, just remove them from the state
             setUploads((prevUploads) =>
                 prevUploads.filter((item) => item.id !== fileItem.id)
             );
         }
     };
 
-    // Get file size in a human-readable format
+    /**
+     * Formats file size in bytes to human-readable string.
+     * @param {number} bytes - File size in bytes
+     * @returns {string} Formatted file size string
+     */
     const formatFileSize = (bytes) => {
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
@@ -376,7 +400,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
-    // Check if there are any pending files to upload
     const hasPendingFiles = uploads.some(item => item.status === "pending");
 
     return (
@@ -485,7 +508,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                     </div>
                 )}
                 
-                {/* Confirm button */}
                 {hasPendingFiles && (
                     <button 
                         onClick={handleConfirmUpload} 
