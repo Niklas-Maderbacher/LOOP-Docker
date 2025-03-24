@@ -1,45 +1,114 @@
+import os
+from dotenv import load_dotenv
 import requests
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends, Form
 from sqlmodel import Session
-from app.crud.attachment import save_attachment
+
+from app.crud.attachment import save_attachment, delete_attachment_by_details
 from app.api.schemas.attachment import AttachmentCreate
 from app.api.deps import SessionDep
 
 router = APIRouter(prefix="/attachments", tags=["Attachments"])
 
-IMAGE_SERVER_URL = "http://image-server.com/upload"  # Ändere diese URL auf deinen Image-Server
+# Load image-server configuration from .env
+load_dotenv()
+IMAGE_SERVER_URL = os.getenv("FILE_SERVER_IP")
+IMAGE_SERVER_PORT = os.getenv("FILE_SERVER_PORT")
+
+# Validate environment variables (must not be empty)
+if not IMAGE_SERVER_URL or not IMAGE_SERVER_PORT:
+    raise ValueError("FILE_SERVER_IP oder FILE_SERVER_PORT nicht in der .env Datei gesetzt")
+
+# Define endpoints for upload and delete on the file server
+IMAGE_SERVER_UPLOAD_ENDPOINT = f"http://{IMAGE_SERVER_URL}:{IMAGE_SERVER_PORT}/dump"
+IMAGE_SERVER_DELETE_ENDPOINT = f"http://{IMAGE_SERVER_URL}:{IMAGE_SERVER_PORT}/attachments"
 
 @router.post("/")
-async def upload_file(
-    session: SessionDep, 
-    issue_id: int, 
-    file: UploadFile = File(...)
+async def upload_files(
+    session: SessionDep,
+    project_id: int = Form(...),
+    issue_id: int = Form(...),
+    files: list[UploadFile] = File(...),
 ):
-    """Empfängt eine Datei, sendet sie an den Image-Server und speichert den zurückgegebenen Pfad."""
-    
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="Keine Datei übermittelt.")
+    """
+    Receives multiple files from the frontend in one request,
+    but for each individual file, it sends a separate POST request to the file server.
+    After successfully uploading each file, the filename is saved to the database.
+    """
 
-    files = {"file": (file.filename, file.file, file.content_type)}
+    # If no files are provided, raise an error
+    if not files:
+        raise HTTPException(status_code=400, detail="Keine Dateien übermittelt.")
 
-    # Datei an den externen Image-Server senden
-    response = requests.post(IMAGE_SERVER_URL, files=files)
+    uploaded_attachments = []
 
-    if response.status_code != 200:
-        raise HTTPException(status_code=500, detail="Fehler beim Hochladen zum Image-Server")
+    # Iterate over each file, sending a single request per file to the file server
+    for single_file in files:
+        file_data = [
+            ("file", (single_file.filename, single_file.file, single_file.content_type))
+        ]
+        metadata = {
+            "project_id": str(project_id),
+            "issue_id": str(issue_id)
+        }
 
-    image_server_data = response.json()
-    file_path = image_server_data.get("file_path")  # Erwartet: Der Server gibt den Dateipfad zurück
+        # Perform a POST request to the file server for this single file
+        response = requests.post(IMAGE_SERVER_UPLOAD_ENDPOINT, files=file_data, data=metadata)
 
-    if not file_path:
-        raise HTTPException(status_code=500, detail="Kein Dateipfad vom Image-Server erhalten.")
+        # If the file server doesn't return a 201 status
+        if response.status_code != 201:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Fehler beim Hochladen zum File-Server, Status: {response.status_code}"
+            )
 
-    # Datei-Referenz in der Datenbank speichern
-    attachment_data = AttachmentCreate(issue_id=issue_id, link=file_path)
-    saved_attachment = save_attachment(session, attachment_data)
+        server_response = response.json()
+        filename_from_server = server_response.get("filename")
+        if not filename_from_server:
+            raise HTTPException(status_code=500, detail="Kein 'filename' vom Image-Server erhalten.")
+
+        attachment_data = AttachmentCreate(
+            issue_id=issue_id,
+            project_id=project_id,
+            filename=filename_from_server
+        )
+        saved_attachment = save_attachment(session, attachment_data)
+
+        uploaded_attachments.append({
+            "attachment_id": saved_attachment.id,
+            "filename": saved_attachment.filename
+        })
 
     return {
-        "message": "Datei erfolgreich hochgeladen",
-        "attachment": saved_attachment,
-        "file_path": file_path
+        "message": "Alle Dateien erfolgreich hochgeladen",
+        "project_id": project_id,
+        "issue_id": issue_id,
+        "uploaded_attachments": uploaded_attachments
     }
+
+
+@router.delete("/{project_id}/{issue_id}/{filename}", status_code=204)
+async def delete_file_from_backend(
+    project_id: int,
+    issue_id: int,
+    filename: str,
+    session: SessionDep
+):
+    """
+    1) Calls the file server to delete the specified attachment.
+    2) If successful, also deletes the attachment record from the database.
+    3) Returns a 204 (No Content) status if everything goes well.
+    """
+    response = requests.delete(IMAGE_SERVER_DELETE_ENDPOINT + f"/{project_id}/{issue_id}/{filename}")
+    if response.status_code != 200:
+        raise HTTPException(
+            status_code=500,
+            detail=f"File-Server konnte Datei nicht löschen (Status: {response.status_code})"
+        )
+
+    # If deletion on the file server was successful, remove the database record
+    success = delete_attachment_by_details(session, project_id, issue_id, filename)
+    if not success:
+        raise HTTPException(status_code=404, detail="Attachment nicht in der DB gefunden.")
+
+    return
