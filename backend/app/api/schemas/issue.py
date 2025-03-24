@@ -13,3 +13,4 @@ class IssueCreate(BaseModel):
     description: str
     story_points: Optional[int]
     project_id: int
+

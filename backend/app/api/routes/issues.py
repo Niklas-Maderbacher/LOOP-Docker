@@ -39,4 +39,8 @@ async def create_new_issue(session: SessionDep, issue_data: IssueCreate):
     if not new_issue:
         raise HTTPException(status_code=400, detail="Failed to create issue.")
 
+    if issue_data.story_points:
+        if issue_data.story_points <= 0:
+            raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
+    
     return new_issue
