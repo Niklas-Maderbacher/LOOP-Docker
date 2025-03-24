@@ -1,0 +1,125 @@
+
+.add-issue-btn {
+    margin-left: 300px;
+    margin-top: 50px;
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    padding: 10px 20px;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+
+.issue-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.issue-modal-content {
+    background: hsl(0, 0%, 20%);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 300px;
+}
+
+.SelectIssueType-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.issue-modal-content input {
+    padding: 8px;
+    border: 1px solid hsl(0, 0%, 50%);
+    border-radius: 5px;
+    background: hsl(0, 0%, 15%);
+    color: white;
+}
+
+.issue-modal-buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
+
+.issue-modal-buttons button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.issue-modal-buttons button:first-child {
+    background-color: coral;
+    color: black;
+}
+
+.issue-modal-buttons button:last-child {
+    background-color: gray;
+    color: white;
+}
+
+
+.issue-dropdown {
+    width: 100%;
+    padding: 10px;
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    border: 2px solid hsl(0, 0%, 13%);
+    border-radius: 5px;
+    background-color: hsl(0, 0%, 13%); /* Schwarz */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+}
+
+/* Hover-Effekt */
+.issue-dropdown:hover {
+    border-color: hsl(0, 0%, 30%);
+    background-color: hsl(0, 0%, 20%);
+}
+
+/* Fokus-Effekt */
+.issue-dropdown:focus {
+    outline: none;
+    border-color: white;
+    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
+}
+
+/* Dropdown-Optionen */
+.issue-dropdown option {
+    font-weight: 600;
+    background: hsl(0, 0%, 13%); /* Schwarz */
+    color: white;
+    padding: 10px;
+}
+
+/* Animationseffekt beim Öffnen */
+.issue-dropdown:active {
+    transform: scale(0.98);
+}
+
+

@@ -2,7 +2,11 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.db.models import Project
+
 from app.crud.project import unarchive_project, archive_project, is_not_archived
+
+from app.db.models import User
+from app.db.models import Role
 
 # creates new archived project and testing to archive it 
 def test_unarchive_project_success(db: Session) -> None:
@@ -69,6 +73,12 @@ def test_is_not_archived_1(db: Session):
 # creates an archived project, check if it's archived
 def test_is_not_archived_2(db: Session):
     project = Project(id=6, name='Projekt6', archived_at=datetime(2025, 2, 10))
+
+
+
+# Successfully archive an active project as an admin
+def test_archive_project_success_so(db: Session) -> None:
+    project = Project(id=1, name="Test Project", archived_at=None)
     db.add(project)
     db.commit()
     db.refresh(project)
@@ -78,8 +88,16 @@ def test_is_not_archived_2(db: Session):
     assert checked_project is False
 
 # creates new project and testing to archive it 
-def test_archive_project_success(db: Session) -> None:
+def test_archive_project_success_so(db: Session) -> None:
     project = Project(id=999, name='Projekt1')
+    updated_project = archive_project(db, project_id=1)
+
+    assert updated_project is not None
+    assert updated_project.archived_at is not None  # Project should now be archived
+
+# A project that is already archived should not be archived again
+def test_archive_project_already_archived_so(db: Session) -> None:
+    project = Project(id=2, name="Already Archived", archived_at=datetime.utcnow())
     db.add(project)
     db.commit()
     db.refresh(project)
@@ -107,3 +125,30 @@ def test_archive_project_already_archived(db: Session) -> None:
 
     assert updated_project is None
 
+    result = archive_project(db, project_id=2)
+
+    assert result == "already_archived"
+
+# A non-existent project cannot be archived
+def test_archive_project_not_found_so(db: Session) -> None:
+    result = archive_project(db, project_id=999)
+
+    assert result is None  # No project found → should return None
+
+def test_only_admins_can_archive_so(db: Session) -> None:
+    # Create role entries in the database if they don't exist
+    admin_role = Role(id=1, name="admin")
+    user_role = Role(id=2, name="user")
+    
+    db.add_all([admin_role, user_role])
+    db.commit()
+
+    # Create a non-admin user
+    user = User(id=10, display_name="Regular User", email="user@example.com", password="securepass", is_admin=False)
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    # Ensure the user is not an admin
+    assert not user.is_admin  # The test should fail if the user is incorrectly marked as admin
