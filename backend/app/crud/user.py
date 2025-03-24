@@ -20,7 +20,7 @@ def get_project_role(id, project_id):
             UserAtProject.user_id == user.id
         ).first()  # We assume there is only one role per user per project
 
-    return role.role_id if role else None
+    return role.role if role else None
 
 def add_admin_user():
     with next(get_db()) as db:
