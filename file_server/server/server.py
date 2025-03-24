@@ -2,6 +2,7 @@ from flask import Flask, send_from_directory, request, abort, Response
 from flask_cors import CORS
 import os
 import sys
+import json
 from werkzeug.utils import secure_filename
 from colorama import Fore, Style
 
@@ -55,6 +56,7 @@ def insert_file():
             + Style.RESET_ALL,
             file=sys.stdout,
         )
+
         return Response(response="File has no name", status=409)
         # return 409  # 409 Conflict
     if file:
@@ -65,7 +67,18 @@ def insert_file():
         # save file
         save_file(project_id, issue_id, filename, file)
 
-        return Response(response="File uploaded", status=201)
+        return Response(
+            response=json.dumps(
+                {
+                    "Response": "File uploaded successfully",
+                    "filename": filename,
+                    "project_id": project_id,
+                    "issue_id": issue_id,
+                }
+            ),
+            status=201,
+            mimetype="application/json",
+        )
         # return 201  # 201 Created
 
     return Response(response="Bad Request", status=400)
@@ -120,7 +133,7 @@ def get_file(project_id, issue_id, file_name):
     return send_from_directory(directory, file_name)
 
 
-@app.route("/files/<project_id>/<issue_id>/<file_name>", methods=["DELETE"])
+@app.route("/attachments/<project_id>/<issue_id>/<file_name>", methods=["DELETE"])
 def del_file(project_id, issue_id, file_name):
     try:
         # logs attempt
@@ -147,6 +160,7 @@ def del_file(project_id, issue_id, file_name):
             + Style.RESET_ALL,
             file=sys.stdout,
         )
+        print(e)
         return Response("An exception occured", status=400)
 
     # logs success
