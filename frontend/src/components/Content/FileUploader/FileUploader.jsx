@@ -2,11 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, X, Send, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import './FileUploader.modules.css';
 
-const fileServerIP = process.env.REACT_APP_FILE_SERVER_IP;
-const fileServerPort = process.env.REACT_APP_FILE_SERVER_PORT;
-
-const apiEndpoint = `http://${fileServerIP}:${fileServerPort}/dump`;
-const deleteEndpoint = `http://${fileServerIP}:${fileServerPort}/attachments`;
+const apiBaseUrl = 'http://localhost:8000';
+const apiEndpoint = `${apiBaseUrl}/attachments`;
+const deleteEndpoint = `${apiBaseUrl}/attachments`;
 
 // story: LOOP-33
 
@@ -42,7 +40,7 @@ export const CardContent = ({ children, className = "" }) => {
  * @param {number} [props.maxFileSize=100] - Maximum allowed file size in megabytes
  * @returns {JSX.Element} FileUpload component
  */
-const FileUpload = ({ maxFileSize = 100 }) => {
+const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
     const [uploads, setUploads] = useState([]);
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
@@ -93,8 +91,9 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                 status: validation.valid ? "pending" : "invalid",
                 error: validation.valid ? null : validation.error,
                 response: null,
-                projectId: 10,
-                issueId: 10
+                projectId: projectId,
+                issueId: issueId,
+                filename: null, // To be updated after upload
             };
         });
 
@@ -118,9 +117,9 @@ const FileUpload = ({ maxFileSize = 100 }) => {
             }
 
             const formData = new FormData();
-            formData.append("file", fileItem.file);
-            formData.append("project_id", fileItem.projectId);
-            formData.append("issue_id", fileItem.issueId);
+            formData.append("files", fileItem.file);
+            formData.append("project_id", fileItem.projectId.toString());
+            formData.append("issue_id", fileItem.issueId.toString());
 
             const xhr = new XMLHttpRequest();
             activeXhrRefs.current[fileItem.id] = xhr;
@@ -149,15 +148,19 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                 }
 
                 if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    const newFilename = response.uploaded_attachments[0]?.filename;
+                
                     setUploads((prevUploads) =>
-                        prevUploads.map((item) =>
-                            item.id === fileItem.id ? { 
-                                ...item, 
-                                status: "uploaded", 
-                                progress: 100,
-                                response
-                            } : item
-                        )
+                      prevUploads.map((item) =>
+                        item.id === fileItem.id ? { 
+                          ...item, 
+                          status: "uploaded", 
+                          progress: 100,
+                          filename: newFilename,
+                          response: response
+                        } : item
+                      )
                     );
                     resolve(response);
                 } else {
@@ -224,7 +227,7 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                 )
             );
 
-            const deleteUrl = `${deleteEndpoint}/${fileItem.projectId}/${fileItem.issueId}/${encodeURIComponent(fileItem.file.name)}`;
+            const deleteUrl = `${deleteEndpoint}/${fileItem.projectId}/${fileItem.issueId}/${encodeURIComponent(fileItem.filename)}`;
             
             const xhr = new XMLHttpRequest();
             activeXhrRefs.current[fileItem.id] = xhr;
@@ -436,7 +439,7 @@ const FileUpload = ({ maxFileSize = 100 }) => {
                             <div key={item.id} className="upload-item" role="listitem">
                                 <div className="upload-item-header">
                                     <div className="file-info">
-                                        <span className="file-name">{item.file.name}</span>
+                                        <span className="file-name">{item.filename || item.file.name}</span>
                                         <span className="file-size">{formatFileSize(item.file.size)}</span>
                                     </div>
                                     {item.status !== "uploading" && item.status !== "deleting" && (
