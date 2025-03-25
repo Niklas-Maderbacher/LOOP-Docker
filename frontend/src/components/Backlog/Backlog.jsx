@@ -89,23 +89,24 @@ function Backlog() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
             return;
-        }
-            fetch("/api/v1/issues/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                name: newIssue.name,
-                category_id: newIssue.issueType,
-                sprint_id: newIssue.sprint_id || 0,
-                responsible_id: newIssue.responsible_id || 0,
-                priority_id: newIssue.priority_id || 0,
-                description: newIssue.description,
-                story_points: newIssue.story_points || 0,
-                project_id: 0
-            })
-        });
+        }   
+
+        fetch("/api/v1/issues/", {
+        method: "POST",
+        headers: {
+            
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            name: newIssue.name,
+            category_id: newIssue.issueType,
+            sprint_id: newIssue.sprint_id || null,
+            responsible_id: newIssue.responsible_id || null,
+            priority_id: newIssue.priority_id || null,
+            description: newIssue.description,
+            story_points: newIssue.story_points || null,
+            project_id: null
+        })});
 
         setIsIssueFormOpen(false);
         setNewIssue({ 
@@ -138,10 +139,10 @@ function Backlog() {
                             onChange={handleInputChange}
                         >
                             <option value="">Select...</option>
-                            <option value="BUG">Bug</option>
+                            <option value="Bug">Bug</option>
                             <option value="Epic">Epic</option>
-                            <option value="USERSTORY">Story</option>
-                            <option value="SUBTASK">Subtask</option>
+                            <option value="User Story">Story</option>
+                            <option value="Subtask">Subtask</option>
                         </select>
                         <div className="modal-buttons">
                             <button onClick={handleSubmitIssueType}>Submit</button>
