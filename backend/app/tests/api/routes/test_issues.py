@@ -2,7 +2,7 @@ from app.db.models import Issue
 from app.api.deps import SessionDep
 
 def test_update_issue_success(db: SessionDep, client_with_superuser):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
+    issue = Issue(id=1, category_id = "BUG", project_id=1, name="First Issue", story_points=4)
     db.add(issue)
     db.commit()
     db.refresh(issue)
@@ -16,7 +16,7 @@ def test_update_issue_success(db: SessionDep, client_with_superuser):
     assert data["story_points"] == 13
 
 def test_update_issue_negative_points(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
+    issue = Issue(id=1,category_id = "BUG", project_id=1, name="First Issue", story_points=4)
     db.add(issue)
     db.commit()
     db.refresh(issue)
@@ -37,7 +37,7 @@ def test_update_nonexistent_issue(client_with_superuser):
     assert response.content == b''
 
 def test_invalid_story_point_type(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
+    issue = Issue(id=1, category_id = "BUG", project_id=1, name="First Issue", story_points=4)
     db.add(issue)
     db.commit()
     db.refresh(issue)
@@ -49,7 +49,7 @@ def test_invalid_story_point_type(client_with_superuser, db):
     assert response.status_code == 422  # Validation error
 
 def test_missing_required_field(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
+    issue = Issue(id=1, category_id = "BUG", project_id=1, name="First Issue", story_points=4)
     db.add(issue)
     db.commit()
     db.refresh(issue)
@@ -59,11 +59,11 @@ def test_missing_required_field(client_with_superuser, db):
     assert response.status_code == 422
 
 
-def test_create_issue_success(client, db):
+def test_create_issue_success(client):
     """Tests the successful creation of a issue."""
     issue = {
         "name": "First Issue",
-        "category_id": 0,
+        "category_id": "User Story",
         "sprint_id": 0,
         "responsible_id": 0,
         "priority_id": 0,
@@ -80,11 +80,11 @@ def test_create_issue_success(client, db):
     assert data["story_points"] == 4
 
 
-def test_create_issue_missing_fields(client, db):
+def test_create_issue_missing_fields(client):
     """Tests the creation of a issue, where the required fields are empty(name, description)."""
     issue = {
         "name": "",
-        "category_id": 0,
+        "category_id": "User Story",
         "sprint_id": 0,
         "responsible_id": 0,
         "priority_id": 0,
@@ -98,11 +98,11 @@ def test_create_issue_missing_fields(client, db):
     assert response.status_code == 400
     assert response.json()["detail"] == "Name and description are required fields."
 
-def test_create_issue_invalid_story_points(client, db):
+def test_create_issue_invalid_story_points(client):
     """Tests the creation of an issue with invalid story points"""
     issue = {
         "name": "Invalid Story Points Issue",
-        "category_id": 0,
+        "category_id": "User Story",
         "sprint_id": 0,
         "responsible_id": 0,
         "priority_id": 0,
