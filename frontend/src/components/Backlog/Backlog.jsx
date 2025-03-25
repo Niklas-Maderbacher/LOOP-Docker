@@ -2,6 +2,7 @@
 import './Backlog.modules.css';
 import React, { useState } from 'react';
 
+
 function Backlog() {
     // State variables to control opening and closing of modals and to store new issue data
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
@@ -89,12 +90,27 @@ function Backlog() {
             alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
             return;
         }
+            fetch("/api/v1/issues/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: newIssue.name,
+                category_id: newIssue.issueType,
+                sprint_id: newIssue.sprint_id || 0,
+                responsible_id: newIssue.responsible_id || 0,
+                priority_id: newIssue.priority_id || 0,
+                description: newIssue.description,
+                story_points: newIssue.story_points || 0,
+                project_id: 0
+            })
+        });
+
         setIsIssueFormOpen(false);
-        // Add API call to create the issue here
         setNewIssue({ 
             issueType: "", 
             name: "", 
-            category_id: "", 
             sprint_id: "", 
             responsible_id: "", 
             priority_id: "", 
@@ -122,10 +138,10 @@ function Backlog() {
                             onChange={handleInputChange}
                         >
                             <option value="">Select...</option>
-                            <option value="bug">Bug</option>
-                            <option value="epic">Epic</option>
-                            <option value="story">Story</option>
-                            <option value="subtask">Subtask</option>
+                            <option value="BUG">Bug</option>
+                            <option value="Epic">Epic</option>
+                            <option value="USERSTORY">Story</option>
+                            <option value="SUBTASK">Subtask</option>
                         </select>
                         <div className="modal-buttons">
                             <button onClick={handleSubmitIssueType}>Submit</button>
