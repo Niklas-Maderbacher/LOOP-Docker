@@ -45,3 +45,38 @@ def create_issue(db: Session, issue: IssueCreate) -> Issue:
     db.commit()
     db.refresh(db_issue)
     return db_issue
+
+def get_issues(db: Session, skip: int = 0, limit: int = 50) -> list[Issue]:
+
+    return db.query(Issue).offset(skip).limit(limit).all()
+
+
+def get_issue(session: Session, id: int) -> Issue:
+    issue_db = session.query(Issue).filter(Issue.id == id).one()
+
+    issue_db = Issue(
+        id=issue_db.id,
+        name=issue_db.name,
+        category_id=issue_db.category_id,
+        sprint_id=issue_db.sprint_id,
+        state_id=issue_db.state_id,
+        creator_id=issue_db.creator_id,
+        responsible_user_id=issue_db.responsible_user_id,
+        priority_id=issue_db.priority_id,
+        description=issue_db.description,
+        repository_link=issue_db.repository_link,
+        story_points=issue_db.story_points,
+        report_time=issue_db.report_time,
+        version=issue_db.version,
+        updater_id=issue_db.updater_id,
+        project_id=issue_db.project_id,
+        updated_at=issue_db.updated_at,
+        created_at=issue_db.created_at,
+        backlog_order_number=issue_db.backlog_order_number,
+        deleted_at=issue_db.deleted_at,
+        finisher_id=issue_db.finisher_id,
+        parent_issue_id=issue_db.parent_issue_id,
+    )
+
+    return issue_db
+

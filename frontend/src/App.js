@@ -4,9 +4,11 @@ import './App.css';
 import TopBar from './components/TopBar/TopBar.jsx'
 import Sidebar from './components/Sidebar/Sidebar.jsx'
 import Content from './components/Content/Content.jsx'
+import Backlog from  './components/Backlog/Backlog.jsx';
 import Projects from './components/Projects/Projects.jsx';
 import Registration from './components/Registration/Registration.jsx';
 import LoginPage from './components/LoginPage/LoginPage.jsx'
+
 import {Routes, Route, BrowserRouter} from 'react-router-dom'
 
 
@@ -25,7 +27,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Content isSidebarShrunk={isSidebarShrunk} />}></Route> 
           <Route path="/projects" element={<Projects isSidebarShrunk={isSidebarShrunk} />}></Route>
-          <Route path="/backlog" element={<h1>In progress</h1>}></Route>
+          {/* Integrate Backlog(Add Issue Only)*/}
+          <Route path="/backlog" element={<Backlog isSidebarShrunk={isSidebarShrunk}/>}></Route>
           <Route path="/tasks" element={<h1>In progress</h1>}></Route>
           <Route path="/reports" element={<h1>In progress</h1>}></Route>
           <Route path="/login" element={<LoginPage></LoginPage>}></Route>
