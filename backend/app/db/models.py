@@ -6,6 +6,9 @@ from app.db.session import engine
 from sqlmodel import SQLModel, Field
 from sqlalchemy.dialects.postgresql import ENUM
 from app.enums.role import Role
+from app.enums.issueType import Type
+from app.enums.state import State
+from app.enums.priority import Priority
 
 
 class User(SQLModel, table=True):
@@ -41,23 +44,16 @@ class Sprint(SQLModel, table=True):
     start_date: Optional[str] = Field(default=None)
     end_date: Optional[str] = Field(default=None)
 
-class Priority(SQLModel, table=True):
-    id: int = Field(default=None, primary_key=True)
-    name: str = Field(max_length=30, nullable=False)
-
-class State(SQLModel, table=True):
-    id: int = Field(default=None, primary_key=True)
-    name: str = Field(max_length=50, nullable=False)
 
 class Issue(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=100, nullable=False)
-    category_id: Optional[int] = Field(foreign_key="category.id")
+    category: Type = Field(sa_column=Column(ENUM(Type, name="category_enum", create_type=True), nullable=False))
     sprint_id: Optional[int] = Field(foreign_key="sprint.id")
-    state_id: Optional[int] = Field(foreign_key="state.id")
+    state: State = Field(sa_column=Column(ENUM(State, name="state_enum", create_type=True), nullable=False))
     creator_id: Optional[int] = Field(foreign_key="user.id")
     responsible_user_id: Optional[int] = Field(foreign_key="user.id")
-    priority_id: Optional[int] = Field(foreign_key="priority.id")
+    priority: Priority = Field(sa_column=Column(ENUM(Priority, name="priority_enum", create_type=True), nullable=False))
     description: Optional[str] = Field(default=None)
     repository_link: Optional[str] = Field(default=None)
     story_points: Optional[int] = Field(default=None)
