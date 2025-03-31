@@ -12,6 +12,8 @@ import os
 from sqlmodel import select
 from app.db.models import User
 from app.crud.user import get_user, get_project_role
+from app.enums.role import Role
+
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -92,7 +94,7 @@ def is_admin(user: User = Depends(get_current_user)):
 def is_product_owner(session: SessionDep, project_id: int, user: User = Depends(get_current_user)):
     project_role = get_project_role(session, user.id, project_id)  # Retrieve project role
     print(f"projectrole {project_role}")
-    if project_role != 1:
+    if project_role != Role.PRODUCTOWNER:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return user
 
