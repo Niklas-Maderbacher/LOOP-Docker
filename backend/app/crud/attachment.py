@@ -1,6 +1,7 @@
 from sqlmodel import Session
 from app.db.models import Attachment
 from app.api.schemas.attachment import AttachmentCreate
+from app.db.models import Issue
 
 def save_attachment(db: Session, attachment_data: AttachmentCreate) -> Attachment:
     """
@@ -39,9 +40,13 @@ def delete_attachment_by_details(db: Session, project_id: int, issue_id: int, fi
         bool: True if the attachment was found and deleted, False if no such 
               attachment existed.
     """
+    issue = db.get(Issue, issue_id)
+    if not issue:
+        return False
+
     db_attachment = (
         db.query(Attachment)
-        .filter(Attachment.project_id == project_id)
+        .filter(Attachment.project_id == issue.project_id)
         .filter(Attachment.issue_id == issue_id)
         .filter(Attachment.filename == filename)
         .first()

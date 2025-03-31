@@ -3,8 +3,8 @@ import axios from "axios";
 import { UploadCloud, X, Send, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import './FileUploader.modules.css';
 
-const apiBaseUrl = "http://localhost:8000";
-const apiEndpoint = `${apiBaseUrl}/attachments`;
+const apiBaseUrl = "http://localhost:8000/api/v1";
+const apiEndpoint = `${apiBaseUrl}/attachments/`;
 const deleteEndpoint = `${apiBaseUrl}/attachments`;
 
 /**
@@ -37,15 +37,12 @@ export const CardContent = ({ children, className = "" }) => {
  *
  * @component
  * @param {number} [props.maxFileSize=100] - Maximum allowed file size in megabytes
- * @param {number} props.projectId - ID of the project
- * @param {number} props.issueId - ID of the issue
  * @returns {JSX.Element} FileUpload component
  */
 const FileUpload = ({ maxFileSize = 100 }) => {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
-  const [projectId, setProjectId] = useState("");
   const [issueId, setIssueId] = useState("");
   const fileInputRef = useRef(null);
 
@@ -90,7 +87,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
         status: validation.valid ? "pending" : "invalid",
         error: validation.valid ? null : validation.error,
         filename: null,
-        projectId: projectId || null,
         issueId: issueId || null,
       };
     });
@@ -115,11 +111,6 @@ const FileUpload = ({ maxFileSize = 100 }) => {
     // Prepare FormData
     const formData = new FormData();
     formData.append("files", fileItem.file);
-    
-    // Only append if they exist
-    if (fileItem.projectId) {
-      formData.append("project_id", fileItem.projectId.toString());
-    }
     
     if (fileItem.issueId) {
       formData.append("issue_id", fileItem.issueId.toString());
@@ -181,9 +172,9 @@ const FileUpload = ({ maxFileSize = 100 }) => {
   };
 
   const handleConfirmUpload = async () => {
-    // Check if IDs are set
-    if (!projectId || !issueId) {
-      alert("Please enter both Project ID and Issue ID before uploading");
+    // Check if issue ID is set
+    if (!issueId) {
+      alert("Please enter Issue ID before uploading");
       return;
     }
 
@@ -191,14 +182,13 @@ const FileUpload = ({ maxFileSize = 100 }) => {
     if (pendingUploads.length === 0) return;
 
     setIsUploading(true);
-    // Update project and issue IDs for all pending uploads
+    // Update issueId for all pending uploads
     setUploads((prevUploads) =>
       prevUploads.map((item) =>
         item.status === "pending" 
           ? { 
               ...item, 
               status: "uploading",
-              projectId: projectId,
               issueId: issueId
             } 
           : item
@@ -224,7 +214,7 @@ const FileUpload = ({ maxFileSize = 100 }) => {
       );
 
       const encodedFilename = encodeURIComponent(fileItem.filename);
-      const deleteUrl = `${deleteEndpoint}/${fileItem.projectId}/${fileItem.issueId}/${encodedFilename}`;
+      const deleteUrl = `${deleteEndpoint}/${fileItem.issueId}/${encodedFilename}`;
 
       const response = await axios.delete(deleteUrl);
       if (response.status >= 200 && response.status < 300) {
@@ -342,19 +332,8 @@ const FileUpload = ({ maxFileSize = 100 }) => {
   return (
     <Card>
       <CardContent>
-        {/* ID Input Fields */}
+        {/* Issue ID Input Field */}
         <div className="id-inputs">
-          <div className="input-group">
-            <label htmlFor="project-id">Project ID:</label>
-            <input
-              type="number"
-              id="project-id"
-              value={projectId}
-              onChange={(e) => setProjectId(e.target.value)}
-              placeholder="Enter Project ID"
-              className="id-input"
-            />
-          </div>
           <div className="input-group">
             <label htmlFor="issue-id">Issue ID:</label>
             <input

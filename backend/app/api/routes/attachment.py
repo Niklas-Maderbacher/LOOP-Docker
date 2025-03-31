@@ -7,6 +7,7 @@ from sqlmodel import Session
 from app.crud.attachment import save_attachment, delete_attachment_by_details
 from app.api.schemas.attachment import AttachmentCreate
 from app.api.deps import SessionDep
+from app.db.models import Issue
 
 router = APIRouter(prefix="/attachments", tags=["Attachments"])
 
@@ -26,23 +27,20 @@ IMAGE_SERVER_DELETE_ENDPOINT = f"http://{IMAGE_SERVER_URL}:{IMAGE_SERVER_PORT}/a
 @router.post("/")
 async def upload_files(
     session: SessionDep,
-    project_id: int = Form(...),
     issue_id: int = Form(...),
     files: list[UploadFile] = File(...),
 ):
-    """
-    Receives multiple files from the frontend in one request,
-    but for each individual file, it sends a separate POST request to the file server.
-    After successfully uploading each file, the filename is saved to the database.
-    """
+    # Get project_id from the issue
+    issue = session.get(Issue, issue_id)
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    project_id = issue.project_id
 
-    # If no files are provided, raise an error
     if not files:
         raise HTTPException(status_code=400, detail="Keine Dateien übermittelt.")
 
     uploaded_attachments = []
 
-    # Iterate over each file, sending a single request per file to the file server
     for single_file in files:
         file_data = [
             ("file", (single_file.filename, single_file.file, single_file.content_type))
@@ -52,7 +50,6 @@ async def upload_files(
             "issue_id": str(issue_id)
         }
 
-        # Perform a POST request to the file server for this single file
         response = requests.post(IMAGE_SERVER_UPLOAD_ENDPOINT, files=file_data, data=metadata)
 
         # If the file server doesn't return a 201 status
@@ -87,19 +84,20 @@ async def upload_files(
     }
 
 
-@router.delete("/{project_id}/{issue_id}/{filename}", status_code=204)
+@router.delete("/{issue_id}/{filename}", status_code=204)  # Updated endpoint
 async def delete_file_from_backend(
-    project_id: int,
-    issue_id: int,
+    issue_id: int,  # Only get issue_id from URL
     filename: str,
     session: SessionDep
 ):
-    """
-    1) Calls the file server to delete the specified attachment.
-    2) If successful, also deletes the attachment record from the database.
-    3) Returns a 204 (No Content) status if everything goes well.
-    """
-    response = requests.delete(IMAGE_SERVER_DELETE_ENDPOINT + f"/{project_id}/{issue_id}/{filename}")
+    # Get project_id from the issue
+    issue = session.get(Issue, issue_id)
+    if not issue:
+        raise HTTPException(status_code=404, detail="Issue not found")
+    project_id = issue.project_id
+
+    # Use project_id from database for file server call
+    response = requests.delete(f"{IMAGE_SERVER_DELETE_ENDPOINT}/{project_id}/{issue_id}/{filename}")
     if response.status_code != 200:
         raise HTTPException(
             status_code=500,
