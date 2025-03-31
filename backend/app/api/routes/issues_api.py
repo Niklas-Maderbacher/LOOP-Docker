@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends, Response
-from app.crud.issue import update_story_point
+from app.crud.issues import update_story_point
 from app.api.schemas.issue import StoryPointUpdate 
 from app.api.deps import SessionDep
-from app.crud.issue import get_issues
+from app.crud.issues import get_issues
 from app.api.schemas.issue import GetIssue
 
 router = APIRouter(prefix="/issues", tags=["Issues"])

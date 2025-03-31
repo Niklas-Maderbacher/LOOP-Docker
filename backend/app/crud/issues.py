@@ -1,7 +1,7 @@
 from typing import List
 from sqlmodel import Session
 from app.db.models import Issue
-from app.api.schemas.issue import Issue
+from app.api.schemas.issue import GetIssue
 
 def update_story_point(db: Session, issue_id: int, updated_story_point: int):
     try:
