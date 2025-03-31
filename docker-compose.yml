@@ -98,7 +98,7 @@ services:
       context: ./backend
 
   frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
+    image: oven/bun
     restart: always
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
