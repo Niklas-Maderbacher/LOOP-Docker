@@ -7,7 +7,7 @@ const apiBaseUrl = "http://localhost:8000/api/v1";
 const apiEndpoint = `${apiBaseUrl}/attachments/`;
 const deleteEndpoint = `${apiBaseUrl}/attachments`;
 
-/**
+/** <LOOP-33></LOOP-33>
  * A reusable card component for wrapping content.
  * @component
  * @param {Object} props - Component props
