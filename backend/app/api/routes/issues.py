@@ -3,11 +3,11 @@ from app.crud.issue import update_story_point
 from app.api.schemas.issue import StoryPointUpdate 
 from app.api.deps import SessionDep
 from app.crud.issue import get_issues
-from app.api.schemas import IssueGet
+from app.api.schemas.issue import GetIssue
 
 router = APIRouter(prefix="/issues", tags=["Issues"])
 
-@router.get("/issues/", response_model=list[IssueGet])
+@router.get("/issues/", response_model=list[GetIssue])
 async def read_issues(session: SessionDep):
     return get_issues(session)
 
