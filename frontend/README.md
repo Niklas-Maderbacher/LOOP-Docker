@@ -1,18 +1,17 @@
-
-Start App
+## Start App
 ```shell
-yarn start
+bun start
 ```
 
-React-DnD (Drag and Drop)
+## React-DnD (Drag and Drop)
 ```shell
-npm install react-dnd react-dnd-html5-backend
+bun install react-dnd react-dnd-html5-backend
 ```
 
-Font Awesome
+## Font Awesome
 ```shell
-yarn add @fortawesome/fontawesome-svg-core
-yarn add @fortawesome/free-solid-svg-icons
-yarn add @fortawesome/react-fontawesome
+bun add @fortawesome/fontawesome-svg-core
+bun add @fortawesome/free-solid-svg-icons
+bun add @fortawesome/react-fontawesome
 ```
 
