@@ -13,5 +13,5 @@ class IssueCreate(BaseModel):
     priority_id: Optional[int]
     description: str
     story_points: Optional[int]
-    project_id: int
+    project_id: Optional[int]
 

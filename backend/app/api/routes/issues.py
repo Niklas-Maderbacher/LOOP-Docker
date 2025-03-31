@@ -20,7 +20,7 @@ async def update_issue_story_points(session: SessionDep, issue_id: int, update_d
 
     return updated_issue
 
-@router.post("/", response_model=Issue, status_code=201)
+@router.post("/create", response_model=Issue, status_code=201)
 async def create_new_issue(session: SessionDep, issue_data: IssueCreate):
     """Creates a new issue in the database.
 

@@ -85,19 +85,32 @@ function Backlog() {
     }
 
     // Function to handle the submission of the issue creation form
-    function handleSubmitIssueForm() {
+    async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
             return;
         }   
 
-        fetch("/api/v1/issues/", {
-        method: "POST",
-        headers: {
-            
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
+        const response = await fetch("http://localhost:8000/api/v1/issues/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: newIssue.name,
+                category_id: newIssue.issueType,
+                sprint_id: newIssue.sprint_id || null,
+                responsible_id: newIssue.responsible_id || null,
+                priority_id: newIssue.priority_id || null,
+                description: newIssue.description,
+                story_points: newIssue.story_points || null,
+                project_id: null
+            })
+        });
+        
+        const data = await response.json();
+        console.log(data);
+        console.log(JSON.stringify({
             name: newIssue.name,
             category_id: newIssue.issueType,
             sprint_id: newIssue.sprint_id || null,
@@ -106,7 +119,7 @@ function Backlog() {
             description: newIssue.description,
             story_points: newIssue.story_points || null,
             project_id: null
-        })});
+        }));
 
         setIsIssueFormOpen(false);
         setNewIssue({ 

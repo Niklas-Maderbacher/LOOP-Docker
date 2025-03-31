@@ -80,7 +80,7 @@ class Issue(SQLModel, table=True):
     report_time: Optional[str] = Field(default=None)
     version: Optional[int] = Field(default=None)
     updater_id: Optional[int] = Field(foreign_key="user.id")
-    project_id: int = Field(foreign_key="project.id")
+    project_id: Optional[int] = Field(foreign_key="project.id")
     updated_at: Optional[str] = Field(default=None)
     created_at: Optional[str] = Field(default=None)
     backlog_order_number: Optional[int] = Field(default=None)
