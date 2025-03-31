@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import axios from "axios";  // <-- axios import
+import axios from "axios";
 import { UploadCloud, X, Send, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import './FileUploader.modules.css';
 
@@ -41,10 +41,12 @@ export const CardContent = ({ children, className = "" }) => {
  * @param {number} props.issueId - ID of the issue
  * @returns {JSX.Element} FileUpload component
  */
-const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
+const FileUpload = ({ maxFileSize = 100 }) => {
   const [uploads, setUploads] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [projectId, setProjectId] = useState("");
+  const [issueId, setIssueId] = useState("");
   const fileInputRef = useRef(null);
 
   // Convert MB to bytes
@@ -88,8 +90,8 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
         status: validation.valid ? "pending" : "invalid",
         error: validation.valid ? null : validation.error,
         filename: null,
-        projectId,
-        issueId,
+        projectId: projectId || null,
+        issueId: issueId || null,
       };
     });
 
@@ -113,8 +115,15 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
     // Prepare FormData
     const formData = new FormData();
     formData.append("files", fileItem.file);
-    formData.append("project_id", fileItem.projectId.toString());
-    formData.append("issue_id", fileItem.issueId.toString());
+    
+    // Only append if they exist
+    if (fileItem.projectId) {
+      formData.append("project_id", fileItem.projectId.toString());
+    }
+    
+    if (fileItem.issueId) {
+      formData.append("issue_id", fileItem.issueId.toString());
+    }
 
     try {
       const response = await axios.post(apiEndpoint, formData, {
@@ -130,18 +139,13 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
             );
           }
         },
-        // If you need a specific header for multipart, but usually this is fine
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.status >= 200 && response.status < 300) {
-        // We expect a JSON response with "uploaded_attachments"
         const data = response.data;
-        // For multi-file uploads in a single request, pick the correct array item
-        // but in your code, "uploaded_attachments" might be an array
-        // or something else. Adjust if needed:
         const newFilename = data?.uploaded_attachments?.[0]?.filename || data?.filename;
 
         setUploads((prevUploads) =>
@@ -176,18 +180,28 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
     }
   };
 
-  /**
-   * Initiates upload of all pending files.
-   */
   const handleConfirmUpload = async () => {
+    // Check if IDs are set
+    if (!projectId || !issueId) {
+      alert("Please enter both Project ID and Issue ID before uploading");
+      return;
+    }
+
     const pendingUploads = uploads.filter((item) => item.status === "pending");
     if (pendingUploads.length === 0) return;
 
     setIsUploading(true);
-    // Mark all pending files as "uploading"
+    // Update project and issue IDs for all pending uploads
     setUploads((prevUploads) =>
       prevUploads.map((item) =>
-        item.status === "pending" ? { ...item, status: "uploading" } : item
+        item.status === "pending" 
+          ? { 
+              ...item, 
+              status: "uploading",
+              projectId: projectId,
+              issueId: issueId
+            } 
+          : item
       )
     );
 
@@ -214,7 +228,6 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
 
       const response = await axios.delete(deleteUrl);
       if (response.status >= 200 && response.status < 300) {
-        // Mark as deleted, remove from list after a short delay
         setUploads((prevUploads) =>
           prevUploads.map((item) =>
             item.id === fileItem.id
@@ -270,11 +283,9 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
    * @param {Object} fileItem - File item to remove
    */
   const handleRemoveFile = async (fileItem) => {
-    // If it's only pending or failed, just remove from list
     if (fileItem.status === "uploaded") {
       await deleteFile(fileItem);
     } else {
-      // If mid-upload or error, just remove
       setUploads((prevUploads) =>
         prevUploads.filter((item) => item.id !== fileItem.id)
       );
@@ -331,6 +342,32 @@ const FileUpload = ({ maxFileSize = 100, projectId, issueId }) => {
   return (
     <Card>
       <CardContent>
+        {/* ID Input Fields */}
+        <div className="id-inputs">
+          <div className="input-group">
+            <label htmlFor="project-id">Project ID:</label>
+            <input
+              type="number"
+              id="project-id"
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              placeholder="Enter Project ID"
+              className="id-input"
+            />
+          </div>
+          <div className="input-group">
+            <label htmlFor="issue-id">Issue ID:</label>
+            <input
+              type="number"
+              id="issue-id"
+              value={issueId}
+              onChange={(e) => setIssueId(e.target.value)}
+              placeholder="Enter Issue ID"
+              className="id-input"
+            />
+          </div>
+        </div>
+
         {/* File input for selection */}
         <input
           type="file"
