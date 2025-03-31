@@ -1,8 +1,6 @@
 # import logging
 #
-# from sqlmodel import Session
-#
-# from app.core.db import engine, init_db
+import app.crud.user as crud_user
 #
 # logging.basicConfig(level=logging.INFO)
 # logger = logging.getLogger(__name__)
@@ -17,7 +15,7 @@
 #     logger.info("Creating initial data")
 #     init()
 #     logger.info("Initial data created")
-#
-#
-# if __name__ == "__main__":
-#     main()
+crud_user.add_admin_user()
+
+if __name__ == "__main__":
+    main()
