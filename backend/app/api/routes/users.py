@@ -34,7 +34,7 @@ async def get_user(session: SessionDep, email: str):
         raise HTTPException(status_code=404, detail="User not found")
     return user
 
-@router.post("/create_user", dependencies=[Depends(FastApiAuthorization.is_admin)])
+@router.post("/create_user", dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
 async def register_user(session: SessionDep, user: UserCreate):
     """api call to create a user
 
