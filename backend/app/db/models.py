@@ -2,7 +2,6 @@ from sqlmodel import Field, Relationship, SQLModel
 from sqlalchemy import Column
 from typing import List, Optional
 from pydantic import EmailStr
-from app.db.session import engine
 from sqlmodel import SQLModel, Field
 from sqlalchemy.dialects.postgresql import ENUM
 from app.enums.role import Role
