@@ -25,15 +25,16 @@ def create_superuser_if_not_exists():
             password = "NAWI is oasch"  # Sicherstellen, dass das Passwort sicher ist
             hashed_password = get_password_hash(password)
             
-            superuser_data = UserCreateSuperuser(
+            superuser_data = User(
                 email=email,
                 display_name=display_name,
                 password=hashed_password,
-                is_admin=True,
+                is_admin=True
             )
+
             session.add(superuser_data)
             session.commit()
-            session.refresh(superuser)
+            session.refresh(superuser_data)
             print(f"Superuser {email} wurde erfolgreich erstellt.")
 
 # Superuser erstellen, falls nicht vorhanden
