@@ -1,99 +1,68 @@
-from fastapi import APIRouter, HTTPException, Depends, Response
-from app.crud.priority import update_priority
-from app.crud.issue import update_story_point
 from app.api.schemas.issue import StoryPointUpdate
-from app.api.deps import SessionDep
-from sqlalchemy.orm import Session
+from fastapi.testclient import TestClient
+from app.main import app  # Import the FastAPI application
 
-router = APIRouter(prefix="/issues", tags=["Issues"])
+client = TestClient(app)
 
-@router.post("/update-priority")
-def update_issue_priority(
-    issue_id: int,
-    user_id: int,
-    priority_name: str,
-    session: Session = Depends(SessionDep)
-):
+def test_update_issue_story_points_success():
     """
-    Updates the priority of an issue.
+    Test case for successfully updating story points of an issue.
 
-    - **issue_id**: ID of the issue whose priority needs to be updated.
-    - **user_id**: ID of the user performing the change.
-    - **priority_name**: The new priority name.
-    - **session**: SQLAlchemy session for database interaction.
-
-    **Responses:**
-    - Returns the updated issue if the priority is successfully changed.
-    - If an error occurs, an HTTPException is raised with the error detail.
+    Steps:
+    1. A valid issue ID and new story point value (5) are provided.
+    2. The `PATCH` request is sent to the `/api/v1/issues/{issue_id}` endpoint with the new story point value.
+    3. The response status code is checked to be 200 OK.
+    4. The updated issue is returned, and its `story_points` field is checked to ensure it has been updated to the new value (5).
+    
+    Expected outcome:
+    - The response status code should be 200.
+    - The `story_points` field should be equal to the provided value (5).
     """
-    try:
-        updated_issue = update_priority(session, issue_id, user_id, priority_name)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    issue_id = 1
+    update_data = StoryPointUpdate(new_story_point_value=5)
+    
+    response = client.patch(f"/api/v1/issues/{issue_id}", json=update_data.dict())
+    
+    assert response.status_code == 200
+    updated_issue = response.json()
+    assert updated_issue["story_points"] == 5  # Check if story points were updated correctly
 
-    if not updated_issue:
-        raise HTTPException(status_code=400, detail="Failed to update priority")
-
-    return updated_issue
-
-
-@router.patch("/{issue_id}")
-async def update_issue_story_points(
-    session: SessionDep,
-    issue_id: int,
-    update_data: StoryPointUpdate
-):
+def test_update_issue_story_points_failure_negative_value():
     """
-    Updates the story points for an issue.
+    Test case for failing to update story points with a negative value.
 
-    - **issue_id**: ID of the issue whose story points need to be updated.
-    - **update_data**: The new story points to be set.
-    - **session**: SQLAlchemy session for database interaction.
+    Steps:
+    1. A valid issue ID and an invalid story point value (-1) are provided.
+    2. The `PATCH` request is sent to the `/api/v1/issues/{issue_id}` endpoint with the negative story point value.
+    3. The response status code is checked to be 400 Bad Request.
+    4. The error message returned is checked to ensure it matches the expected message that story points must be positive integers.
 
-    **Responses:**
-    - Returns the updated issue if the story points are successfully changed.
-    - If the new story points are invalid (e.g., negative), an HTTPException with the error detail is raised.
-    - Returns a 204 response if no changes are required.
+    Expected outcome:
+    - The response status code should be 400 (Bad Request).
+    - The response JSON should contain the correct error message: "Story points need to be positive integer values."
     """
-    if update_data.new_story_point_value < 0:
-        raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
+    issue_id = 1
+    update_data = StoryPointUpdate(new_story_point_value=-1)
+    
+    response = client.patch(f"/api/v1/issues/{issue_id}", json=update_data.dict())
+    
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Story points need to be positive integer values."}  # Check if the error message is correct
 
-    try:
-        updated_issue = update_story_point(session, issue_id, update_data.new_story_point_value)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    if updated_issue is None:
-        return Response(status_code=204)
-
-    return updated_issue
-
-
-def update_priority(session: Session, issue_id: int, user_id: int, new_priority_name: str):
+def test_update_issue_story_points_no_update():
     """
-    Helper function to update the priority of an issue.
+    Test case for no update to story points when the new value is the same as the current one (0 in this case).
 
-    - **session**: SQLAlchemy session for database interaction.
-    - **issue_id**: ID of the issue whose priority needs to be updated.
-    - **user_id**: ID of the user performing the change.
-    - **new_priority_name**: The new priority name.
-
-    **Responses:**
-    - Returns the updated issue if the priority is successfully changed.
-    - If an error occurs (e.g., issue or priority does not exist), a ValueError is raised.
+    Steps:
+    1. A valid issue ID and a new story point value (0) are provided (assuming the current value is also 0).
+    2. The `PATCH` request is sent to the `/api/v1/issues/{issue_id}` endpoint with the story point value of 0.
+    3. The response status code is checked to be 200 OK, as no actual update is needed.
+    
+    Expected outcome:
+    - The response status code should be 200 OK, indicating that the update was processed but no change was made.
     """
-    issue = session.query(Issue).filter(Issue.id == issue_id).first()
-    if not issue:
-        raise ValueError(f"Issue with ID {issue_id} does not exist.")
+    issue_id = 1
+    update_data = StoryPointUpdate(new_story_point_value=0)  # Assuming no change to story points
+    response = client.patch(f"/api/v1/issues/{issue_id}", json=update_data.dict())
 
-    if not isinstance(new_priority_name, str):
-        raise ValueError("Priority must be a string.")
-
-    priority = session.query(Priority).filter(Priority.name == new_priority_name).first()
-    if not priority:
-        raise ValueError(f"Priority '{new_priority_name}' does not exist.")
-
-    issue.priority_id = priority.id
-    session.commit()
-    session.refresh(issue)
-    return issue
+    assert response.status_code == 200  # Expecting 200 OK even though there was no update
