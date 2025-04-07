@@ -1,13 +1,20 @@
 services:
   file_server:
+    container_name: loop-file-server
     restart: always
     build:
       context: ./file_server
     volumes:
       - ./file_server/attachments:/file_server/attachments
     ports:
-      - ${FILE_SERVER_PORT}:${FILE_SERVER_PORT}
+      - ${OUTSIDE_FILE_SERVER_PORT}:${FILE_SERVER_PORT}
     env_file:
       - .env
     environment:
       - FILE_SERVER_PORT=${FILE_SERVER_PORT}
+    networks:
+      - loop-network
+
+networks:
+  loop-network:
+    external: true

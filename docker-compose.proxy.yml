@@ -1,0 +1,17 @@
+services:
+  proxy:
+    container_name: loop-proxy
+    build:
+      context: ./proxy
+    volumes:
+      - ./proxy.conf:/etc/nginx/proxy.conf
+      - /etc/ssl/certs/local.crt:/etc/ssl/certs/local.crt
+      - /etc/ssl/private/local.key:/etc/ssl/private/local.key
+    ports:
+      - "443:443"
+    networks:
+      - loop-network
+
+networks:
+  loop-network:
+    external: true
