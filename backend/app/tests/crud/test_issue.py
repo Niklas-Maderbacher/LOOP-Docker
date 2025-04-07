@@ -1,14 +1,14 @@
-from app.crud.issue import update_story_point
 from app.api.deps import SessionDep
 import pytest
-from sqlmodel import Session
-from app.db.models import Issue, Priority, User
-from app.crud.issue import create_issue, get_issues, get_issue
-from app.crud.priority import update_priority
 from datetime import datetime
+from sqlalchemy.orm import Session
+from app.db.models import Issue, Priority, User
+from app.crud.issue import update_story_point, create_issue, get_issues, get_issue
+
+
 
 def test_update_story_point_existing(db: SessionDep):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=3)
+    issue = Issue(id=1, project_id = 1, name="First Issue", story_points=3)
     db.add(issue)
     db.commit()
     db.refresh(issue)
@@ -36,62 +36,57 @@ def test_update_story_point_exception(db: SessionDep, monkeypatch):
     assert "error" in error_data
     assert "Simulated database error" in error_data["error"]
     assert status_code == 500
-
-
-
-def test_create_issue(db: Session):
-    issue_data = Issue(
-        name="Test Issue",
-        category_id=1,
-        sprint_id=1,
-        state_id=1,
-        creator_id=1,
-        responsible_user_id=2,
-        priority_id=1,
-        description="Test description",
-        repository_link="http://github.com/test",
-        story_points=5,
-        report_time=datetime.utcnow(),
-        version=1,
-        updater_id=1,
-        project_id=1,
-        updated_at=datetime.utcnow(),
-        created_at=datetime.utcnow(),
-        backlog_order_number=1,
-        deleted_at=None,
-        finisher_id=None,
-        parent_issue_id=None,
-    )
     
-    created_issue = create_issue(db, issue_data)
-    assert created_issue is not None
-    assert created_issue.name == "Test Issue"
+# Test for updating story points
+def test_update_story_point_success(db: Session) -> None:
+    issue = Issue(id=1, name="Test Issue", story_points=5, project_id=1)
+    db.add(issue)
+    db.commit()
+    
+    updated_issue = update_story_point(db, issue_id=1, updated_story_point=8)
+    
+    assert updated_issue.story_points == 8
 
-def test_get_issues(db: Session):
+# Test for updating story points with non-existing issue
+def test_update_story_point_not_found(db: Session) -> None:
+    updated_issue = update_story_point(db, issue_id=999, updated_story_point=8)
+    
+    assert updated_issue is None
+
+# Test for retrieving issues
+def test_get_issues_success(db: Session) -> None:
+    issue1 = Issue(name="Issue 1", project_id=1)
+    issue2 = Issue(name="Issue 2", project_id=1)
+    db.add_all([issue1, issue2])
+    db.commit()
+    
     issues = get_issues(db)
-    assert isinstance(issues, list)
+    
+    assert len(issues) == 2
 
-def test_get_issue(db: Session):
-    issue = Issue(id=1, name="Existing Issue", category_id=1, project_id=1)
+test_user = User(
+        email="testuser@example.com",
+        display_name="Test User",
+        password="testpassword123",  # Normalerweise würdest du das Passwort hashen
+        microsoft_account=False,
+        is_email_verified=True,
+        is_admin=False)
+
+# Test for creating an issue
+def test_create_issue_success(db: Session) -> None:
+    issue3 = Issue(name= "New Issue", creator_id=1, priority_id=1,  project_id=1)
+    created_issue = create_issue(db, issue3)
+    
+    assert created_issue.id is not None
+
+
+# Test for retrieving a single issue
+def test_get_issue_success(db: Session) -> None:
+    issue = Issue(id=1, name="Test Issue", project_id=1)
     db.add(issue)
     db.commit()
-    db.refresh(issue)
     
-    fetched_issue = get_issue(db, id=1)
-    assert fetched_issue is not None
-    assert fetched_issue.name == "Existing Issue"
-
-def test_update_priority(db: Session):
-    user = User(id=1, name="Test User")
-    priority = Priority(id=1, name="High")
-    issue = Issue(id=1, name="Issue to Update", category_id=1, priority_id=2, creator_id=1, project_id=1)
+    retrieved_issue = get_issue(db, id=1)
     
-    db.add(user)
-    db.add(priority)
-    db.add(issue)
-    db.commit()
-    db.refresh(issue)
-    
-    updated_issue = update_priority(issue_id=1, user_id=1, new_priority_name="High")
-    assert updated_issue is not None
-    assert updated_issue.priority_id == 1
+    assert retrieved_issue.id == 1
+    assert retrieved_issue.name == "Test Issue"

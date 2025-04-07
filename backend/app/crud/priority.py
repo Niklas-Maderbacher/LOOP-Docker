@@ -3,9 +3,9 @@ from sqlmodel import Session
 from datetime import datetime
 from app.api.deps import get_db  # Funktion, um die DB-Session zu erhalten
 
-def update_priority(issue_id: int, user_id: int, new_priority_name: str):
+def update_priority(db: Session, issue_id:int, user_id: int, new_priority_name: str):
     # Holt die Sitzung aus der Datenbank
-    session = next(get_db())  # Wir gehen davon aus, dass get_db() eine Generator-Funktion ist, die die Sitzung bereitstellt
+    session = db  # Wir gehen davon aus, dass get_db() eine Generator-Funktion ist, die die Sitzung bereitstellt
 
     # Überprüfen, ob der User existiert
     user = session.query(User).filter(User.id == user_id).first()

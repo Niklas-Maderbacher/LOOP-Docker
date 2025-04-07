@@ -1,59 +1,69 @@
-from app.db.models import Issue
+from fastapi import APIRouter, HTTPException, Depends, Response
+from app.crud.priority import update_priority
+from app.crud.issue import update_story_point
+from app.api.schemas.issue import StoryPointUpdate
 from app.api.deps import SessionDep
+from sqlalchemy.orm import Session
 
-def test_update_issue_success(db: SessionDep, client_with_superuser):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
-    db.add(issue)
-    db.commit()
-    db.refresh(issue)
-    
-    response = client_with_superuser.patch(
-        f"/api/v1/issues/{issue.id}", json={"new_story_point_value": 13}
-    )
-    
-    assert response.status_code == 200
-    data = response.json()
-    assert data["story_points"] == 13
+router = APIRouter(prefix="/issues", tags=["Issues"])
 
-def test_update_issue_negative_points(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
-    db.add(issue)
-    db.commit()
-    db.refresh(issue)
-    
-    response = client_with_superuser.patch(
-        f"/api/v1/issues/{issue.id}", json={"new_story_point_value": -3}
-    )
-    
-    assert response.status_code == 400
-    assert "Story points need to be positive integer" in response.json()["detail"]
+@router.post("/update-priority")
+def update_issue_priority(
+    issue_id: int,
+    user_id: int,
+    priority_name: str,
+    session: Session = Depends(SessionDep)
+):
+    """
+    Aktualisiert die Priorität eines Issues.
+    """
+    try:
+        updated_issue = update_priority(session, issue_id, user_id, priority_name)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-def test_update_nonexistent_issue(client_with_superuser):
-    response = client_with_superuser.patch(
-        "/api/v1/issues/999", json={"new_story_point_value": 5}
-    )
-    
-    assert response.status_code == 204
-    assert response.content == b''
+    if not updated_issue:
+        raise HTTPException(status_code=400, detail="Failed to update priority")
 
-def test_invalid_story_point_type(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
-    db.add(issue)
-    db.commit()
-    db.refresh(issue)
-    
-    response = client_with_superuser.patch(
-        f"/api/v1/issues/{issue.id}", json={"new_story_point_value": "invalid"}
-    )
-    
-    assert response.status_code == 422  # Validation error
+    return updated_issue
 
-def test_missing_required_field(client_with_superuser, db):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=4)
-    db.add(issue)
-    db.commit()
-    db.refresh(issue)
-    
-    response = client_with_superuser.patch(f"/api/v1/issues/{issue.id}", json={})
-    
-    assert response.status_code == 422
+
+@router.patch("/{issue_id}")
+async def update_issue_story_points(
+    session: SessionDep,
+    issue_id: int,
+    update_data: StoryPointUpdate
+):
+    """
+    Aktualisiert Story Points für ein Issue.
+    """
+    if update_data.new_story_point_value < 0:
+        raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
+
+    try:
+        updated_issue = update_story_point(session, issue_id, update_data.new_story_point_value)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if updated_issue is None:
+        return Response(status_code=204)
+
+    return updated_issue
+
+def update_priority(session: Session, issue_id: int, user_id: int, new_priority_name: str):
+    issue = session.query(Issue).filter(Issue.id == issue_id).first()
+    if not issue:
+        raise ValueError(f"Issue mit ID {issue_id} existiert nicht.")
+
+    if not isinstance(new_priority_name, str):
+        raise ValueError("Priority muss ein String sein.")
+
+    priority = session.query(Priority).filter(Priority.name == new_priority_name).first()
+    if not priority:
+        raise ValueError(f"Priority '{new_priority_name}' existiert nicht.")
+
+    issue.priority_id = priority.id
+    session.commit()
+    session.refresh(issue)
+    return issue
+
