@@ -1,9 +1,9 @@
-from sqlmodel import Field, Relationship, SQLModel
+from typing import Optional, List
+from sqlmodel import Field, SQLModel
 from sqlalchemy import Column
-from typing import List, Optional
 from pydantic import EmailStr
-from sqlmodel import SQLModel, Field
 from sqlalchemy.dialects.postgresql import ENUM
+
 from app.enums.role import Role
 from app.enums.issueType import Type
 from app.enums.state import State
@@ -42,6 +42,14 @@ class Sprint(SQLModel, table=True):
     project_id: int = Field(foreign_key="project.id")
     start_date: Optional[str] = Field(default=None)
     end_date: Optional[str] = Field(default=None)
+
+""" class PriorityModel(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(max_length=30, nullable=False)
+
+class StateModel(SQLModel, table=True):
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(max_length=50, nullable=False) """
 
 class Attachment(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
