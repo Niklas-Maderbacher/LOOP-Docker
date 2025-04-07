@@ -3,20 +3,57 @@ import React, { useState, useEffect } from 'react';
 
 function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [projects, setProjects] = useState([
-        { name: "Project Alpha", key: "ALPHA", type: "Software", lead: "Alice" },
-        { name: "Project Beta", key: "BETA", type: "Marketing", lead: "Bob" },
-        { name: "Project Gamma", key: "GAMMA", type: "Design", lead: "Charlie" }
-    ]);
+    const [projects, setProjects] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
     const [newProject, setNewProject] = useState({ name: "", key: "", type: "", lead: "", description: "" });
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-    // Check if user is admin when component mounts
+    // Fetch projects and check admin status when component mounts
     useEffect(() => {
-        checkIfAdmin();
+        const fetchInitialData = async () => {
+            try {
+                await Promise.all([
+                    fetchProjects(),
+                    checkIfAdmin()
+                ]);
+            } catch (error) {
+                console.error("Error initializing data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchInitialData();
     }, []);
+
+    // Function to fetch projects from the API
+    const fetchProjects = async () => {
+        try {
+            const token = localStorage.getItem('jwt');
+            if (!token) {
+                setError("Authentication required");
+                return;
+            }
+
+            const response = await fetch('http://localhost:8000/api/v1/projects/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch projects: ${response.status}`);
+            }
+
+            const projectsData = await response.json();
+            setProjects(projectsData);
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+            setError("Failed to load projects");
+        }
+    };
 
     // Function to check if user is admin via the API
     const checkIfAdmin = async () => {
@@ -24,11 +61,9 @@ function Projects() {
             const token = localStorage.getItem('jwt');
             if (!token) {
                 setIsAdmin(false);
-                setLoading(false);
                 return;
             }
 
-            // Option 1: Use the specific admin check endpoint
             const response = await fetch('http://localhost:8000/api/v1/security/users/check/admin', {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -42,27 +77,9 @@ function Projects() {
                 // If 403 Forbidden, user is not an admin
                 setIsAdmin(false);
             }
-
-            // Option 2: Get the full user profile and check is_admin
-            /*
-            const userResponse = await fetch('http://localhost:8000/api/v1/security/users/me/', {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                setIsAdmin(userData.is_admin);
-            } else {
-                setIsAdmin(false);
-            }
-            */
         } catch (error) {
             console.error("Error checking admin status:", error);
             setIsAdmin(false);
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -79,43 +96,76 @@ function Projects() {
         setNewProject({ ...newProject, [event.target.name]: event.target.value });
     }
 
-    function handleSubmit() {
-        setProjects([...projects, newProject]);
-        handleCloseModal();
+    async function handleSubmit() {
+        try {
+            const token = localStorage.getItem('jwt');
+            if (!token) {
+                setError("Authentication required");
+                return;
+            }
+
+            const response = await fetch('http://localhost:8000/api/v1/projects/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newProject)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to create project: ${response.status}`);
+            }
+
+            // Refresh the project list after successful creation
+            await fetchProjects();
+            handleCloseModal();
+            setMessage("Project created successfully!");
+            setTimeout(() => setMessage(null), 3000);
+        } catch (error) {
+            console.error("Error creating project:", error);
+            setMessage("Error creating project ❌");
+            setTimeout(() => setMessage(null), 3000);
+        }
     }
 
-    async function handleArchive() {
-        // TODO add parameter for project_id
+    async function handleArchive(projectId) {
         try {
-        //     const response = await fetch(`/api/v1/projects/archive/${projectId}`, {
-        //         method: "PUT",
-        //         headers: {
-        //             "Authorization": `Bearer ${localStorage.getItem("jwt")}`,
-        //             "Content-Type": "application/json",
-        //         },
-        //     });
+            const token = localStorage.getItem('jwt');
+            if (!token) {
+                setError("Authentication required");
+                return;
+            }
 
-        //     if (!response.ok) {
-        //         throw new Error("Failed to archive project");
-            // }
+            const response = await fetch(`http://localhost:8000/api/v1/projects/archive/${projectId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            });
 
-            setMessage("Button not yet functioning!");
+            if (!response.ok) {
+                throw new Error("Failed to archive project");
+            }
 
-            // // Remove archived project from state
-            // setProjects(projects.filter(project => project.id !== projectId));
-
-            // Hide message after 3 seconds
-            setTimeout(() => {
-                setMessage(null);
-            }, 3000);
+            // Refresh the project list after successful archiving
+            await fetchProjects();
+            setMessage("Project archived successfully!");
+            setTimeout(() => setMessage(null), 3000);
         } catch (error) {
             console.error("Error:", error);
             setMessage("Error archiving project ❌");
+            setTimeout(() => setMessage(null), 3000);
         }
     }
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <div className="loading">Loading projects...</div>;
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>;
     }
 
     return (
@@ -129,43 +179,48 @@ function Projects() {
                 </button>
             )}
 
+            {message && <div className="message-box">{message}</div>}
+
             <div className="search">
                 <input type="text" placeholder="Search..." />
             </div>
 
             <div className="project-list">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Key</th>
-                            <th>Type</th>
-                            <th>Lead</th>
-                            {isAdmin && <th>Actions</th>}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {projects.map((project, index) => (
-                            <tr key={index}>
-                                <td>{project.name}</td>
-                                <td>{project.key}</td>
-                                <td>{project.type}</td>
-                                <td>{project.lead}</td>
-                                {isAdmin && (
-                                    <td>
-                                        <button 
-                                            className="archive-project-btn" 
-                                            onClick={() => handleArchive()}
-                                        >
-                                            Archive
-                                        </button>
-                                    </td>
-                                )}
-                                {message && <div className="message-box">{message}</div>}
+                {projects.length === 0 ? (
+                    <p>No projects found.</p>
+                ) : (
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Key</th>
+                                <th>Type</th>
+                                <th>Lead</th>
+                                {isAdmin && <th>Actions</th>}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {projects.map((project) => (
+                                <tr key={project.id}>
+                                    <td>{project.name}</td>
+                                    <td>{project.key}</td>
+                                    <td>{project.type}</td>
+                                    <td>{project.lead}</td>
+                                    {isAdmin && (
+                                        <td>
+                                            <button 
+                                                className="archive-project-btn" 
+                                                onClick={() => handleArchive(project.id)}
+                                            >
+                                                Archive
+                                            </button>
+                                        </td>
+                                    )}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
 
             {isModalOpen && (
@@ -178,6 +233,7 @@ function Projects() {
                             placeholder="Project Name" 
                             value={newProject.name} 
                             onChange={handleInputChange} 
+                            required
                         />
                         <input 
                             type="text" 
@@ -185,6 +241,7 @@ function Projects() {
                             placeholder="Project Key" 
                             value={newProject.key} 
                             onChange={handleInputChange} 
+                            required
                         />
                         <input 
                             type="text" 
@@ -192,6 +249,7 @@ function Projects() {
                             placeholder="Project Type" 
                             value={newProject.type} 
                             onChange={handleInputChange} 
+                            required
                         />
                         <input 
                             type="text" 
@@ -199,6 +257,7 @@ function Projects() {
                             placeholder="Project Lead" 
                             value={newProject.lead} 
                             onChange={handleInputChange} 
+                            required
                         />
                         <input 
                             type="text" 
