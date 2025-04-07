@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 from sqlmodel import Field, SQLModel
 from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import ENUM
 from pydantic import EmailStr
+from sqlalchemy.dialects.postgresql import ENUM
 
 from app.enums.role import Role
 from app.enums.issueType import Type
@@ -62,10 +62,10 @@ class Issue(SQLModel, table=True):
     name: str = Field(max_length=100, nullable=False)
     category: Type = Field(sa_column=Column(ENUM(Type, name="category_enum", create_type=True), nullable=False))
     sprint_id: Optional[int] = Field(foreign_key="sprint.id")
-    state: State = Field(sa_column=Column(ENUM(State, name="state_enum", create_type=True), nullable=False))
+    state: Optional[State] = Field(sa_column=Column(ENUM(State, name="state_enum", create_type=True), nullable=True))
     creator_id: Optional[int] = Field(foreign_key="user.id")
     responsible_user_id: Optional[int] = Field(foreign_key="user.id")
-    priority: Priority = Field(sa_column=Column(ENUM(Priority, name="priority_enum", create_type=True), nullable=False))
+    priority: Priority = Field(sa_column=Column(ENUM(Priority, name="priority_enum", create_type=True), nullable=True))
     description: Optional[str] = Field(default=None)
     repository_link: Optional[str] = Field(default=None)
     story_points: Optional[int] = Field(default=None)

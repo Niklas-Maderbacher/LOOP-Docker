@@ -32,7 +32,7 @@ def create_issue(db: Session, issue: IssueCreate) -> Issue:
     """
     db_issue = Issue(
         name=issue.name,
-        category_id=issue.category_id,
+        category=issue.category,
         sprint_id=issue.sprint_id,
         responsible_user_id=issue.responsible_id,
         priority_id=issue.priority_id,

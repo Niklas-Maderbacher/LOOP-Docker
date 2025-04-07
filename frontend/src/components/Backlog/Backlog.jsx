@@ -12,7 +12,6 @@ function Backlog() {
     const [newIssue, setNewIssue] = useState({ 
         issueType: "", 
         name: "", 
-        category_id: "", 
         sprint_id: "", 
         responsible_id: "", 
         priority_id: "", 
@@ -75,7 +74,6 @@ function Backlog() {
         setNewIssue({ 
             issueType: "", 
             name: "", 
-            category_id: "", 
             sprint_id: "", 
             responsible_id: "", 
             priority_id: "", 
@@ -98,13 +96,13 @@ function Backlog() {
             },
             body: JSON.stringify({
                 name: newIssue.name,
-                category_id: newIssue.issueType,
+                category: newIssue.issueType,
                 sprint_id: newIssue.sprint_id || null,
                 responsible_id: newIssue.responsible_id || null,
                 priority_id: newIssue.priority_id || null,
                 description: newIssue.description,
                 story_points: newIssue.story_points || null,
-                project_id: null
+                project_id: 1
             })
         });
         
@@ -180,18 +178,6 @@ function Backlog() {
                             onChange={handleInputChange} 
                         />
 
-                        {/* Dropdown for selecting the category */}
-                        <select
-                            className='issue-dropdown' 
-                            name="category_id" 
-                            value={newIssue.category_id} 
-                            onChange={handleInputChange}
-                        >
-                            <option value="">Category ↓</option>
-                            <option value="1">Category A</option>
-                            <option value="2">Category B</option>
-                        </select>
-
                         {/* Dropdown for selecting the sprint */}
                         <select
                             className='issue-dropdown' 
@@ -224,9 +210,11 @@ function Backlog() {
                             onChange={handleInputChange}
                         >
                             <option value="">Priority ↓</option>
-                            <option value="1">Low</option>
-                            <option value="2">Medium</option>
-                            <option value="3">High</option>
+                            <option value="Very high">Very high</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                            <option value="Very low">Very low</option>
                         </select>
 
                         {/* Input for the issue description */}
