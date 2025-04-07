@@ -14,7 +14,25 @@
 * Start the local stack with Docker Compose:
 
 ```bash
+docker network create loop-network
+```
+
+* Backend + Frontend + Adminer + Prestart
+
+```bash
 docker compose -f docker-compose.yml up --build
+```
+
+* File Server
+
+```bash
+docker compose -f docker-compose.file-server.yml up --build
+```
+
+* Reverse Proxy
+
+```bash
+docker compose -f docker-compose.proxy.yml up --build
 ```
 
 * Now you can open your browser and interact with these URLs:
