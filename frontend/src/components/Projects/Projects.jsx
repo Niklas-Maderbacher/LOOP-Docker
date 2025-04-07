@@ -1,5 +1,5 @@
 import './Projects.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -8,14 +8,67 @@ function Projects() {
         { name: "Project Beta", key: "BETA", type: "Marketing", lead: "Bob" },
         { name: "Project Gamma", key: "GAMMA", type: "Design", lead: "Charlie" }
     ]);
-
+    const [isAdmin, setIsAdmin] = useState(false);
     const [newProject, setNewProject] = useState({ name: "", key: "", type: "", lead: "", description: "" });
+    const [message, setMessage] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    // Check if user is admin when component mounts
+    useEffect(() => {
+        checkIfAdmin();
+    }, []);
+
+    // Function to check if user is admin via the API
+    const checkIfAdmin = async () => {
+        try {
+            const token = localStorage.getItem('jwt');
+            if (!token) {
+                setIsAdmin(false);
+                setLoading(false);
+                return;
+            }
+
+            // Option 1: Use the specific admin check endpoint
+            const response = await fetch('http://localhost:8000/api/v1/security/users/check/admin', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            // If successful, the user is an admin
+            if (response.ok) {
+                setIsAdmin(true);
+            } else {
+                // If 403 Forbidden, user is not an admin
+                setIsAdmin(false);
+            }
+
+            // Option 2: Get the full user profile and check is_admin
+            /*
+            const userResponse = await fetch('http://localhost:8000/api/v1/security/users/me/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                setIsAdmin(userData.is_admin);
+            } else {
+                setIsAdmin(false);
+            }
+            */
+        } catch (error) {
+            console.error("Error checking admin status:", error);
+            setIsAdmin(false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     function handleOpenModal() {
         setIsModalOpen(true);
     }
-
-    const [message, setMessage] = useState(null);
 
     function handleCloseModal() {
         setIsModalOpen(false);
@@ -37,7 +90,7 @@ function Projects() {
         //     const response = await fetch(`/api/v1/projects/archive/${projectId}`, {
         //         method: "PUT",
         //         headers: {
-        //             "Authorization": `Bearer ${localStorage.getItem("token")}`,
+        //             "Authorization": `Bearer ${localStorage.getItem("jwt")}`,
         //             "Content-Type": "application/json",
         //         },
         //     });
@@ -61,12 +114,20 @@ function Projects() {
         }
     }
 
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <div className="projects">
             <h1>Projects</h1>
-            <button className="add-project-btn" onClick={handleOpenModal}>
-                Create Project  
-            </button>
+            
+            {/* Only show the Create Project button if user is admin */}
+            {isAdmin && (
+                <button className="add-project-btn" onClick={handleOpenModal}>
+                    Create Project  
+                </button>
+            )}
 
             <div className="search">
                 <input type="text" placeholder="Search..." />
@@ -80,6 +141,7 @@ function Projects() {
                             <th>Key</th>
                             <th>Type</th>
                             <th>Lead</th>
+                            {isAdmin && <th>Actions</th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -89,9 +151,16 @@ function Projects() {
                                 <td>{project.key}</td>
                                 <td>{project.type}</td>
                                 <td>{project.lead}</td>
-                                <button className="archive-project-btn" onClick={() => handleArchive()}>
-                                    Archive
-                                </button>
+                                {isAdmin && (
+                                    <td>
+                                        <button 
+                                            className="archive-project-btn" 
+                                            onClick={() => handleArchive()}
+                                        >
+                                            Archive
+                                        </button>
+                                    </td>
+                                )}
                                 {message && <div className="message-box">{message}</div>}
                             </tr>
                         ))}
