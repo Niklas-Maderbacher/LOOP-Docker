@@ -5,7 +5,7 @@ function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState([]);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [newProject, setNewProject] = useState({ name: "", key: "", type: "", lead: "", description: "" });
+    const [newProject, setNewProject] = useState({ name: "", key: "", start_date: "", end_date: "", github_token: "" });
     const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -89,7 +89,7 @@ function Projects() {
 
     function handleCloseModal() {
         setIsModalOpen(false);
-        setNewProject({ name: "", key: "", type: "", lead: "", description: "" });
+        setNewProject({ name: "", key: "", start_date: "", end_date: "", github_token: "" });
     }
 
     function handleInputChange(event) {
@@ -113,8 +113,10 @@ function Projects() {
                 body: JSON.stringify(newProject)
             });
 
+            const responseData = await response.json();
+
             if (!response.ok) {
-                throw new Error(`Failed to create project: ${response.status}`);
+                throw new Error(`Failed to create project: ${response.status} - ${responseData.detail || responseData.message}`);
             }
 
             // Refresh the project list after successful creation
@@ -123,8 +125,8 @@ function Projects() {
             setMessage("Project created successfully!");
             setTimeout(() => setMessage(null), 3000);
         } catch (error) {
-            console.error("Error creating project:", error);
-            setMessage("Error creating project ❌");
+            console.error("Error creating project:", error.message);
+            setMessage(`Error creating project: ${error.message}`);
             setTimeout(() => setMessage(null), 3000);
         }
     }
@@ -155,7 +157,7 @@ function Projects() {
             setTimeout(() => setMessage(null), 3000);
         } catch (error) {
             console.error("Error:", error);
-            setMessage("Error archiving project ❌");
+            setMessage("Error archiving project");
             setTimeout(() => setMessage(null), 3000);
         }
     }
@@ -194,8 +196,8 @@ function Projects() {
                             <tr>
                                 <th>Name</th>
                                 <th>Key</th>
-                                <th>Type</th>
-                                <th>Lead</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
                                 {isAdmin && <th>Actions</th>}
                             </tr>
                         </thead>
@@ -204,8 +206,8 @@ function Projects() {
                                 <tr key={project.id}>
                                     <td>{project.name}</td>
                                     <td>{project.key}</td>
-                                    <td>{project.type}</td>
-                                    <td>{project.lead}</td>
+                                    <td>{project.start_date}</td>
+                                    <td>{project.end_date}</td>
                                     {isAdmin && (
                                         <td>
                                             <button 
@@ -244,27 +246,26 @@ function Projects() {
                             required
                         />
                         <input 
-                            type="text" 
-                            name="type" 
-                            placeholder="Project Type" 
-                            value={newProject.type} 
+                            type="date" 
+                            name="start_date" 
+                            placeholder="Project Start Date" 
+                            value={newProject.start_date} 
                             onChange={handleInputChange} 
-                            required
                         />
                         <input 
-                            type="text" 
-                            name="lead" 
-                            placeholder="Project Lead" 
-                            value={newProject.lead} 
-                            onChange={handleInputChange} 
-                            required
+                            type="date" 
+                            name="end_date" 
+                            placeholder="Project End Date" 
+                            value={newProject.end_date} 
+                            onChange={handleInputChange}
                         />
+
                         <input 
                             type="text" 
-                            name="description" 
-                            placeholder="Project Description" 
-                            value={newProject.description} 
-                            onChange={handleInputChange} 
+                            name="github_token" 
+                            placeholder="Project GitHub Token" 
+                            value={newProject.github_token} 
+                            onChange={handleInputChange}
                         />
 
                         <div className="modal-buttons">
