@@ -4,6 +4,7 @@ import jwt
 from fastapi import Depends, FastAPI, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
+from app.api.deps import SessionDep
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from dotenv import load_dotenv, dotenv_values 
@@ -11,6 +12,8 @@ import os
 from sqlmodel import select
 from app.db.models import User
 from app.crud.user import get_user, get_project_role
+from app.enums.role import Role
+
 load_dotenv()
 SECRET_KEY = os.getenv("AUTH_SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -39,8 +42,8 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 # checks if the user exists and is authenticated
-def authenticate_user(email: str, password: str):
-    user = get_user(email)
+def authenticate_user(session: SessionDep, email: str, password: str):
+    user = get_user(session, email)
     if not user:
         return False
     if not verify_password(password, user.password):
@@ -61,7 +64,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 # Method decodes the jwt token using the shared security key
 # returns the user object from the authenticated user
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(session: SessionDep, token: Annotated[str, Depends(oauth2_scheme)]):
     # unauthorized access
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -77,8 +80,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(email=email)
     except InvalidTokenError:
         raise credentials_exception
-    # Retrieve user from the db using the username
-    user = get_user(email=token_data.email)
+    # Retrieve user from the db using the email
+    user = get_user(session, email=token_data.email)
     if user is None:
         raise credentials_exception
     return user
@@ -88,19 +91,19 @@ def is_admin(user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return user
 
-def is_product_owner(project_id: int, user: User = Depends(get_current_user)):
-    project_role = get_project_role(user.id, project_id)  # Retrieve project role
+def is_product_owner(session: SessionDep, project_id: int, user: User = Depends(get_current_user)):
+    project_role = get_project_role(session, user.id, project_id)  # Retrieve project role
     print(f"projectrole {project_role}")
-    if project_role != 1:
+    if project_role != Role.PRODUCTOWNER:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     return user
 
 @router.post("/token")
-async def login_for_access_token(
+async def login_for_access_token(session: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> Token:
     # checks the hashed passwords and the email with the db
-    user = authenticate_user(form_data.username, form_data.password)
+    user = authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -8,7 +8,9 @@ from app.crud.issue import update_story_point, create_issue, get_issues, get_iss
 
 
 def test_update_story_point_existing(db: SessionDep):
-    issue = Issue(id=1, project_id = 1, name="First Issue", story_points=3)
+
+    issue = Issue(id=1, category_id = "BUG",project_id=1, name="First Issue", story_points=3)
+
     db.add(issue)
     db.commit()
     db.refresh(issue)

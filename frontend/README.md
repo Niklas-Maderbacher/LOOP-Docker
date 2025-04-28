@@ -6,7 +6,7 @@ yarn start
 
 React-DnD (Drag and Drop)
 ```shell
-npm install react-dnd react-dnd-html5-backend
+yarn add react-dnd react-dnd-html5-backend
 ```
 
 Font Awesome
