@@ -4,7 +4,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - ${OUTSIDE_POSTGRES_PORT}:${POSTGRES_PORT}
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
@@ -28,7 +28,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - ${OUTSIDE_ADMINER_PORT}:${ADMINER_PORT}
+      - ${ADMINER_PORT}:${ADMINER_PORT}
     depends_on:
       - db
     environment:
@@ -69,7 +69,7 @@ services:
       context: ./backend
     restart: always
     ports:
-      - ${OUTSIDE_BACKEND_PORT}:${BACKEND_PORT}
+      - ${BACKEND_PORT}:${BACKEND_PORT}
     depends_on:
       db:
         condition: service_healthy
@@ -114,7 +114,7 @@ services:
     image: oven/bun
     restart: always
     ports:
-      - ${OUTSIDE_FRONTEND_PORT}:${FRONTEND_PORT}
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
     build:
       context: ./frontend
     depends_on:

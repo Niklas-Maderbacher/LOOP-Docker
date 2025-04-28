@@ -7,7 +7,7 @@ services:
     volumes:
       - ./file_server/attachments:/file_server/attachments
     ports:
-      - ${OUTSIDE_FILE_SERVER_PORT}:${FILE_SERVER_PORT}
+      - ${FILE_SERVER_PORT}:${FILE_SERVER_PORT}
     env_file:
       - .env
     environment:
