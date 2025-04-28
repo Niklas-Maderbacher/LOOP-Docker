@@ -1,6 +1,7 @@
 //Leo Tandl
 import './Backlog.modules.css';
 import React, { useState } from 'react';
+import FileUpload from '../Content/FileUploader/FileUploader';
 
 
 function Backlog() {
@@ -225,6 +226,8 @@ function Backlog() {
                             value={newIssue.description} 
                             onChange={handleInputChange} 
                         />
+
+                        <FileUpload />
 
                         {/* Parent Issue dropdown shown only for Subtasks */}
                         {newIssue.issueType === "subtask" && (
