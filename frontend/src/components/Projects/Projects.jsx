@@ -97,6 +97,18 @@ function Projects() {
     }
 
     async function handleSubmit() {
+        if (!newProject.name.trim() || !newProject.key.trim()) {
+            setMessage("Name and Key are required fields.");
+            setTimeout(() => setMessage(null), 3000);
+            return;
+        }
+
+        if (!newProject.start_date.trim() || !newProject.end_date.trim()) {
+            setMessage("Start Date and End Date are required fields.");
+            setTimeout(() => setMessage(null), 3000);
+            return;
+        }
+
         try {
             const token = localStorage.getItem('jwt');
             if (!token) {
@@ -139,7 +151,7 @@ function Projects() {
                 return;
             }
 
-            const response = await fetch(`http://localhost:8000/api/v1/projects/archive/${projectId}`, {
+            const response = await fetch(`http://localhost:8000/api/v1/projects/archive-project/${projectId}`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,
