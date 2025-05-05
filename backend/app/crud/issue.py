@@ -1,5 +1,6 @@
 from sqlmodel import Session
 from app.db.models import Issue
+from app.api.schemas.issue import IssueCreate
 
 def update_story_point(db: Session, issue_id: int, updated_story_point: int):
     try:
@@ -19,36 +20,31 @@ def update_story_point(db: Session, issue_id: int, updated_story_point: int):
         db.rollback()
         return {"error": f"An error occurred: {str(e)}"}, 500
 
-def create_issue(session: Session, user: Issue) -> Issue:
-    issue_db = Issue(
-        id=Issue.id,
-        name=Issue.name,
-        category_id=Issue.category_id,
-        sprint_id=Issue.sprint_id,
-        state_id=Issue.state_id,
-        creator_id=Issue.creator_id,
-        responsible_user_id=Issue.responsible_user_id,
-        priority_id=Issue.priority_id,
-        description=Issue.description,
-        repository_link=Issue.repository_link,
-        story_points=Issue.story_points,
-        report_time=Issue.report_time,
-        version=Issue.version,
-        updater_id=Issue.updater_id,
-        project_id=Issue.project_id,
-        updated_at=Issue.updated_at,
-        created_at=Issue.created_at,
-        backlog_order_number=Issue.backlog_order_number,
-        deleted_at=Issue.deleted_at,
-        finisher_id=Issue.finisher_id,
-        parent_issue_id=Issue.parent_issue_id,
+def create_issue(db: Session, issue: IssueCreate) -> Issue:
+    """Creates a new issue in the database.
+
+    Args:
+        db (Session): Database session
+        issue (IssueCreate): Issue details
+
+    Returns:
+        Issue: The created issue instance
+    """
+    db_issue = Issue(
+        name=issue.name,
+        category=issue.category,
+        sprint_id=issue.sprint_id,
+        responsible_user_id=issue.responsible_id,
+        priority_id=issue.priority_id,
+        description=issue.description,
+        story_points=issue.story_points,
+        project_id=issue.project_id
     )
 
-    session.add(issue_db)
-    session.commit()
-    session.refresh(issue_db)
-
-    return issue_db
+    db.add(db_issue)
+    db.commit()
+    db.refresh(db_issue)
+    return db_issue
 
 def get_issues(db: Session, skip: int = 0, limit: int = 50) -> list[Issue]:
 
@@ -83,3 +79,4 @@ def get_issue(session: Session, id: int) -> Issue:
     )
 
     return issue_db
+
