@@ -121,6 +121,21 @@ td:nth-child(4) {
     opacity: 0.8;
 }
 
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color:  coral;
+    color: black;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    text-align: center;
+    font-weight: bold;
+}
+
 @media (max-width: 768px) {
     .projects {
         margin-left: 0;
