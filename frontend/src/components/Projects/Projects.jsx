@@ -103,12 +103,6 @@ function Projects() {
             return;
         }
 
-        if (!newProject.start_date.trim() || !newProject.end_date.trim()) {
-            setMessage("Start Date and End Date are required fields.");
-            setTimeout(() => setMessage(null), 3000);
-            return;
-        }
-
         try {
             const token = localStorage.getItem('jwt');
             if (!token) {
@@ -122,7 +116,11 @@ function Projects() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(newProject)
+                body: JSON.stringify({
+                    ...newProject,
+                    start_date: newProject.start_date.trim() === "" ? null : newProject.start_date,
+                    end_date: newProject.end_date.trim() === "" ? null : newProject.end_date
+                })
             });
 
             const responseData = await response.json();
@@ -195,10 +193,6 @@ function Projects() {
 
             {message && <div className="message-box">{message}</div>}
 
-            <div className="search">
-                <input type="text" placeholder="Search..." />
-            </div>
-
             <div className="project-list">
                 {projects.length === 0 ? (
                     <p>No projects found.</p>
@@ -214,12 +208,12 @@ function Projects() {
                             </tr>
                         </thead>
                         <tbody>
-                            {projects.map((project) => (
+                            {projects.filter(project => !project.archived_at).map(project => (
                                 <tr key={project.id}>
                                     <td>{project.name}</td>
                                     <td>{project.key}</td>
-                                    <td>{project.start_date}</td>
-                                    <td>{project.end_date}</td>
+                                    <td style={{ textAlign: 'center' }}>{project.start_date || '-'}</td>
+                                    <td  style={{ textAlign: 'center' }}>{project.end_date || '-'}</td>
                                     {isAdmin && (
                                         <td>
                                             <button 
