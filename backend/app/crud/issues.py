@@ -21,28 +21,28 @@ def update_story_point(db: Session, issue_id: int, updated_story_point: int):
         db.rollback()
         return {"error": f"An error occurred: {str(e)}"}, 500
 
-def create_issue(session: Session, user: Issue) -> Issue:
+def create_issue(session: Session, issue: Issue) -> Issue:
     issue_db = Issue(
-        name=Issue.name,
-        category_id=Issue.category_id,
-        sprint_id=Issue.sprint_id,
-        state_id=Issue.state_id,
-        creator_id=Issue.creator_id,
-        responsible_user_id=Issue.responsible_user_id,
-        priority_id=Issue.priority_id,
-        description=Issue.description,
-        repository_link=Issue.repository_link,
-        story_points=Issue.story_points,
-        report_time=Issue.report_time,
-        version=Issue.version,
-        updater_id=Issue.updater_id,
-        project_id=Issue.project_id,
-        updated_at=Issue.updated_at,
-        created_at=Issue.created_at,
-        backlog_order_number=Issue.backlog_order_number,
-        deleted_at=Issue.deleted_at,
-        finisher_id=Issue.finisher_id,
-        parent_issue_id=Issue.parent_issue_id,
+        name=issue.name,
+        category_id=issue.category_id,
+        sprint_id=issue.sprint_id,
+        state_id=issue.state_id,
+        creator_id=issue.creator_id,
+        responsible_user_id=issue.responsible_user_id,
+        priority_id=issue.priority_id,
+        description=issue.description,
+        repository_link=issue.repository_link,
+        story_points=issue.story_points,
+        report_time=issue.report_time,
+        version=issue.version,
+        updater_id=issue.updater_id,
+        project_id=issue.project_id,
+        updated_at=issue.updated_at,
+        created_at=issue.created_at,
+        backlog_order_number=issue.backlog_order_number,
+        deleted_at=issue.deleted_at,
+        finisher_id=issue.finisher_id,
+        parent_issue_id=issue.parent_issue_id,
     )
 
     session.add(issue_db)
