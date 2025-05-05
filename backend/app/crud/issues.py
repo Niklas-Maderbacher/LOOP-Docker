@@ -60,7 +60,6 @@ def get_issue(session: Session, id: int) -> Issue:
     issue_db = session.query(Issue).filter(Issue.id == id).one()
 
     issue_db = Issue(
-        id=issue_db.id,
         name=issue_db.name,
         category_id=issue_db.category_id,
         sprint_id=issue_db.sprint_id,
