@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel, Field
 from typing import List
+import app.crud.user as crud
 
 from app.api.routes import FastApiAuthorization
 from app.api.deps import SessionDep
@@ -23,10 +24,15 @@ class User(BaseModel):
 
 user_list: List[User] = []
 
-# returns all users
+# LOOP-124
 @router.get("/get_all_users")
-async def get_all_users():
-    return {"users": user_list}
+async def get_all_users(session: SessionDep):
+    """api call to get all users
+
+    Returns:
+        List[User]: list of all users 
+    """
+    return crud.get_all_users(session)
 
 # path call to return user with specified name
 @router.get("/get_user/{display_name}")

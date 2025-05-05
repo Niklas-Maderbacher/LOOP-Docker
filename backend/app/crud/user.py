@@ -40,3 +40,12 @@ def get_user(email: str):
         user = db.query(User).filter(User.email == email).first()
     return user
 
+# LOOP-124
+def get_all_users(db: Session):
+    """gets all users form the database
+
+    Returns:
+        List[User]: the list of users
+    """
+    users = db.query(User).all()
+    return users

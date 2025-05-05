@@ -1,3 +1,61 @@
+.issue {
+    margin-top: 5px;
+    margin-left: 250px;
+    padding: 16px;
+    background-color: hsl(0, 0%, 7%);
+    height: 100%;
+    color: white;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    transition: margin-left 0.3s ease, color 0.3s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Background overlay for the modal */
+.edit-issue-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0); /* Semi-transparent background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999; /* Ensure modal is on top */
+}
+
+/* Modal content */
+.edit-issue-modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 50%; /* Set modal width to 50% of the screen */
+    height: 50%;
+    max-width: 800px;
+    min-width: 300px;
+    max-height: 800px;
+    min-height: 300px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.issue.selected {
+    background-color: #d3f8e2; /* Light green background for selected issue */
+    border-color: #4caf50; /* Green border for selected issue */
+    color: #4caf50; /* Green text color */
+}
+
+.issue:hover {
+    background-color: #ff7b00; /* Light gray background on hover */
+}
 
 .add-issue-btn {
     margin-left: 300px;
@@ -15,6 +73,12 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+.no-issues {
+    text-align: center;
+    font-style: italic;
+    color: rgb(255, 255, 255);
+    font-size: 16px;
+}
 
 .issue-modal {
     position: fixed;

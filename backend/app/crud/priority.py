@@ -1,6 +1,10 @@
 from app.db.models import Priority, Issue, User
 from sqlmodel import Session
 
+# LOOP-124
+def get_priorities(db: Session, skip: int = 0, limit: int = 50) -> list[Priority]:
+    return db.query(Priority).offset(skip).limit(limit).all()
+
 
 def update_priority(session: Session, issue_id: int, user_id: int, new_priority: str):
     
@@ -21,3 +25,4 @@ def update_priority(session: Session, issue_id: int, user_id: int, new_priority:
     session.refresh(issue)
 
     return issue  
+

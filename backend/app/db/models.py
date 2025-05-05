@@ -103,7 +103,7 @@ class Issue(SQLModel, table=True):
     repository_link: Optional[str] = Field(default=None)
     story_points: Optional[int] = Field(default=None)
     report_time: Optional[str] = Field(default=None)
-    version: Optional[int] = Field(default=None)
+    version: Optional[int] = Field(default=1)
     updater_id: Optional[int] = Field(foreign_key="user.id")
     project_id: int = Field(foreign_key="project.id")
     updated_at: Optional[str] = Field(default=None)
