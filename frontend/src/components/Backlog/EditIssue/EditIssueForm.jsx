@@ -34,10 +34,10 @@ const EditIssueForm = ({ issueId, onClose }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [{ data: issueData }, categories, sprints, states, users, priorities] = await Promise.all([
-          axios.get(`http://localhost:8000/api/v1/issues/${issueId}`),
+        const { data: issueData } = await axios.get(`http://localhost:8000/api/v1/issues/${issueId}`);
+        const [categories, sprints, states, users, priorities] = await Promise.all([
           axios.get("http://localhost:8000/api/v1/categories"),
-          axios.get("http://localhost:8000/api/v1/sprints"),
+          axios.get(`http://localhost:8000/api/v1/sprints/project/${issueData.project_id}`),
           axios.get("http://localhost:8000/api/v1/states"),
           axios.get("http://localhost:8000/api/v1/users/get_all_users"),
           axios.get("http://localhost:8000/api/v1/priorities"),
