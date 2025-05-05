@@ -23,7 +23,6 @@ def update_story_point(db: Session, issue_id: int, updated_story_point: int):
 
 def create_issue(session: Session, user: Issue) -> Issue:
     issue_db = Issue(
-        id=Issue.id,
         name=Issue.name,
         category_id=Issue.category_id,
         sprint_id=Issue.sprint_id,
@@ -58,28 +57,5 @@ def get_issues(db: Session) -> List[Issue]:
 
 def get_issue(session: Session, id: int) -> Issue:
     issue_db = session.query(Issue).filter(Issue.id == id).one()
-
-    issue_db = Issue(
-        name=issue_db.name,
-        category_id=issue_db.category_id,
-        sprint_id=issue_db.sprint_id,
-        state_id=issue_db.state_id,
-        creator_id=issue_db.creator_id,
-        responsible_user_id=issue_db.responsible_user_id,
-        priority_id=issue_db.priority_id,
-        description=issue_db.description,
-        repository_link=issue_db.repository_link,
-        story_points=issue_db.story_points,
-        report_time=issue_db.report_time,
-        version=issue_db.version,
-        updater_id=issue_db.updater_id,
-        project_id=issue_db.project_id,
-        updated_at=issue_db.updated_at,
-        created_at=issue_db.created_at,
-        backlog_order_number=issue_db.backlog_order_number,
-        deleted_at=issue_db.deleted_at,
-        finisher_id=issue_db.finisher_id,
-        parent_issue_id=issue_db.parent_issue_id,
-    )
 
     return issue_db
