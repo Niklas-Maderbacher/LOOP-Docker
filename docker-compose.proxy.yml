@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   proxy:
     container_name: loop-proxy
@@ -7,31 +5,13 @@ services:
       context: ./proxy
     volumes:
       - ./proxy.conf:/etc/nginx/proxy.conf
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - ./certs/local.crt:/etc/ssl/certs/local.crt
+      - ./certs/local.key:/etc/ssl/private/local.key
     ports:
       - "443:443"
-      - "80:80" # Needed for HTTP challenge
-    depends_on:
-      - certbot
+      - "80:80"
     networks:
       - loop-network
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
-    entrypoint: >
-      sh -c 'trap exit TERM; while :; do sleep 12h & wait $${!}; certbot renew; done'
-    networks:
-      - loop-network
-
-volumes:
-  certbot-etc:
-  certbot-var:
-
 
 networks:
   loop-network:

@@ -1,6 +1,9 @@
-docker run --rm -it \
-  -v certbot-etc:/etc/letsencrypt \
-  -v certbot-var:/var/lib/letsencrypt \
-  -p 80:80 \
-  certbot/certbot certonly --standalone \
-  -d *.loop.htl --agree-tos --email itp.loop.htl@gmail.com --non-interactive
+#!/bin/bash
+
+mkdir -p ./certs
+
+openssl req -x509 -nodes -days 365 \
+  -newkey rsa:2048 \
+  -keyout ./certs/local.key \
+  -out ./certs/local.crt \
+  -subj "/C=AT/ST=Vienna/L=Vienna/O=Local Dev/CN=loop.htl"
