@@ -1,5 +1,6 @@
 services:
   file_server:
+    container_name: loop-file-server
     restart: always
     build:
       context: ./file_server
@@ -11,3 +12,9 @@ services:
       - .env
     environment:
       - FILE_SERVER_PORT=${FILE_SERVER_PORT}
+    networks:
+      - loop-network
+
+networks:
+  loop-network:
+    external: true

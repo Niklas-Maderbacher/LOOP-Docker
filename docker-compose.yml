@@ -1,5 +1,6 @@
 services:
   db:
+    container_name: loop-db
     image: postgres
     restart: always
     ports:
@@ -19,8 +20,11 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - loop-network
 
   adminer:
+    container_name: loop-adminer
     image: adminer
     restart: always
     ports:
@@ -29,8 +33,11 @@ services:
       - db
     environment:
       - ADMINER_DESIGN=pepa-linha-dark
+    networks:
+      - loop-network
 
   prestart:
+    container_name: loop-prestart
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
     build:
       context: ./backend
@@ -52,9 +59,14 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - loop-network
 
   backend:
+    container_name: loop-backend
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
+    build:
+      context: ./backend
     restart: always
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
@@ -92,15 +104,16 @@ services:
 
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health_check" ]
-      interval: 10s
+      interval: 60s
       timeout: 5s
       retries: 5
 
-    build:
-      context: ./backend
+    networks:
+      - loop-network
 
   frontend:
-    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
+    container_name: loop-frontend
+    image: oven/bun
     restart: always
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
@@ -110,6 +123,13 @@ services:
       backend:
         condition: service_healthy
         restart: true
+    networks:
+      - loop-network
 
 volumes:
   app-db-data:
+
+
+networks:
+  loop-network:
+    external: true
