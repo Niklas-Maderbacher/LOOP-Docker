@@ -129,7 +129,30 @@ function Backlog() {
                 })
             });
             
-            const data = await response.json();
+            // Check if the response is OK
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Server error: ${response.status} - ${errorText}`);
+            }
+            
+            // Check the content type
+            const contentType = response.headers.get('Content-Type');
+            
+            // Handle the response based on content type
+            let data;
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                // If not JSON, get the response as text and try to parse it
+                const text = await response.text();
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    console.error("Response is not JSON:", text);
+                    throw new Error(`Invalid JSON response: ${text.substring(0, 100)}`);
+                }
+            }
+            
             console.log("Issue created:", data);
             
             // Check if the issue was created successfully and we got an ID back
@@ -234,18 +257,30 @@ function Backlog() {
                 );
                 return { success: true, id: fileItem.id };
             } else {
-                const errorMsg = response.data?.message || `Upload failed with status ${response.status}`;
-                throw new Error(errorMsg);
+                // Handle non-JSON responses
+                if (typeof response.data === 'string') {
+                    throw new Error(`Upload failed with status ${response.status}: ${response.data.substring(0, 100)}`);
+                } else {
+                    const errorMsg = response.data?.message || `Upload failed with status ${response.status}`;
+                    throw new Error(errorMsg);
+                }
             }
         } catch (error) {
             console.error("Upload error:", error);
+            // Extract response data for Axios errors
+            const errorMessage = error.response 
+                ? (typeof error.response.data === 'string' 
+                    ? error.response.data.substring(0, 100) 
+                    : (error.response.data?.message || `Error ${error.response.status}`))
+                : (error.message || "Upload failed");
+                
             setUploads((prevUploads) =>
                 prevUploads.map((item) =>
                     item.id === fileItem.id
                         ? {
                             ...item,
                             status: "error",
-                            error: error.message || "Upload failed",
+                            error: errorMessage,
                         }
                         : item
                 )
@@ -495,8 +530,6 @@ function Backlog() {
                         {/* Integrated File Upload */}
                         {newIssue.issueType.toLowerCase() !== "epic" && (
                             <div className="file-upload-container">
-                                <h3>Attachments</h3>
-                                
                                 {/* File input for selection */}
                                 <input
                                     type="file"
