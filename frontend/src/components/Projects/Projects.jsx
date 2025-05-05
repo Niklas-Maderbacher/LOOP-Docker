@@ -1,5 +1,6 @@
 import './Projects.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,41 @@ function Projects() {
     }
 
     const [message, setMessage] = useState(null);
+
+    
+    const [isAdmin, setIsAdmin] = useState(null); // null = noch nicht geprüft
+    const [error, setError] = useState(false);
+
+    useEffect(() => {
+        const checkAdmin = async () => {
+        try {
+            const token = localStorage.getItem("jwt");
+            const response = await axios.get("http://localhost:8000/api/v1/security/users/check/admin", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            });
+
+            const admin = response.data[0]?.admin_state === true;
+            setIsAdmin(admin);
+        } catch (err) {
+            console.error("Admin-Check fehlgeschlagen", err);
+            setError(true);
+        }
+        };
+
+        checkAdmin();
+    }, []);
+
+    // Wenn noch geladen wird
+    if (isAdmin === null && !error) {
+        return <p>Loading...</p>;
+    }
+
+    // Kein Admin → blockieren
+    if (!isAdmin || error) {
+        return <h1 className='error-message'>403 - Zugriff verweigert</h1>;
+    }
 
     function handleCloseModal() {
         setIsModalOpen(false);

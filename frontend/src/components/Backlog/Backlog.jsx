@@ -1,13 +1,14 @@
 //Leo Tandl
 import './Backlog.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 
 function Backlog() {
     // State variables to control opening and closing of modals and to store new issue data
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
-
+    const [project, setProject] = useState(null);
+  
     // Initializes state for the new issue
     const [newIssue, setNewIssue] = useState({ 
         issueType: "", 
@@ -18,6 +19,17 @@ function Backlog() {
         description: "", 
         story_points: "" 
     });
+
+    useEffect(() => {
+        const stored = localStorage.getItem("selectedProject");
+        if (stored) {
+        setProject(JSON.parse(stored));
+        }
+    }, []);
+
+    if (!project) {
+        return <h1 className='message'>Kein Projekt ausgewählt.</h1>;
+    }
 
     // Function to open the modal for selecting the issue type
     function handleOpenSelectIType() {
@@ -137,6 +149,8 @@ function Backlog() {
             <button className="add-issue-btn" onClick={handleOpenSelectIType}>
                 Create Issue
             </button>
+
+            <h1 className='message'>Project {localStorage.getItem("selectedProject")} selected</h1>
 
             {/* Modal for selecting the issue type */}
             {isSelectITypeOpen && (

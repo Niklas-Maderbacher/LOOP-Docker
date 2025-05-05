@@ -20,7 +20,7 @@ def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Projec
     """
     return db.query(Project).offset(skip).limit(limit).all()
 
-def create_project(db: Session, project: ProjectCreate) -> Project:
+def create_project(db: Session, project: ProjectCreate, user_id: int) -> Project:
     """Creates a new project in the database.
 
     Args:
@@ -40,6 +40,16 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
     db.add(db_project)
     db.commit()
     db.refresh(db_project)
+
+    # Verknüpfung mit dem aktuellen Benutzer (als Admin)
+    db_user_at_project = UserAtProject(
+        user_id=user_id,
+        project_id=db_project.id,
+        role=Role.PRODUCTOWNER
+    )
+    db.add(db_user_at_project)
+    db.commit()
+
     return db_project
 
 
@@ -120,3 +130,9 @@ def archive_project(db: Session, project_id: int) -> Optional[Project]:
     db.refresh(db_project)
     return db_project
 
+
+def get_my_projects(db: Session, user_id: int):
+    project_ids = db.query(UserAtProject.project_id).filter(UserAtProject.user_id == user_id).subquery()
+    projects = db.query(Project).filter(Project.id.in_(project_ids)).all()
+
+    return projects
