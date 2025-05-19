@@ -186,6 +186,10 @@ function Backlog() {
                 Create Issue
             </button>
 
+            <button className="add-sprint-btn" onClick={handleOpenSprintForm}> 
+                Create Sprint
+            </button>
+
             {/* Modal for selecting the issue type */}
             {isSelectITypeOpen && (
                 <div className="issue-modal">
