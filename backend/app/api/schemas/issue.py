@@ -1,6 +1,8 @@
 from pydantic import BaseModel
-from typing import Optional, Literal
+from typing import Optional
 from app.enums.issueType import Type
+from app.enums.state import State
+
 from app.enums.priority import Priority
 
 class StoryPointUpdate(BaseModel):
@@ -9,10 +11,10 @@ class StoryPointUpdate(BaseModel):
 class IssueCreate(BaseModel):
     name: str
     category: Type
-    sprint_id: Optional[int]
-    responsible_id: Optional[int]
-    priority_id: Optional[Priority]
+    state: State
+    sprint_id: Optional[int] = None
+    responsible_user_id: Optional[int] = None
+    priority: Optional[Priority] = None
     description: str
-    story_points: Optional[int]
-    project_id: Optional[int]
-
+    story_points: Optional[int] = None
+    project_id: Optional[int] = None
