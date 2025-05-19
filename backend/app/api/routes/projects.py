@@ -113,6 +113,7 @@ async def archive_project(session: SessionDep, project_id: int):
     
     return updated_project
 
+# Loop-125
 @router.get("/me", response_model=List[Project])
 def get_my_projects(db: SessionDep, current_user=Depends(FastApiAuthorization.get_current_user)):
     db_projects = crud_project.get_my_projects(db, current_user.id)
