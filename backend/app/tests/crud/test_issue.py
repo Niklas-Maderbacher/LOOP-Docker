@@ -46,7 +46,7 @@ def test_create_issue_fails_without_name(db: SessionDep):
         created = create_issue(db, issue)
 
 def test_update_story_point_existing(db: SessionDep):
-    issue = Issue(id=1, project_id=1, name="First Issue", story_points=3)
+    issue = Issue(id=1, category_id = "BUG",project_id=1, name="First Issue", story_points=3)
     db.add(issue)
     db.commit()
     db.refresh(issue)

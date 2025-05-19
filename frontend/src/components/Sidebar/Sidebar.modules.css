@@ -68,6 +68,11 @@
   display: block;
   margin-left: auto;
   margin-right: auto;
+  width: 100%;
+}
+
+.sidebar.shrink #shrinkButton {
+    width: auto;
 }
 
 .sidebar #shrinkButton.rotated {
@@ -99,7 +104,6 @@
 
 .sidebar ul li a {
     display: block;
-    
     text-decoration: none;
     color: inherit;
     background: none;
@@ -107,4 +111,3 @@
     height: 20px;
     box-sizing: border-box;
 }
-
