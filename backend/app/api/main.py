@@ -5,7 +5,7 @@ from app.api.routes import TEMPLATE_SHOWCASE
 from app.api.routes import health_check
 from app.api.routes import FastApiAuthorization
 
-from app.api.routes import projects, issues, users, attachment
+from app.api.routes import projects, issue, users, attachment
 
 
 api_router = APIRouter()
@@ -16,7 +16,7 @@ api_router.include_router(projects.router)
 api_router.include_router(issue.router)
 api_router.include_router(FastApiAuthorization.router)
 
-api_router.include_router(issues.router)
+
 api_router.include_router(users.router)
 api_router.include_router(attachment.router)
 

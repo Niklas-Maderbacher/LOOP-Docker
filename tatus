@@ -1,0 +1,128 @@
+[33mb466913[m[33m ([m[1;36mHEAD -> [m[1;32msommerauer-sprint3-set-priority[m[33m, [m[1;31morigin/sommerauer-sprint3-set-priority[m[33m)[m Merge main into sommerauer-sprint3-set-priority
+[33m3180cae[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m added dockerignore file. greatly improved build performance
+[33m98ef62a[m test issue works and documented
+[33mf1ebe97[m Merge pull request #56 from Niklas-Maderbacher/staging-file-upload
+[33m0c8a2c0[m[33m ([m[1;31morigin/staging-file-upload[m[33m)[m Merge pull request #55 from Niklas-Maderbacher/main
+[33m4a27686[m works on remote, port set for current file server ip
+[33m8ae5747[m fixed bug
+[33md3e3356[m added test documentation
+[33mdc56cf7[m finished tests for 2 reviews
+[33mc4b7f5d[m Merge pull request #53 from Niklas-Maderbacher/revert-52-staging-file-upload
+[33m6929b91[m Revert "fileserver access from remote works, local doesn't, wait till reverse…"
+[33md10bf7b[m Merge pull request #52 from Niklas-Maderbacher/staging-file-upload
+[33m50d1dda[m Merge branch 'main' into staging-file-upload
+[33meb398d3[m fileserver access from remote works, local doesn't, wait till reverse proxy implementation
+[33m90e3f46[m admin gemacht (email ="admin@example.com"    display_name="Superuser"  password = "NAWI is oasch"
+[33m4fe2bec[m "fixed" file upload localhost test didnt work
+[33m0328355[m fix
+[33mc7a6c71[m Merge branch 'main' of https://github.com/Niklas-Maderbacher/LOOP-Docker
+[33m6dd3d73[m fix (mybe)
+[33m9a151d2[m Merge pull request #51 from Niklas-Maderbacher/mn-image_server
+[33m4b62054[m Merge pull request #50 from Niklas-Maderbacher/main
+[33me38b24b[m Merge pull request #49 from Niklas-Maderbacher/staging-file-upload
+[33m13cbfe7[m Merge branch 'main' into staging-file-upload
+[33m200ffb1[m Merge pull request #48 from Niklas-Maderbacher/sommerauer-sprint5-user-login
+[33m451bfc3[m updated import
+[33mdc81144[m Merge pull request #47 from Niklas-Maderbacher/lt-LOOP71
+[33m87b28a9[m Merge pull request #46 from Niklas-Maderbacher/staging-main-into-file-upload
+[33mffa1d8d[m Merge branch 'staging-file-upload' into staging-main-into-file-upload
+[33m134397a[m[33m ([m[1;31morigin/sommerauer-sprint5-user-login[m[33m)[m Merge pull request #45 from Niklas-Maderbacher/merge_2025-03-31_user-login
+[33m87facb6[m[33m ([m[1;31morigin/merge_2025-03-31_user-login[m[33m)[m Merge branch 'sommerauer-sprint5-user-login' into merge_2025-03-31_user-login
+[33md2e1590[m[33m ([m[1;31morigin/lt-LOOP71[m[33m)[m add more enums to model
+[33m38ee865[m some changes
+[33md0d963f[m Login Works perfektly
+[33m9fa8926[m Merge pull request #44 from Niklas-Maderbacher/zzp-sprint4-register-user
+[33meb6cca6[m transfer for create issue is working
+[33m70a0b5a[m added reference
+[33ma67d5c9[m removed project id from attachment. passed
+[33mf1ca579[m[33m ([m[1;31morigin/zzp-sprint4-register-user[m[33m)[m Merge pull request #43 from Niklas-Maderbacher/main
+[33mbf07a29[m added api tests
+[33m791d4c1[m added statuscode
+[33m4c22371[m added test crud methods
+[33m3a840a0[m added buttons for project and issue id
+[33mab0bda3[m updated to work with crud layer (broken)
+[33mcf5e693[m submit is not working
+[33mb57879e[m functionality finished
+[33md455b3c[m[33m ([m[1;31morigin/tl-IssueTypefix[m[33m)[m api aufruf
+[33m8f8899b[m Merge pull request #42 from Niklas-Maderbacher/pp-sprint-loop-32
+[33m6a2275c[m[33m ([m[1;31morigin/pp-sprint-loop-32[m[33m)[m Merge branch 'main' into pp-sprint-loop-32
+[33me786856[m Pytests finished
+[33mdb0dbd2[m Merge pull request #41 from Niklas-Maderbacher/pp-loop-35
+[33m8e5130a[m updated to use api
+[33m5c1cbe2[m[33m ([m[1;31morigin/pp-loop-35[m[33m)[m Merge pull request #40 from Niklas-Maderbacher/main
+[33m31720bb[m attachment api
+[33mf6c9927[m added crud and api commands for user
+[33m4854bd5[m added story notation
+[33m0e989b9[m Updated response message on successfull file upload
+[33me330a8f[m Merge pull request #39 from Niklas-Maderbacher/main
+[33mc35a03c[m added docstrings
+[33m865b8fb[m added delete from server for file uploader
+[33mbabfb2b[m Created seperate docker-compose file for file-server
+[33m968ab13[m Added logging
+[33ma8b16e5[m Updated typos
+[33mb8c685e[m[33m ([m[1;31morigin/zzp-LOOP-124[m[33m)[m Fix story/epic Frontend
+[33mce23826[m Added color logging
+[33m1942cbe[m Merge pull request #38 from Niklas-Maderbacher/lt-sprint3
+[33md7306cb[m[33m ([m[1;31morigin/lt-sprint3[m[33m)[m Merge branch 'main' into lt-sprint3
+[33m4b95bf2[m changed ip
+[33mb839b02[m Updated .env file
+[33ma30355f[m Merge pull request #36 from Niklas-Maderbacher/LOOP17-Updating_User_Role-Sprint4
+[33mdff5a0f[m Merge pull request #35 from Niklas-Maderbacher/main
+[33m341c7ad[m Merge pull request #34 from Niklas-Maderbacher/dm-CRUD_issue
+[33m0dc357f[m[33m ([m[1;31morigin/dm-CRUD_issue[m[33m)[m test cases
+[33m9f5a048[m Merge pull request #33 from Niklas-Maderbacher/merge-main-dm-crud
+[33mf35b714[m Merge branch 'dm-CRUD_issue' into merge-main-dm-crud
+[33mad8117e[m wip
+[33mc4d75ff[m Merge branch 'LOOP17-Updating_User_Role-Sprint4' of https://github.com/Niklas-Maderbacher/LOOP-Docker into LOOP17-Updating_User_Role-Sprint4
+[33m94eeecc[m updated role handling
+[33me34e259[m added user authentication
+[33m0f26e08[m imported role enum
+[33m4cfa448[m updated role handling
+[33mc4bffe8[m test
+[33mcb3ef24[m[33m ([m[1;31morigin/Loo[m[33m, [m[1;31morigin/LOOP14-Create_Project_Frontend_UI_Allmer[m[33m)[m Roles Consistent
+[33m0975e12[m Merge branch 'LOOP17-Updating_User_Role-Sprint4' of https://github.com/Niklas-Maderbacher/LOOP-Docker into LOOP17-Updating_User_Role-Sprint4
+[33m8669bf0[m merge conflict
+[33m23836ec[m Update test_project.py
+[33m608e907[m Update test_project.py
+[33m9e520fa[m Update test_project.py
+[33m301ba2b[m Update test_project.py
+[33mc36b72d[m file upload works
+[33md8c26d2[m Merge branch 'sommerauer-sprint3-archive-project' into main
+[33m7a00868[m attachment
+[33mcb5fd0a[m roles consistent
+[33m9d92d10[m so) created tests for review
+[33m995064c[m fehler behoben
+[33m64870ab[m create issue api
+[33m753dc0c[m Merge pull request #30 from Niklas-Maderbacher/sommerauer-sprint3-archive-project
+[33mcbb3ffc[m added test cases for project archive
+[33m99babe7[m added api route test methods (archive project)
+[33md68df28[m test
+[33mf70d21b[m Added File Server IP Address to .env file
+[33m60afb11[m Merge pull request #29 from Niklas-Maderbacher/mn-image_server
+[33mad2fd37[m Updated documentation
+[33m3efb8dd[m Changed localhost to IP Address
+[33mbb6d094[m added comments
+[33m8833303[m added test method
+[33mef7ec2f[m Merge pull request #28 from Niklas-Maderbacher/set-priority
+[33mbb63f49[m Merge branch 'sommerauer-sprint3-set-priority' into set-priority
+[33mf8d61bb[m changed color scheming
+[33mbfbfe37[m priority, crud and API works
+[33m0f3829f[m added confirm button
+[33m62413a8[m Merge pull request #25 from Niklas-Maderbacher/ma_merch_2025-03-10
+[33md565110[m Merge branch 'sommerauer-sprint3-archive-project' into ma_merch_2025-03-10
+[33m99d7836[m Merge pull request #26 from Niklas-Maderbacher/pp-LOOP-23
+[33m51d0841[m Merge branch 'LOOP17-Updating_User_Role-Sprint4' of https://github.com/Niklas-Maderbacher/LOOP-Docker into LOOP17-Updating_User_Role-Sprint4
+[33me907ebb[m venv
+[33ma6d609d[m Merge pull request #24 from Niklas-Maderbacher/main
+[33m14a02d9[m Merge branch 'LOOP17-Updating_User_Role-Sprint4' into main
+[33m35e3ce4[m login button
+[33ma8961d3[m Merge pull request #23 from Niklas-Maderbacher/bj-file-upload-issue
+[33m50630b4[m fixed shrink button
+[33m117f5eb[m Merge pull request #22 from Niklas-Maderbacher/bj-file-upload-issue
+[33mda43dce[m fixed tests
+[33mb8dfff7[m Merge pull request #21 from Niklas-Maderbacher/main
+[33mf5a857d[m Merge pull request #20 from Niklas-Maderbacher/pp-sprint3
+[33mfb512b0[m Merge branch 'main' into pp-sprint3
+[33m0fee431[m added documentation
+[33mf8ea895[m added documentation
+[3

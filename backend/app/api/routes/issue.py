@@ -1,12 +1,9 @@
-from app.api.routes import FastApiAuthorization
-from app.crud.priority import update_priority  
 from fastapi import APIRouter, HTTPException, Depends, Response
-from app.crud.issue import update_story_point
-from app.api.schemas.issue import StoryPointUpdate 
 from app.api.deps import SessionDep
-from app.crud.issue import create_issue
-from app.api.schemas.issue import IssueCreate
+from app.crud.issue import update_story_point, create_issue
+from app.api.schemas.issue import StoryPointUpdate, IssueCreate
 from app.db.models import Issue
+from app.crud.priority import update_priority
 
 router = APIRouter(prefix="/issues", tags=["Issues"])
 
@@ -21,6 +18,17 @@ def update_issue_priority(session: SessionDep, issue_id: int, user_id: int, prio
 
 @router.patch("/{issue_id}")
 async def update_issue_story_points(session: SessionDep, issue_id: int, update_data: StoryPointUpdate):
+    """
+    Aktualisiert die Story Points eines Issues.
+    
+    Args:
+        session: Datenbanksitzung
+        issue_id: ID des zu aktualisierenden Issues
+        update_data: Die neuen Story-Point-Daten
+        
+    Returns:
+        Das aktualisierte Issue oder einen 204-Status, wenn das Issue nicht gefunden wurde
+    """
     if update_data.new_story_point_value < 0:
         raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
 
@@ -33,25 +41,25 @@ async def update_issue_story_points(session: SessionDep, issue_id: int, update_d
 
 @router.post("/create", response_model=Issue, status_code=201)
 async def create_new_issue(session: SessionDep, issue_data: IssueCreate):
-    """Creates a new issue in the database.
+    """
+    Erstellt ein neues Issue in der Datenbank.
 
     Args:
-        session (SessionDep): Database session
-        issue_data (IssueCreate): Issue data
+        session: Datenbanksitzung
+        issue_data: Issue-Daten
 
     Returns:
-        Issue: Created issue object
+        Issue: Das erstellte Issue-Objekt
     """
     if not issue_data.name or not issue_data.description:
         raise HTTPException(status_code=400, detail="Name and description are required fields.")
 
+    if issue_data.story_points is not None and issue_data.story_points < 0:
+        raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
+        
     new_issue = create_issue(session, issue_data)
 
     if not new_issue:
         raise HTTPException(status_code=400, detail="Failed to create issue.")
-
-    if issue_data.story_points:
-        if issue_data.story_points <= 0:
-            raise HTTPException(status_code=400, detail="Story points need to be positive integer values.")
     
     return new_issue
