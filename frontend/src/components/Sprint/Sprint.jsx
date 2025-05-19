@@ -1,6 +1,6 @@
-import './Projects.modules.css';
+import '../Projects/Projects.modules.css';
 import React, { useState } from 'react';
-import { createSprint } from '../../services/sprintService'; // Pfad anpassen!
+import { createSprint } from './sprintService'; // Pfad anpassen!
 
 function Sprints() {
     const [isModalOpen, setIsModalOpen] = useState(false);

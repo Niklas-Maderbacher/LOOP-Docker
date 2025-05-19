@@ -15,6 +15,18 @@
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+.add-sprint-btn {
+    margin-left: 300px;
+    margin-top: 20px;
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-weight: 600;
+    padding: 10px 20px;
+    background-color: hsl(210, 100%, 30%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
 
 .issue-modal {
     position: fixed;
