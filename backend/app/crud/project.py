@@ -32,10 +32,11 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
     """
     db_project = Project(
         name=project.name,
+        key=project.key,
         start_date=project.start_date,
+        end_date=project.end_date,
         github_token=project.github_token
     )
-
     db.add(db_project)
     db.commit()
     db.refresh(db_project)

@@ -3,22 +3,27 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import EditIssueForm from './EditIssue/EditIssueForm';
 
+
 function Backlog() {
+    // State variables to control opening and closing of modals and to store new issue data
+    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
+    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
+
+    // Initializes state for the new issue
+    const [newIssue, setNewIssue] = useState({ 
+        issueType: "", 
+        name: "", 
+        sprint_id: "", 
+        responsible_id: "", 
+        priority_id: "", 
+        description: "", 
+        story_points: "" 
     // LOOP-124
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
     const [issues, setIssues] = useState([]);
     const [selectedIssue, setSelectedIssue] = useState(null);
     
-    const [newIssue, setNewIssue] = useState({
-        issueType: "",
-        name: "",
-        category_id: "",
-        sprint_id: "",
-        responsible_id: "",
-        priority_id: "",
-        description: "",
-        story_points: ""
     });
     // LOOP-124
     const [isModalOpen, setIsModalOpen] = useState(true); // Manage modal visibility
@@ -66,16 +71,63 @@ function Backlog() {
 
     function handleCloseIssueForm() {
         setIsIssueFormOpen(false);
+        setNewIssue({ 
+            issueType: "", 
+            name: "", 
+            sprint_id: "", 
+            responsible_id: "", 
+            priority_id: "", 
+            description: "", 
+            story_points: "" 
+        });
     }
 
-    function handleSubmitIssueForm() {
-        fetch("http://localhost:8000/api/v1/issues/", {
+    // Function to handle the submission of the issue creation form
+    async function handleSubmitIssueForm() {
+        if (!newIssue.name.trim() || !newIssue.description.trim()) {
+            alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
+            return;
+        }   
+
+        const response = await fetch("http://localhost:8000/api/v1/issues/create", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newIssue)
-        }).then(() => {
-            setIsIssueFormOpen(false);
-            fetchIssues();
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: newIssue.name,
+                category: newIssue.issueType,
+                sprint_id: newIssue.sprint_id || null,
+                responsible_id: newIssue.responsible_id || null,
+                priority_id: newIssue.priority_id || null,
+                description: newIssue.description,
+                story_points: newIssue.story_points || null,
+                project_id: 1
+            })
+        });
+        
+        const data = await response.json();
+        console.log(data);
+        console.log(JSON.stringify({
+            name: newIssue.name,
+            category_id: newIssue.issueType,
+            sprint_id: newIssue.sprint_id || null,
+            responsible_id: newIssue.responsible_id || null,
+            priority_id: newIssue.priority_id || null,
+            description: newIssue.description,
+            story_points: newIssue.story_points || null,
+            project_id: null
+        }));
+
+        setIsIssueFormOpen(false);
+        setNewIssue({ 
+            issueType: "", 
+            name: "", 
+            sprint_id: "", 
+            responsible_id: "", 
+            priority_id: "", 
+            description: "", 
+            story_points: "" 
         });
     }
 
@@ -114,9 +166,93 @@ function Backlog() {
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Create new {newIssue.issueType}</h2>
-                        <input type="text" name="name" placeholder="Name" value={newIssue.name} onChange={handleInputChange} />
-                        <button onClick={handleSubmitIssueForm}>Create issue</button>
-                        <button onClick={handleCloseIssueForm}>Cancel</button>
+                        
+                        {/* Input for the issue name */}
+                        <input 
+                            type="text" 
+                            name="name" 
+                            placeholder="Name" 
+                            value={newIssue.name} 
+                            onChange={handleInputChange} 
+                        />
+
+                        {/* Dropdown for selecting the sprint */}
+                        <select
+                            className='issue-dropdown' 
+                            name="sprint_id" 
+                            value={newIssue.sprint_id} 
+                            onChange={handleInputChange}
+                        >
+                            <option value="">Sprint ↓</option>
+                            <option value="1">Sprint 1</option>
+                            <option value="2">Sprint 2</option>
+                        </select>
+
+                        {/* Dropdown for selecting the responsible person */}
+                        <select
+                            className='issue-dropdown' 
+                            name="responsible_id" 
+                            value={newIssue.responsible_id} 
+                            onChange={handleInputChange}
+                        >
+                            <option value="">Responsible ↓</option>
+                            <option value="1">Max</option>
+                            <option value="2">Anna</option>
+                        </select>
+
+                        {/* Dropdown for selecting the priority */}
+                        <select
+                            className='issue-dropdown' 
+                            name="priority_id" 
+                            value={newIssue.priority_id} 
+                            onChange={handleInputChange}
+                        >
+                            <option value="">Priority ↓</option>
+                            <option value="Very high">Very high</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                            <option value="Very low">Very low</option>
+                        </select>
+
+                        {/* Input for the issue description */}
+                        <input 
+                            type="text"
+                            name="description" 
+                            placeholder="Description" 
+                            value={newIssue.description} 
+                            onChange={handleInputChange} 
+                        />
+
+                        {/* Parent Issue dropdown shown only for Subtasks */}
+                        {newIssue.issueType === "subtask" && (
+                            <select
+                                className='issue-dropdown'
+                                name="parent_issue_id"
+                                value={newIssue.parent_issue_id}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Parent Issue</option>
+                                <option value="1">Parent Issue 1</option>
+                                <option value="2">Parent Issue 2</option>
+                            </select>
+                        )}
+
+                        {/* Story Points field shown only for Epic or Subtask */}
+                        {["story", "subtask"].includes(newIssue.issueType) && (
+                            <input 
+                                type="text"  // Text input to prevent the number input spinner
+                                name="story_points" 
+                                placeholder="Story Points (optional)" 
+                                value={newIssue.story_points} 
+                                onChange={handleInputChange} 
+                            />
+                        )}
+
+                        <div className="modal-buttons">
+                            <button onClick={handleSubmitIssueForm}>Create issue</button>
+                            <button onClick={handleCloseIssueForm}>Cancel</button>
+                        </div>
                     </div>
                 </div>
             )}

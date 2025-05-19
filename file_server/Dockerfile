@@ -10,6 +10,7 @@ COPY . .
 
 # Define environment variable
 ENV FLASK_APP=server/server.py
+ENV PYTHONUNBUFFERED=1
 
 # Run app.py when the container launches
 CMD ["flask", "run", "--host=0.0.0.0"]
