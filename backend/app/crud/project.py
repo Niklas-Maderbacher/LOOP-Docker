@@ -4,7 +4,8 @@ from datetime import datetime
 from sqlmodel import Session
 from app.db.models import Project
 from app.api.schemas.project import ProjectCreate
-from app.db.models import UserAtProject, Role, User
+from app.db.models import UserAtProject, User
+from app.enums.role import Role
 
 def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Project]:
     """Returns all projects from the database.
@@ -31,10 +32,11 @@ def create_project(db: Session, project: ProjectCreate) -> Project:
     """
     db_project = Project(
         name=project.name,
+        key=project.key,
         start_date=project.start_date,
+        end_date=project.end_date,
         github_token=project.github_token
     )
-
     db.add(db_project)
     db.commit()
     db.refresh(db_project)
@@ -68,7 +70,7 @@ def unarchive_project(db: Session, project_id: int):
 
     return db_project
 
-def update_user_role(db: Session, project_id: int, user_id: int, new_role_id: int):
+def update_user_role(db: Session, project_id: int, user_id: int, new_role: Role):
     """
     updates a user's role within a project
     checks whether the specified new role and user exist
@@ -82,8 +84,6 @@ def update_user_role(db: Session, project_id: int, user_id: int, new_role_id: in
     Returns:
         useratproject | none: returns the updated UserAtProject object if the update was successful, otherwise none
     """
-    if not db.query(Role).filter(Role.id == new_role_id).first():
-        return None
     
     if not db.query(User).filter(User.id == user_id).first():
         return None
@@ -96,7 +96,7 @@ def update_user_role(db: Session, project_id: int, user_id: int, new_role_id: in
     if not user_at_project:
         return None
 
-    user_at_project.role_id = new_role_id
+    user_at_project.role = new_role
     db.commit()
     db.refresh(user_at_project)
 
