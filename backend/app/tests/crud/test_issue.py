@@ -1,6 +1,8 @@
 from app.db.models import Issue
 from app.crud.issues import update_story_point, create_issue
 from app.api.deps import SessionDep
+import pytest
+from sqlalchemy.exc import IntegrityError
 
 def test_create_issue(db: SessionDep):
     """Test the creation of an issue."""
@@ -33,6 +35,15 @@ def test_create_issue(db: SessionDep):
     assert created.name == "Test Issue"
     assert created.category_id == 1
     assert created.priority_id == 3
+
+def test_create_issue_fails_without_name(db: SessionDep):
+    issue = Issue(
+        name=None,  
+        project_id=1  
+    )
+
+    with pytest.raises(IntegrityError):
+        created = create_issue(db, issue)
 
 def test_update_story_point_existing(db: SessionDep):
     issue = Issue(id=1, project_id=1, name="First Issue", story_points=3)
