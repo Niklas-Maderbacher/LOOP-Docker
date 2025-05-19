@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from app.api.routes import TEMPLATE_SHOWCASE
 from app.api.routes import health_check
 from app.api.routes import FastApiAuthorization
-from app.api.routes import projects, issues, category, sprint, state, users, priorities
+from app.api.routes import projects, issues, category, sprint, state, users, priorities, users, attachment
 
 api_router = APIRouter()
 api_router.include_router(TEMPLATE_SHOWCASE.router)
@@ -18,6 +18,8 @@ api_router.include_router(sprint.router)
 api_router.include_router(state.router)
 api_router.include_router(users.router)
 api_router.include_router(priorities.router)
+api_router.include_router(users.router)
+api_router.include_router(attachment.router)
 # add more routers here:
 # api_router.include_router(IMPORTED_ROUTER.router)
 

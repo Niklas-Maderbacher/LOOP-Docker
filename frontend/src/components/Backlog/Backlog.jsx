@@ -48,11 +48,33 @@ function Backlog() {
 
     function handleInputChange(event) {
         const { name, value } = event.target;
-        setNewIssue((prevIssue) => ({ ...prevIssue, [name]: value }));
+        
+        setNewIssue((prevIssue) => {
+            let newValue = value;
+
+            if (name === "story_points") {
+                newValue = value.replace(/[^0-9]/g, "");
+                if (newValue !== "" && parseInt(newValue) < 1) {
+                    newValue = "1";
+                }
+            }
+
+            return { ...prevIssue, [name]: newValue };
+        });
     }
 
     function handleCloseSelectIType() {
         setIsSelectITypeOpen(false);
+        setNewIssue({ 
+            issueType: "", 
+            name: "", 
+            category_id: "", 
+            sprint_id: "", 
+            responsible_user_id: "", 
+            priority_id: "", 
+            description: "", 
+            story_points: "" 
+        });
     }
 
     function handleSubmitIssueType() {
@@ -66,6 +88,16 @@ function Backlog() {
 
     function handleCloseIssueForm() {
         setIsIssueFormOpen(false);
+        setNewIssue({ 
+            issueType: "", 
+            name: "", 
+            category_id: "", 
+            sprint_id: "", 
+            responsible_user_id: "", 
+            priority_id: "", 
+            description: "", 
+            story_points: "" 
+        });
     }
 
     function handleSubmitIssueForm() {
@@ -101,6 +133,12 @@ function Backlog() {
                             <option value="Epic">Epic</option>
                             <option value="User Story">Story</option>
                             <option value="Subtask">Subtask</option>
+                        <select
+                            className='issue-dropdown' 
+                            name="issueType" 
+                            value={newIssue.issueType} 
+                            onChange={handleInputChange}
+                        >
                         </select>
                         <div className="modal-buttons">
                             <button onClick={handleSubmitIssueType}>Submit</button>
@@ -123,35 +161,10 @@ function Backlog() {
                             onChange={handleInputChange} 
                         />
 
-                        {/* Dropdown for selecting the category */}
                         <select
                             className='issue-dropdown' 
-                            name="category_id" 
-                            value={newIssue.category_id} 
-                            onChange={handleInputChange}
-                        >
-                            <option value="">Category ↓</option>
-                            <option value="1">Category A</option>
-                            <option value="2">Category B</option>
-                        </select>
-
-                        {/* Dropdown for selecting the sprint */}
-                        <select
-                            className='issue-dropdown' 
-                            name="sprint_id" 
-                            value={newIssue.sprint_id} 
-                            onChange={handleInputChange}
-                        >
-                            <option value="">Sprint ↓</option>
-                            <option value="1">Sprint 1</option>
-                            <option value="2">Sprint 2</option>
-                        </select>
-
-                        {/* Dropdown for selecting the responsible person */}
-                        <select
-                            className='issue-dropdown' 
-                            name="responsible_id" 
-                            value={newIssue.responsible_id} 
+                            name="responsible_user_id" 
+                            value={newIssue.responsible_user_id} 
                             onChange={handleInputChange}
                         >
                             <option value="">Responsible ↓</option>
@@ -159,7 +172,6 @@ function Backlog() {
                             <option value="2">Anna</option>
                         </select>
 
-                        {/* Dropdown for selecting the priority */}
                         <select
                             className='issue-dropdown' 
                             name="priority_id" 
@@ -172,33 +184,9 @@ function Backlog() {
                             <option value="3">High</option>
                         </select>
 
-                        {/* Input for the issue description */}
-                        <input 
-                            type="text"
-                            name="description" 
-                            placeholder="Description" 
-                            value={newIssue.description} 
-                            onChange={handleInputChange} 
-                        />
-
-                        {/* Parent Issue dropdown shown only for Subtasks */}
-                        {newIssue.issueType === "subtask" && (
-                            <select
-                                className='issue-dropdown'
-                                name="parent_issue_id"
-                                value={newIssue.parent_issue_id}
-                                onChange={handleInputChange}
-                            >
-                                <option value="">Parent Issue</option>
-                                <option value="1">Parent Issue 1</option>
-                                <option value="2">Parent Issue 2</option>
-                            </select>
-                        )}
-
-                        {/* Story Points field shown only for Epic or Subtask */}
                         {["story", "subtask"].includes(newIssue.issueType) && (
                             <input 
-                                type="text"  // Text input to prevent the number input spinner
+                                type="text"
                                 name="story_points" 
                                 placeholder="Story Points (optional)" 
                                 value={newIssue.story_points} 

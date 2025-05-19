@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
 from datetime import date
 from typing import Optional
+from typing import Optional, Literal
+from app.enums.issueType import Type
+from app.enums.priority import Priority
 
 class StoryPointUpdate(BaseModel):
     new_story_point_value: int
@@ -19,3 +22,15 @@ class IssueUpdate(BaseModel):
     project_id: int = Field(foreign_key="project.id")
     backlog_order_number: Optional[int] = Field(default=None)
     parent_issue_id: Optional[int] = Field(foreign_key="issue.id")
+
+
+class IssueCreate(BaseModel):
+    name: str
+    category: Type
+    sprint_id: Optional[int]
+    responsible_id: Optional[int]
+    priority_id: Optional[Priority]
+    description: str
+    story_points: Optional[int]
+    project_id: Optional[int]
+
