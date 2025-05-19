@@ -1,6 +1,7 @@
-//Leo Tandl
 import './Backlog.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import EditIssueForm from './EditIssue/EditIssueForm';
 
 
 function Backlog() {
@@ -17,58 +18,57 @@ function Backlog() {
         priority_id: "", 
         description: "", 
         story_points: "" 
+    // LOOP-124
+    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
+    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    const [issues, setIssues] = useState([]);
+    const [selectedIssue, setSelectedIssue] = useState(null);
+    
     });
+    // LOOP-124
+    const [isModalOpen, setIsModalOpen] = useState(true); // Manage modal visibility
 
-    // Function to open the modal for selecting the issue type
+    // LOOP-124
+    // This function will close the modal
+    const closeModal = () => {
+        setIsSelectITypeOpen(false);
+    };
+
+    useEffect(() => {
+        fetchIssues();
+    }, []);
+    // LOOP-124
+    const fetchIssues = async () => {
+        try {
+            const { data } = await axios.get('http://localhost:8000/api/v1/issues/');
+            setIssues(data);
+        } catch (error) {
+            console.error("Error fetching issues", error);
+        }
+    };
+
     function handleOpenSelectIType() {
         setIsSelectITypeOpen(true);
     }
 
-    // Function to handle input field changes
     function handleInputChange(event) {
         const { name, value } = event.target;
-        
-        setNewIssue((prevIssue) => {
-            let newValue = value;
-    
-            // Story Points field validation: only allows numbers
-            if (name === "story_points") {
-                newValue = value.replace(/[^0-9]/g, "");  // Removes non-numeric characters
-                if (newValue !== "" && parseInt(newValue) < 1) {
-                    newValue = "1"; // Sets minimum value to 1
-                }
-            }
-    
-            return { ...prevIssue, [name]: newValue };  // Returns updated issue state
-        });
+        setNewIssue((prevIssue) => ({ ...prevIssue, [name]: value }));
     }
 
-    // Function to close the issue type selection modal and reset the form state
     function handleCloseSelectIType() {
         setIsSelectITypeOpen(false);
-        setNewIssue({ 
-            issueType: "", 
-            name: "", 
-            category_id: "", 
-            sprint_id: "", 
-            responsible_id: "", 
-            priority_id: "", 
-            description: "", 
-            story_points: "" 
-        });
     }
 
-    // Function to handle the submission of the issue type selection
     function handleSubmitIssueType() {
         if (!newIssue.issueType) {
-            alert("Choose the type of your issue!"); // Shows an alert if no issue type is selected
+            alert("Choose the type of your issue!");
             return;
         }
         setIsSelectITypeOpen(false);
-        setIsIssueFormOpen(true); // Opens the form to create the new issue
+        setIsIssueFormOpen(true);
     }
 
-    // Function to close the issue creation form and reset the form state
     function handleCloseIssueForm() {
         setIsIssueFormOpen(false);
         setNewIssue({ 
@@ -131,24 +131,23 @@ function Backlog() {
         });
     }
 
+    function handleIssueClick(issue) {
+        setSelectedIssue(issue);
+    }
+
+    function handleCloseEditForm() {
+        setSelectedIssue(null);
+    }
+
     return (
         <div className="Backlog">
-            {/* Button to open the issue type selection modal */}
-            <button className="add-issue-btn" onClick={handleOpenSelectIType}>
-                Create Issue
-            </button>
-
-            {/* Modal for selecting the issue type */}
+            <button className="add-issue-btn" onClick={handleOpenSelectIType}>Create Issue</button>
+            
             {isSelectITypeOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Select Issue Type</h2>
-                        <select
-                            className='issue-dropdown' 
-                            name="issueType" 
-                            value={newIssue.issueType} 
-                            onChange={handleInputChange}
-                        >
+                        <select name="issueType" value={newIssue.issueType} onChange={handleInputChange}>
                             <option value="">Select...</option>
                             <option value="Bug">Bug</option>
                             <option value="Epic">Epic</option>
@@ -163,7 +162,6 @@ function Backlog() {
                 </div>
             )}
 
-            {/* Modal for inputting issue details */}
             {isIssueFormOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
@@ -258,7 +256,31 @@ function Backlog() {
                     </div>
                 </div>
             )}
-        </div>  
+            // LOOP-124
+            <div className="issue-list">
+                <h2>Issues</h2>
+                {issues?.length > 0 ? (
+                <ul>
+                    {issues?.map((issue) => (
+                        <li key={issue.id} className={`issue ${selectedIssue && selectedIssue.id === issue.id ? 'selected' : ''}`} onClick={() => handleIssueClick(issue)}>
+                            {issue.name} - Story points: {issue.story_points}
+                        </li>
+                    ))}
+                </ul>
+                ) : (
+                    <p className="no-issues">No issues found.</p>
+                )}
+            </div>
+
+            {selectedIssue && (
+                <div>
+                  <EditIssueForm
+                    issueId={selectedIssue.id}
+                    onClose={handleCloseEditForm}
+                  />
+              </div>
+            )}
+        </div>
     );
 }
 

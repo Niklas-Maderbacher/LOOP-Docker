@@ -1,0 +1,133 @@
+/* LOOP-124 */
+.modal-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background: rgba(0, 0, 0, 0.4); /* background dark overlay */
+    padding: 1rem; /* optional: small padding around edges */
+    z-index: 1000;
+  }
+  
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 800px;
+    padding: 11rem 2rem 2rem; /* ← Top padding now 3rem, sides and bottom 2rem */
+    max-height: 70vh; /* modal never higher than 90% of screen */
+    overflow-y: auto; /* scroll inside modal if too tall */
+  }
+  
+  .modal-title {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 2rem;
+    font-weight: bold;
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+    gap: 2rem;
+  }
+  
+  .form-section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    color: #ffffff;
+  }
+  
+  .form-group:last-child {
+    margin-bottom: 0; /* Ensure no margin below the last field */
+  }
+
+  .form-sections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;            /* Abstand zwischen den Spalten */
+  }
+
+  .form-full-width {
+    grid-column: 1 / -1;
+  }
+  
+  .form-input {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .form-input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: background 0.3s ease;
+  }
+  
+  .btn-save {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .btn-save:hover {
+    background-color: #218838;
+  }
+  
+  .btn-close {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .btn-close:hover {
+    background-color: #c82333;
+  }
+  
+  /* Responsive für Mobile */
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  

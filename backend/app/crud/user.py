@@ -56,6 +56,7 @@ def get_all_users(db: Session):
     users = db.query(User).all()
     return users
 
+
 def create_user(db: Session, user: UserCreate):
     """creates a new user and saves it into the database
 
@@ -80,3 +81,4 @@ def create_user(db: Session, user: UserCreate):
     db.commit()
     db.refresh(new_user)
     return new_user
+
