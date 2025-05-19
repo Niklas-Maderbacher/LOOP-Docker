@@ -8,6 +8,8 @@ import Content from './components/Content/Content.jsx';
 import Backlog from './components/Backlog/Backlog.jsx';
 import Projects from './components/Projects/Projects.jsx';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
+import Sprint from './components/Sprint/Sprint.jsx';
+
 
 function App() {
   const [isSidebarShrunk, setIsSidebarShrunk] = useState(false);
@@ -37,6 +39,7 @@ function App() {
             <Route path="/" element={<Content isSidebarShrunk={isSidebarShrunk} />} />
             <Route path="/projects" element={<Projects isSidebarShrunk={isSidebarShrunk} />} />
             <Route path="/backlog" element={<Backlog isSidebarShrunk={isSidebarShrunk} />} />
+            <Route path="/sprint" element={<Sprint />} />
             <Route path="/tasks" element={<h1>In progress</h1>} />
             <Route path="/reports" element={<h1>In progress</h1>} />
             <Route path="/login" element={<Navigate to="/" />} />

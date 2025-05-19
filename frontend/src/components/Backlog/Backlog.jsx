@@ -7,6 +7,7 @@ function Backlog() {
     // State variables to control opening and closing of modals and to store new issue data
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
+    const [isSprintFormOpen, setIsSprintFormOpen] = useState(false);
 
     // Initializes state for the new issue
     const [newIssue, setNewIssue] = useState({ 
@@ -18,6 +19,14 @@ function Backlog() {
         description: "", 
         story_points: "" 
     });
+
+    const [newSprint, setNewSprint] = useState({
+        name: "",
+        start_date: "",
+        end_date: ""
+    });
+
+    
 
     // Function to open the modal for selecting the issue type
     function handleOpenSelectIType() {
@@ -41,6 +50,23 @@ function Backlog() {
     
             return { ...prevIssue, [name]: newValue };  // Returns updated issue state
         });
+    }
+
+    function handleOpenSprintForm() {
+        setIsSprintFormOpen(true);
+    }
+
+    function handleSprintInputChange(event) {
+        const { name, value } = event.target;
+        setNewSprint((prevSprint) => ({
+            ...prevSprint,
+            [name]: value
+        }));
+    }
+
+    function handleCloseSprintForm() {
+        setIsSprintFormOpen(false);
+        setNewSprint({ name: "", start_date: "", end_date: "" });
     }
 
     // Function to close the issue type selection modal and reset the form state
@@ -80,6 +106,28 @@ function Backlog() {
             description: "", 
             story_points: "" 
         });
+    }
+
+    async function handleSubmitSprintForm() {
+        if (!newSprint.name || !newSprint.start_date || !newSprint.end_date) {
+            alert("Please fill in all sprint fields.");
+            return;
+        }
+
+        const response = await fetch("http://localhost:8000/api/v1/sprints/create", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: newSprint.name,
+                start_date: newSprint.start_date,
+                end_date: newSprint.end_date,
+                project_id: 1
+            })
+        });
+
+        const data = await response.json();
+        console.log("Sprint created:", data);
+        handleCloseSprintForm();
     }
 
     // Function to handle the submission of the issue creation form
@@ -258,7 +306,43 @@ function Backlog() {
                     </div>
                 </div>
             )}
-        </div>  
+
+            {/* Sprint Creation Modal */}
+            {isSprintFormOpen && (
+                <div className="issue-modal">
+                    <div className="issue-modal-content">
+                        <h2>Create Sprint</h2>
+
+                        <input 
+                            type="text" 
+                            name="name" 
+                            placeholder="Sprint Name" 
+                            value={newSprint.name} 
+                            onChange={handleSprintInputChange} 
+                        />
+
+                        <input 
+                            type="date" 
+                            name="start_date" 
+                            value={newSprint.start_date} 
+                            onChange={handleSprintInputChange} 
+                        />
+
+                        <input 
+                            type="date" 
+                            name="end_date" 
+                            value={newSprint.end_date} 
+                            onChange={handleSprintInputChange} 
+                        />
+
+                        <div className="modal-buttons">
+                            <button onClick={handleSubmitSprintForm}>Create Sprint</button>
+                            <button onClick={handleCloseSprintForm}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
