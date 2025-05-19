@@ -7,7 +7,13 @@ import Sidebar from './components/Sidebar/Sidebar.jsx';
 import Content from './components/Content/Content.jsx';
 import Backlog from './components/Backlog/Backlog.jsx';
 import Projects from './components/Projects/Projects.jsx';
+
 import LoginPage from './components/LoginPage/LoginPage.jsx';
+
+//import Priority_Dropdown from './components/Priority_Dropdown/Priority_Dropdown.jsx';
+//import {Routes, Route, BrowserRouter} from 'react-router-dom'
+
+
 
 function App() {
   const [isSidebarShrunk, setIsSidebarShrunk] = useState(false);
