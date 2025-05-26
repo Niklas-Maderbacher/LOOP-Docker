@@ -1,3 +1,5 @@
+// loop-128
+
 import React, { useState, useEffect } from 'react';
 import './TopBar.modules.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -15,6 +17,14 @@ const TopBar = () => {
 
   const toggleProfileModal = () => {
     setIsProfileModalOpen(!isProfileModalOpen);
+  };
+
+  const logUserOut = () => {
+    localStorage.removeItem("jwt");
+
+    window.location.href = "/";
+
+    console.log("User logged out!");
   };
 
   return (
@@ -56,7 +66,7 @@ const TopBar = () => {
         <div className="profile-modal">
           <div className="profile-modal-content">
             <a href="#profile-settings">Profile Settings</a>
-            <a href="#logout">Logout</a>
+            <a href="#logout" onClick={logUserOut}>Logout</a>
           </div>
         </div>
       )}
