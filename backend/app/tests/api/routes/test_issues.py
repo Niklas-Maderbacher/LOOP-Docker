@@ -84,6 +84,7 @@ def test_update_issue_success(db: SessionDep, client_with_superuser):
     data = response.json()
     assert data["story_points"] == 13
 
+
 def test_update_issue_negative_points(db: SessionDep, client_with_superuser):
     issue = Issue(id=1, category="BUG", project_id=1, name="First Issue", story_points=4)
     db.add(issue)
@@ -104,6 +105,7 @@ def test_update_nonexistent_issue(client_with_superuser):
     
     assert response.status_code == 204
     assert response.content == b''
+
 
 def test_invalid_story_point_type(db: SessionDep, client_with_superuser):
     issue = Issue(id=1, category="BUG", project_id=1, name="First Issue", story_points=4)
