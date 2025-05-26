@@ -29,9 +29,13 @@ def insert_file():
         # return 415  # 415 Unsupported Media Type
 
     file = request.files["file"]
-    filename = secure_filename(file.filename)
     project_id = request.form.get("project_id")
     issue_id = request.form.get("issue_id")
+    filename = secure_filename(file.filename)
+
+    # check directory name validity
+    if project_id != secure_filename(project_id) or issue_id != secure_filename(issue_id)
+        return Response(response="Given save location contains invalid characters", status=422)
 
     # logs success
     print(
