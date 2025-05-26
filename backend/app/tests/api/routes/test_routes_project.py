@@ -4,7 +4,7 @@ from app.api.deps import SessionDep
 from datetime import datetime
 
 def test_unarchive_project_success(db:SessionDep, client_with_superuser):
-    db_project = Project(name="Test", start_date="2025-02-02", archived_at=datetime.now())
+    db_project = Project(name="Test", key="TEST", start_date="2025-02-02", archived_at=datetime.now())
 
     db.add(db_project)
     db.commit()
@@ -22,7 +22,7 @@ def test_unarchive_project_failure(db:SessionDep, client_with_superuser):
     assert response.json() == {"detail": "Could not unarchive project"}
 
 def test_unarchive_project_without_permission(db:SessionDep, client):
-    db_project = Project(name="Test",start_date=datetime.now())
+    db_project = Project(name="Test", key="TEST", start_date=datetime.now())
     db.add(db_project)
     db.commit()
     db.refresh(db_project)
@@ -33,7 +33,7 @@ def test_unarchive_project_without_permission(db:SessionDep, client):
     assert response.json() == {"detail": "Not enough permissions"}
 
 def test_archive_project_success(db:SessionDep, client_with_superuser):
-    db_project = Project(name="Test", start_date="2025-02-02")
+    db_project = Project(name="Test", key="TEST", start_date="2025-02-02")
 
     db.add(db_project)
     db.commit()
@@ -51,7 +51,7 @@ def test_archive_project_failure(db:SessionDep, client_with_superuser):
     assert response.json() == {"detail": "Project not found"}
 
 def test_archive_project_without_permission(db:SessionDep, client):
-    db_project = Project(name="Test",start_date=datetime.now())
+    db_project = Project(name="Test", key="TEST", start_date=datetime.now())
     db.add(db_project)
     db.commit()
     db.refresh(db_project)
