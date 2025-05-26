@@ -1,25 +1,19 @@
 .projects {
     margin-top: 50px;
     margin-left: 250px;
-    padding: 16px;
+    padding: 16px 100px 70px 100px;
     background-color: hsl(0, 0%, 7%);
     height: 100%;
     color: white;
-    padding-left: 100px;
-    padding-right: 100px;
-    padding-bottom: 70px;
     transition: margin-left 0.3s ease, color 0.3s ease;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .add-project-btn {
     font-family: "Chivo Mono", monospace, Arial, sans-serif;
-    font-optical-sizing: auto;
     font-weight: 600;
-    font-style: normal;
     padding: 10px 20px;
     background-color: hsl(0, 0%, 13%);
     color: white;
@@ -27,21 +21,7 @@
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.archive-project-btn {
-    font-family: "Chivo Mono", monospace, Arial, sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-style: normal;
-    padding: 10px 10px;
-    background-color: hsl(0, 0%, 13%);
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    margin-top: 5px;
+    align-self: flex-end;
 }
 
 .add-project-btn:hover {
@@ -49,29 +29,37 @@
     color: black;
 }
 
+.archive-project-btn {
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-weight: 600;
+    padding: 8px 12px;
+    background-color: hsl(0, 0%, 13%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    float: right;
+}
+
 .archive-project-btn:hover {
     background-color: coral;
     color: black;
 }
 
-.search {
-    width: 100%; /* Nimmt die volle Breite ein */
-    display: flex;
-    justify-content: left;
-    margin-top: 20px; /* Abstand nach oben */
+table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-.search input {
-    width: 60%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    font-size: 14px;
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
 }
 
-.search input:focus {
-    outline: none;
-    border: none;
+td:nth-child(3),
+td:nth-child(4) {
+    text-align: center;
 }
 
 .modal {
@@ -133,16 +121,30 @@
     opacity: 0.8;
 }
 
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color:  coral;
+    color: black;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    text-align: center;
+    font-weight: bold;
+}
 
 @media (max-width: 768px) {
     .projects {
-        flex-direction: column;
-        align-items: flex-start;
+        margin-left: 0;
+        padding: 16px;
     }
 
     .add-project-btn {
-        margin-top: 10px;
         width: 100%;
+        align-self: stretch;
     }
 }
 

@@ -1,21 +1,50 @@
+.Backlog {
+    margin: 50px auto;
+    padding: 16px;
+    background-color: hsl(0, 0%, 7%);
+    color: white;
+    max-width: 1000px;
+    border-radius: 8px;
+}
 
+/* Button zum Erstellen eines Issues */
 .add-issue-btn {
-    margin-left: 300px;
-    margin-top: 50px;
     font-family: "Chivo Mono", monospace, Arial, sans-serif;
-    font-optical-sizing: auto;
     font-weight: 600;
-    font-style: normal;
     padding: 10px 20px;
     background-color: hsl(0, 0%, 13%);
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    margin-bottom: 20px;
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+.add-issue-btn:hover {
+    background-color: coral;
+    color: black;
+}
 
+/* Tabelle für Issues */
+.issue-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.issue-table th,
+.issue-table td {
+    padding: 12px;
+    border: 1px solid hsl(0, 0%, 20%);
+    text-align: left;
+}
+
+.issue-table th {
+    background-color: hsl(0, 0%, 15%);
+}
+
+/* Modal Styles */
 .issue-modal {
     position: fixed;
     top: 0;
@@ -26,8 +55,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10;
 }
-
 
 .issue-modal-content {
     background: hsl(0, 0%, 20%);
@@ -38,88 +67,66 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 300px;
+    width: 350px;
 }
 
-.SelectIssueType-content {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-
-.issue-modal-content input {
+.issue-modal-content input,
+.issue-modal-content select {
     padding: 8px;
     border: 1px solid hsl(0, 0%, 50%);
     border-radius: 5px;
     background: hsl(0, 0%, 15%);
     color: white;
+    font-size: 14px;
 }
 
-.issue-modal-buttons {
+.issue-dropdown {
+    margin-top: 8px;
+}
+
+/* Modal Buttons */
+.modal-buttons {
     display: flex;
     justify-content: space-around;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-
-.issue-modal-buttons button {
+.modal-buttons button {
     padding: 8px 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    min-width: 100px;
 }
 
-.issue-modal-buttons button:first-child {
+.modal-buttons button:first-child {
     background-color: coral;
     color: black;
 }
 
-.issue-modal-buttons button:last-child {
+.modal-buttons button:last-child {
     background-color: gray;
     color: white;
 }
 
-
-.issue-dropdown {
-    width: 100%;
-    padding: 10px;
-    font-family: "Chivo Mono", monospace, Arial, sans-serif;
-    font-optical-sizing: auto;
-    font-weight: 600;
-    font-style: normal;
-    border: 2px solid hsl(0, 0%, 13%);
-    border-radius: 5px;
-    background-color: hsl(0, 0%, 13%); /* Schwarz */
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+.modal-buttons button:hover {
+    opacity: 0.8;
 }
 
-/* Hover-Effekt */
-.issue-dropdown:hover {
-    border-color: hsl(0, 0%, 30%);
-    background-color: hsl(0, 0%, 20%);
-}
+/* Responsive */
+@media (max-width: 768px) {
+    .Backlog {
+        padding: 12px;
+    }
 
-/* Fokus-Effekt */
-.issue-dropdown:focus {
-    outline: none;
-    border-color: white;
-    box-shadow: 0px 0px 5px rgba(255, 255, 255, 0.5);
-}
 
-/* Dropdown-Optionen */
-.issue-dropdown option {
-    font-weight: 600;
-    background: hsl(0, 0%, 13%); /* Schwarz */
-    color: white;
-    padding: 10px;
-}
+    .issue-modal-content {
+        width: 90%;
+    }
 
-/* Animationseffekt beim Öffnen */
-.issue-dropdown:active {
-    transform: scale(0.98);
+    .add-issue-btn {
+        width: 100%;
+    }
 }
 
 .message {

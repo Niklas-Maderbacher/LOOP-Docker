@@ -73,7 +73,7 @@ async def unarchive_project(session: SessionDep, project_id: int):
     return result
 
 
-@router.put("/{project_id}/users/{user_id}/role", dependencies=[Depends(FastApiAuthorization.is_product_owner)], status_code=200)
+@router.put("/{project_id}/users/{user_id}/role", dependencies=[Depends(FastApiAuthorization.is_product_owner)], status_code=201)
 async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role: Role):
     """
     updates user role
