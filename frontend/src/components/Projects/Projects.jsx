@@ -1,5 +1,6 @@
 import './Projects.modules.css';
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function Projects() {
     const [isModalOpen, setIsModalOpen] = useState(false);

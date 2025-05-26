@@ -119,6 +119,7 @@
         padding: 12px;
     }
 
+
     .issue-modal-content {
         width: 90%;
     }
@@ -126,4 +127,16 @@
     .add-issue-btn {
         width: 100%;
     }
+}
+
+.message {
+    margin-top: 50px;
+    margin-left: 250px;
+    padding: 16px;
+    background-color: hsl(0, 0%, 7%);
+    height: 100%;
+    color: white;
+    padding-left: 100px;
+    padding-right: 100px;
+    padding-bottom: 70px;
 }
