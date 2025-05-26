@@ -57,7 +57,7 @@ def get_issue(session: Session, id: int) -> Issue:
     issue_db = Issue(
         id=issue_db.id,
         name=issue_db.name,
-        category_id=issue_db.category_id,
+        category=issue_db.category,
         sprint_id=issue_db.sprint_id,
         state_id=issue_db.state_id,
         creator_id=issue_db.creator_id,

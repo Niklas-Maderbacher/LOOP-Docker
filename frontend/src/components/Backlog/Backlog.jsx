@@ -49,7 +49,7 @@ function Backlog() {
         setNewIssue({ 
             issueType: "", 
             name: "", 
-            category_id: "", 
+            category: "", 
             sprint_id: "", 
             responsible_id: "", 
             priority_id: "", 
@@ -110,7 +110,7 @@ function Backlog() {
         console.log(data);
         console.log(JSON.stringify({
             name: newIssue.name,
-            category_id: newIssue.issueType,
+            category: newIssue.issueType,
             sprint_id: newIssue.sprint_id || null,
             responsible_id: newIssue.responsible_id || null,
             priority_id: newIssue.priority_id || null,
