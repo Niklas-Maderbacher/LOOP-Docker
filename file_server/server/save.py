@@ -2,12 +2,16 @@ import os
 import sys
 
 from colorama import Fore, Style
+from werkzeug.utils import secure_filename
 
 from create_dir import SAVE_DIR
 from logging_helper import get_cur_time
 
 
 def save_file(project_id: int, issue_id: int, filename: str, file):
+    project_id = secure_filename(project_id)
+    issue_id = secure_filename(issue_id)
+    filename = secure_filename(filename)
     if os.path.exists(os.path.join(SAVE_DIR, project_id)):
         if os.path.exists(os.path.join(SAVE_DIR, project_id, issue_id)):
             file.save(os.path.join(SAVE_DIR, project_id, issue_id, filename))
