@@ -1,11 +1,170 @@
+/* LoginPage.modules.css */
+
 .content {
-    margin-top: 50px;
-    margin-left: 250px;
+    font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    min-height: 100vh;
+    width: 100%;
+    background-color: hsl(0, 0%, 8%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    margin: 0;
+}
+
+.login-card {
+    background-color: hsl(0, 0%, 13%);
+    border-radius: 12px;
+    padding: 40px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 420px;
+    border: 1px solid hsl(0, 0%, 20%);
+}
+
+.login-card h1 {
+    color: hsl(0, 0%, 100%);
+    text-align: center;
+    margin: 0 0 30px 0;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    color: hsl(0, 0%, 85%);
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 4px;
+}
+
+.form-input {
+    background-color: hsl(0, 0%, 10%);
+    border: 2px solid hsl(0, 0%, 25%);
+    border-radius: 8px;
+    padding: 14px 16px;
+    font-size: 16px;
+    color: hsl(0, 0%, 100%);
+    font-family: inherit;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.form-input::placeholder {
+    color: hsl(0, 0%, 50%);
+    font-weight: 400;
+}
+
+.form-input:focus {
+    border-color: coral;
+    background-color: hsl(0, 0%, 12%);
+    box-shadow: 0 0 0 3px rgba(255, 127, 80, 0.1);
+}
+
+.form-input:hover {
+    border-color: hsl(0, 0%, 35%);
+}
+
+.login-button {
+    background-color: coral;
+    color: black;
+    border: none;
+    border-radius: 8px;
     padding: 16px;
-    background-color: hsl(0, 0%, 7%);
-    height: 100%;
-    color: white;
-    padding-left: 100px;
-    padding-right: 100px;
-    padding-bottom: 70px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.login-button:hover {
+    background-color: hsl(16, 100%, 60%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+}
+
+.login-button:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(255, 127, 80, 0.2);
+}
+
+.error {
+    background-color: hsl(0, 70%, 15%);
+    color: hsl(0, 70%, 85%);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid hsl(0, 70%, 50%);
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.signup-section {
+    margin-top: 32px;
+    text-align: center;
+    padding-top: 24px;
+    border-top: 1px solid hsl(0, 0%, 20%);
+}
+
+.signup-text {
+    color: hsl(0, 0%, 65%);
+    margin: 0 0 16px 0;
+    font-size: 14px;
+}
+
+.signup-button {
+    background-color: transparent;
+    color: coral;
+    border: 2px solid coral;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.signup-button:hover {
+    background-color: coral;
+    color: black;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 127, 80, 0.2);
+}
+
+.signup-button:active {
+    transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .content {
+        padding: 16px;
+    }
+    
+    .login-card {
+        padding: 24px;
+    }
+    
+    .login-card h1 {
+        font-size: 24px;
+    }
 }

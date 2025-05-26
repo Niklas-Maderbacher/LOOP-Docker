@@ -1,7 +1,8 @@
 // SignUpPage.jsx
+// LOOP-104
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../LoginPage/LoginPage.modules.css';
+import './SignUpPage.modules.css';
 
 function SignUpPage({ setIsAuthenticated }) {
     const [formData, setFormData] = useState({
@@ -60,8 +61,8 @@ function SignUpPage({ setIsAuthenticated }) {
             // Create new account
             const signUpResponse = await fetch('http://localhost:8000/api/v1/users/sign_up', {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json' 
+                headers: {
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     email: formData.email,
@@ -110,62 +111,83 @@ function SignUpPage({ setIsAuthenticated }) {
 
     return (
         <div className='content'>
-            <h1>Create Account</h1>
-            {error && <p className='error'>{error}</p>}
-            <form onSubmit={handleSignUp}>
-                <input 
-                    type='text'
-                    name='displayName'
-                    placeholder='Full Name' 
-                    value={formData.displayName} 
-                    onChange={handleChange} 
-                    required
-                />
-                <input 
-                    type='email'
-                    name='email' 
-                    placeholder='Email' 
-                    value={formData.email} 
-                    onChange={handleChange} 
-                    required
-                />
-                <input 
-                    type='password'
-                    name='password'
-                    placeholder='Password' 
-                    value={formData.password} 
-                    onChange={handleChange} 
-                    required
-                />
-                <input 
-                    type='password'
-                    name='confirmPassword'
-                    placeholder='Confirm Password' 
-                    value={formData.confirmPassword} 
-                    onChange={handleChange} 
-                    required
-                />
-                <button type='submit' disabled={loading}>
-                    {loading ? 'Creating Account...' : 'Sign Up'}
-                </button>
-            </form>
-            
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <p>Already have an account?</p>
-                <button 
-                    type='button' 
-                    onClick={goToLogin}
-                    style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#007bff',
-                        cursor: 'pointer',
-                        textDecoration: 'underline',
-                        fontSize: '16px'
-                    }}
-                >
-                    Sign In
-                </button>
+            <div className='signup-card'>
+                <h1>Create Account</h1>
+
+                {error && <div className='error'>{error}</div>}
+
+                <form className='signup-form' onSubmit={handleSignUp}>
+                    <div className='form-group'>
+                        <label className='form-label' htmlFor='displayName'>Full Name</label>
+                        <input
+                            id='displayName'
+                            type='text'
+                            name='displayName'
+                            placeholder='Enter your full name'
+                            value={formData.displayName}
+                            onChange={handleChange}
+                            className='form-input'
+                            required
+                        />
+                    </div>
+
+                    <div className='form-group'>
+                        <label className='form-label' htmlFor='email'>Email</label>
+                        <input
+                            id='email'
+                            type='email'
+                            name='email'
+                            placeholder='Enter your email'
+                            value={formData.email}
+                            onChange={handleChange}
+                            className='form-input'
+                            required
+                        />
+                    </div>
+
+                    <div className='form-group'>
+                        <label className='form-label' htmlFor='password'>Password</label>
+                        <input
+                            id='password'
+                            type='password'
+                            name='password'
+                            placeholder='Enter your password'
+                            value={formData.password}
+                            onChange={handleChange}
+                            className='form-input'
+                            required
+                        />
+                    </div>
+
+                    <div className='form-group'>
+                        <label className='form-label' htmlFor='confirmPassword'>Confirm Password</label>
+                        <input
+                            id='confirmPassword'
+                            type='password'
+                            name='confirmPassword'
+                            placeholder='Confirm your password'
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className='form-input'
+                            required
+                        />
+                    </div>
+
+                    <button type='submit' className='signup-button' disabled={loading}>
+                        {loading ? 'Creating Account...' : 'Create Account'}
+                    </button>
+                </form>
+
+                <div className='login-section'>
+                    <p className='login-text'>Already have an account?</p>
+                    <button
+                        type='button'
+                        onClick={goToLogin}
+                        className='login-link-button'
+                    >
+                        Sign In
+                    </button>
+                </div>
             </div>
         </div>
     );
