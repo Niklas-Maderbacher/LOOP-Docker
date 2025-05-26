@@ -29,11 +29,15 @@ function LoginPage({ setIsAuthenticated }) {
             
             const data = await response.json();
             localStorage.setItem('jwt', data.access_token);
-            setIsAuthenticated(true); // Setzt den State für isAuthenticated auf true
-            navigate('/'); // Zur Hauptseite weiterleiten
+            setIsAuthenticated(true);
+            navigate('/');
         } catch (error) {
             setError(error.message);
         }
+    };
+
+    const handleGoToSignUp = () => {
+        navigate('/signup');
     };
 
     return (
@@ -57,6 +61,25 @@ function LoginPage({ setIsAuthenticated }) {
                 />
                 <button type='submit'>Login</button>
             </form>
+
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                <p>Don't have an account?</p>
+                <button 
+                    type='button' 
+                    onClick={handleGoToSignUp}
+                    style={{
+                        background: '#28a745',
+                        color: 'white',
+                        border: 'none',
+                        padding: '10px 20px',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontSize: '16px'
+                    }}
+                >
+                    Sign Up
+                </button>
+            </div>
         </div>
     );
 }
