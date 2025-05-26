@@ -40,7 +40,7 @@ def create_sprint(db: Session, user_id: int, sprint_data: SprintCreate):
         project_id=sprint_data.project_id,
         start_date=sprint_data.start_date,
         end_date=sprint_data.end_date,
-        goal=sprint_data.goal
+        goal=sprint_data.goal   
     )
     db.add(new_sprint)
     db.commit()
