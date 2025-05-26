@@ -41,7 +41,7 @@ function Backlog() {
         setNewIssue({ 
             issueType: "", 
             name: "", 
-            category_id: "", 
+            category: "", 
             sprint_id: "", 
             responsible_user_id: "", 
             priority_id: "", 
@@ -73,11 +73,52 @@ function Backlog() {
         });
     }
 
-    function handleSubmitIssueForm() {
+    async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description.");
             return;
-        }
+        }   
+
+        const response = await fetch("http://localhost:8000/api/v1/issues/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name: newIssue.name,
+                category: newIssue.issueType,
+                sprint_id: newIssue.sprint_id || null,
+                responsible_id: newIssue.responsible_id || null,
+                priority_id: newIssue.priority_id || null,
+                description: newIssue.description,
+                story_points: newIssue.story_points || null,
+                project_id: 1
+            })
+        });
+        
+        const data = await response.json();
+        console.log(data);
+        console.log(JSON.stringify({
+            name: newIssue.name,
+            category: newIssue.issueType,
+            sprint_id: newIssue.sprint_id || null,
+            responsible_id: newIssue.responsible_id || null,
+            priority_id: newIssue.priority_id || null,
+            description: newIssue.description,
+            story_points: newIssue.story_points || null,
+            project_id: null
+        }));
+
+        setIsIssueFormOpen(false);
+        setNewIssue({ 
+            issueType: "", 
+            name: "", 
+            sprint_id: "", 
+            responsible_id: "", 
+            priority_id: "", 
+            description: "", 
+            story_points: "" 
+        });
     }
 
     return (
