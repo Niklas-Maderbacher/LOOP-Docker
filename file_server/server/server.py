@@ -35,7 +35,16 @@ def insert_file():
 
     # check directory name validity
     if project_id != secure_filename(project_id) or issue_id != secure_filename(issue_id)
+        # logs error
+        print(
+            Fore.RED
+            + get_cur_time()
+            + "Received invalid characters for saving location"
+            + Style.RESET_ALL,
+            file=sys.stdout,
+        )
         return Response(response="Given save location contains invalid characters", status=422)
+        # return 422  # 422 Unprocessable Content
 
     # logs success
     print(
