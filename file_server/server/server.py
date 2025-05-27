@@ -34,7 +34,7 @@ def insert_file():
     filename = secure_filename(file.filename)
 
     # check directory name validity
-    if project_id != secure_filename(project_id) or issue_id != secure_filename(issue_id)
+    if project_id != secure_filename(project_id) or issue_id != secure_filename(issue_id):
         # logs error
         print(
             Fore.RED
