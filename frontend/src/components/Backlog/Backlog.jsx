@@ -7,19 +7,27 @@ import React, { useState, useEffect, useRef } from 'react';
 import { UploadCloud, X, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
 import axios from "axios";
 
+
 function Backlog() {
-    // State variables to control opening and closing of modals and to store new issue data
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    const [isSprintFormOpen, setIsSprintFormOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [uploadStatus, setUploadStatus] = useState(null); // null, 'uploading', 'success', 'error'
-
+  
     // File upload related state
     const [uploads, setUploads] = useState([]);
     const [dragActive, setDragActive] = useState(false);
     const fileInputRef = useRef(null);
     const maxFileSize = 100; // Maximum file size in MB
     const maxFileSizeBytes = maxFileSize * 1024 * 1024;
+
+    const [newSprint, setNewSprint] = useState({
+        name: "",
+        start_date: "",
+        end_date: "",
+        goal: "",
+        project_id: ""
 
     // Initializes state for the new issue
     const [newIssue, setNewIssue] = useState({ 
@@ -33,47 +41,58 @@ function Backlog() {
         issue_id: null  // To store the ID of the created issue
     });
 
-    // Function to open the modal for selecting the issue type
     function handleOpenSelectIType() {
         setIsSelectITypeOpen(true);
     }
 
-    // Function to handle input field changes
     function handleInputChange(event) {
         const { name, value } = event.target;
-        
+
         setNewIssue((prevIssue) => {
             let newValue = value;
-    
-            // Story Points field validation: only allows numbers
+
             if (name === "story_points") {
-                newValue = value.replace(/[^0-9]/g, "");  // Removes non-numeric characters
+                newValue = value.replace(/[^0-9]/g, "");
                 if (newValue !== "" && parseInt(newValue) < 1) {
-                    newValue = "1"; // Sets minimum value to 1
+                    newValue = "1";
                 }
             }
-    
-            return { ...prevIssue, [name]: newValue };  // Returns updated issue state
+
+            return { ...prevIssue, [name]: newValue };
         });
     }
 
-    // Function to close the issue type selection modal and reset the form state
+    function handleOpenSprintForm() {
+        setIsSprintFormOpen(true);
+    }
+
+    function handleSprintInputChange(event) {
+        const { name, value } = event.target;
+        setNewSprint((prevSprint) => ({
+            ...prevSprint,
+            [name]: value
+        }));
+    }
+
+    function handleCloseSprintForm() {
+        setIsSprintFormOpen(false);
+        setNewSprint({ name: "", start_date: "", end_date: "", goal: "" });
+    }
+
     function handleCloseSelectIType() {
         setIsSelectITypeOpen(false);
         resetForm();
     }
 
-    // Function to handle the submission of the issue type selection
     function handleSubmitIssueType() {
         if (!newIssue.issueType) {
-            alert("Choose the type of your issue!"); // Shows an alert if no issue type is selected
+            alert("Choose the type of your issue!");
             return;
         }
         setIsSelectITypeOpen(false);
-        setIsIssueFormOpen(true); // Opens the form to create the new issue
+        setIsIssueFormOpen(true);
     }
 
-    // Function to close the issue creation form and reset the form state
     function handleCloseIssueForm() {
         // Only allow closing if we're not in the middle of uploading files
         if (uploadStatus === 'uploading') {
@@ -102,10 +121,45 @@ function Backlog() {
         setIsSubmitting(false);
     }
 
-    // Function to handle the submission of the issue creation form
+    async function handleSubmitSprintForm() {
+        const { name, start_date, end_date, goal, project_id } = newSprint;
+
+        if (!name || !start_date || !end_date || !goal || !project_id ) {
+            alert("Please fill in all sprint fields including goal.");
+            return;
+        }
+        const token = localStorage.getItem("jwt");
+        const response = await fetch("http://localhost:8000/api/v1/sprints/create", {
+        
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`, // <<< wichtig!
+            },
+            body: JSON.stringify({
+                name,
+                start_date,
+                end_date,
+                goal,
+                project_id,
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fehler beim Erstellen des Sprints:", response.status, errorText);
+            alert("Fehler beim Erstellen des Sprints. Siehe Konsole.");
+            return;
+        }    
+
+        const data = await response.json();
+        console.log("Sprint created:", data);
+        handleCloseSprintForm();
+    }
+
     async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
-            alert("Please fill in all required fields: name and description."); // Shows an alert if name or description is missing
+            alert("Please fill in all required fields: name and description.");
             return;
         }
         
@@ -409,20 +463,22 @@ function Backlog() {
 
     return (
         <div className="Backlog">
-            {/* Button to open the issue type selection modal */}
             <button className="add-issue-btn" onClick={handleOpenSelectIType}>
                 Create Issue
             </button>
 
-            {/* Modal for selecting the issue type */}
+            <button className="add-sprint-btn" onClick={handleOpenSprintForm}>
+                Create Sprint
+            </button>
+
             {isSelectITypeOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Select Issue Type</h2>
                         <select
-                            className='issue-dropdown' 
-                            name="issueType" 
-                            value={newIssue.issueType} 
+                            className='issue-dropdown'
+                            name="issueType"
+                            value={newIssue.issueType}
                             onChange={handleInputChange}
                         >
                             <option value="">Select...</option>
@@ -439,26 +495,23 @@ function Backlog() {
                 </div>
             )}
 
-            {/* Modal for inputting issue details */}
             {isIssueFormOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Create new {newIssue.issueType}</h2>
-                        
-                        {/* Input for the issue name */}
-                        <input 
-                            type="text" 
-                            name="name" 
-                            placeholder="Name" 
-                            value={newIssue.name} 
-                            onChange={handleInputChange} 
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={newIssue.name}
+                            onChange={handleInputChange}
                         />
 
-                        {/* Dropdown for selecting the sprint */}
                         <select
-                            className='issue-dropdown' 
-                            name="sprint_id" 
-                            value={newIssue.sprint_id} 
+                            className='issue-dropdown'
+                            name="sprint_id"
+                            value={newIssue.sprint_id}
                             onChange={handleInputChange}
                         >
                             <option value="">Sprint ↓</option>
@@ -466,11 +519,10 @@ function Backlog() {
                             <option value="2">Sprint 2</option>
                         </select>
 
-                        {/* Dropdown for selecting the responsible person */}
                         <select
-                            className='issue-dropdown' 
-                            name="responsible_id" 
-                            value={newIssue.responsible_id} 
+                            className='issue-dropdown'
+                            name="responsible_id"
+                            value={newIssue.responsible_id}
                             onChange={handleInputChange}
                         >
                             <option value="">Responsible ↓</option>
@@ -478,11 +530,10 @@ function Backlog() {
                             <option value="2">Anna</option>
                         </select>
 
-                        {/* Dropdown for selecting the priority */}
                         <select
-                            className='issue-dropdown' 
-                            name="priority_id" 
-                            value={newIssue.priority_id} 
+                            className='issue-dropdown'
+                            name="priority_id"
+                            value={newIssue.priority_id}
                             onChange={handleInputChange}
                         >
                             <option value="">Priority ↓</option>
@@ -493,16 +544,14 @@ function Backlog() {
                             <option value="Very low">Very low</option>
                         </select>
 
-                        {/* Input for the issue description */}
-                        <input 
+                        <input
                             type="text"
-                            name="description" 
-                            placeholder="Description" 
-                            value={newIssue.description} 
-                            onChange={handleInputChange} 
+                            name="description"
+                            placeholder="Description"
+                            value={newIssue.description}
+                            onChange={handleInputChange}
                         />
 
-                        {/* Parent Issue dropdown shown only for Subtasks */}
                         {newIssue.issueType === "subtask" && (
                             <select
                                 className='issue-dropdown'
@@ -677,7 +726,59 @@ function Backlog() {
                     </div>
                 </div>
             )}
-        </div>  
+
+            {isSprintFormOpen && (
+                <div className="issue-modal">
+                    <div className="issue-modal-content">
+                        <h2>Create Sprint</h2>
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Sprint Name"
+                            value={newSprint.name}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="date"
+                            name="start_date"
+                            value={newSprint.start_date}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="date"
+                            name="end_date"
+                            value={newSprint.end_date}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="text"
+                            name="goal"
+                            placeholder="Sprint Goal"
+                            value={newSprint.goal}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="text"
+                            name="project_id"
+                            placeholder="Project ID"
+                            value={newSprint.project_id}
+                            onChange={handleSprintInputChange}
+                        />
+
+
+                        <div className="modal-buttons">
+                            <button onClick={handleSubmitSprintForm}>Create Sprint</button>
+                            <button onClick={handleCloseSprintForm}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
