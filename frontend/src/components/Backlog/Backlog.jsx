@@ -190,14 +190,35 @@ function Backlog() {
     }
 
     return (
-        <div className="Backlog">
+        <div className="backlog">
+            <h1>Backlog</h1>
             <button className="add-issue-btn" onClick={handleOpenSelectIType}>
                 Create Issue
             </button>
 
-            <button className="add-sprint-btn" onClick={handleOpenSprintForm}>
-                Create Sprint
-            </button>
+            <div className='issue-table'>
+                {/* Tabelle mit allen Issues */}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Story Points</th>
+                            <th>Responsible</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {issues.map(issue => (
+                            <tr key={issue.id}>
+                                <td>{issue.name}</td>
+                                <td>{issue.priority}</td>
+                                <td>{issue.story_points}</td>
+                                <td>{issue.responsible_user_id}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             <h1 className='message'>Project {localStorage.getItem("selectedProject")} selected</h1>
 
