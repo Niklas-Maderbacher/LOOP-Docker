@@ -55,7 +55,7 @@ class Attachment(SQLModel, table=True):
 class Issue(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str = Field(max_length=100, nullable=False)
-    category: Type = Field(sa_column=Column(ENUM(Type, name="category_enum", create_type=True), nullable=False))
+    category: Type = Field(sa_column=Column(ENUM(Type, name="category_enum", create_type=True), nullable=True))
     sprint_id: Optional[int] = Field(foreign_key="sprint.id")
     state: Optional[State] = Field(sa_column=Column(ENUM(State, name="state_enum", create_type=True), nullable=True))
     creator_id: Optional[int] = Field(foreign_key="user.id")
