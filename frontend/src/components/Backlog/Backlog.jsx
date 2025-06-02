@@ -180,7 +180,8 @@ function Backlog() {
                     priority_id: newIssue.priority_id || null,
                     description: newIssue.description,
                     story_points: newIssue.story_points || null,
-                    project_id: 1
+                    project_id: 1,
+                    state: "To Do"
                 })
             });
             
