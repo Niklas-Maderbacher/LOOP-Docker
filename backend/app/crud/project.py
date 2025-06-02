@@ -20,7 +20,7 @@ def get_all_projects(db: Session, skip: int = 0, limit: int = 50) -> List[Projec
     """
     return db.query(Project).offset(skip).limit(limit).all()
 
-def create_project(db: Session, project: ProjectCreate, user_id: int) -> Project:
+def create_project(db: Session, project: ProjectCreate, user_id) -> Project:
     """Creates a new project in the database.
 
     Args:

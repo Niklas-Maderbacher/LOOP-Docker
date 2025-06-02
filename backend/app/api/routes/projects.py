@@ -33,7 +33,7 @@ async def get_all_projects(session: SessionDep):
     return list(crud_project.get_all_projects(session))
 
 @router.post("/", response_model=Project, dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
-async def create_project(session: SessionDep, project: ProjectCreate):
+async def create_project(session: SessionDep, project: ProjectCreate, current_user: User = Depends(FastApiAuthorization.get_current_user)):
     """adds a new project to the db based on the Project model, requires admin permissions
 
     Args:
@@ -46,7 +46,7 @@ async def create_project(session: SessionDep, project: ProjectCreate):
     Returns:
         HTTPException: status code 201 (success)
     """
-    db_project = crud_project.create_project(session, project, user_id=project.user_id)
+    db_project = crud_project.create_project(session, project, current_user.id)
     if not db_project:
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project

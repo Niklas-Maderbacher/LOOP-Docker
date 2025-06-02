@@ -173,12 +173,21 @@ function Projects() {
         }
     }
 
+    const handleSelectProject = (project) => {
+        localStorage.setItem("selectedProject", JSON.stringify(project.id));
+        window.location.href = "/backlog"; // oder eine andere Zielseite
+    };
+
     if (loading) {
         return <div className="loading">Loading projects...</div>;
     }
 
     if (error) {
         return <div className="error-message">{error}</div>;
+    }
+
+    if (!isAdmin) {
+        return <div className='projects'><h1>Error 403 - Forbidden</h1></div>;
     }
 
     return (
@@ -210,19 +219,26 @@ function Projects() {
                         </thead>
                         <tbody>
                             {projects.filter(project => !project.archived_at).map(project => (
-                                <tr key={project.id}>
+                                <tr
+                                    key={project.id}
+                                    onClick={() => handleSelectProject(project)}
+                                    style={{ cursor: 'pointer' }}
+                                    >
                                     <td>{project.name}</td>
                                     <td>{project.key}</td>
                                     <td style={{ textAlign: 'center' }}>{project.start_date || '-'}</td>
-                                    <td  style={{ textAlign: 'center' }}>{project.end_date || '-'}</td>
+                                    <td style={{ textAlign: 'center' }}>{project.end_date || '-'}</td>
                                     {isAdmin && (
                                         <td>
-                                            <button 
-                                                className="archive-project-btn" 
-                                                onClick={() => handleArchive(project.id)}
-                                            >
-                                                Archive
-                                            </button>
+                                        <button
+                                            className="archive-project-btn"
+                                            onClick={(e) => {
+                                            e.stopPropagation(); // verhindert, dass der row-click ausgelöst wird
+                                            handleArchive(project.id);
+                                            }}
+                                        >
+                                            Archive
+                                        </button>
                                         </td>
                                     )}
                                 </tr>

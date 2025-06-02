@@ -86,7 +86,7 @@ function Backlog() {
         });
     }
 
-    function handleSubmitIssueForm() {
+    async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description.");
             return;
