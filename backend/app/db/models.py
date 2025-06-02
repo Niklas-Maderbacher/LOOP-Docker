@@ -42,6 +42,9 @@ class Sprint(SQLModel, table=True):
     project_id: int = Field(foreign_key="project.id")
     start_date: Optional[str] = Field(default=None)
     end_date: Optional[str] = Field(default=None)
+    ## Loop-101 Thomas Sommerauer
+    goal: Optional[str] = Field(default=None)
+    #############################
 
 class Attachment(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)

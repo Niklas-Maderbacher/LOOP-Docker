@@ -1,19 +1,31 @@
+//Leo Tandl
 import './Backlog.modules.css';
 import React, { useState } from 'react';
+
+
 
 function Backlog() {
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    const [isSprintFormOpen, setIsSprintFormOpen] = useState(false);
 
-    const [newIssue, setNewIssue] = useState({ 
-        name: "", 
-        responsible_user_id: "", 
-        priority_id: "", 
-        story_points: "" 
+    const [newIssue, setNewIssue] = useState({
+        issueType: "",
+        name: "",
+        sprint_id: "",
+        responsible_id: "",
+        priority_id: "",
+        description: "",
+        story_points: ""
     });
 
-    // Neuer State für die Liste aller Issues
-    const [issues, setIssues] = useState([]);
+    const [newSprint, setNewSprint] = useState({
+        name: "",
+        start_date: "",
+        end_date: "",
+        goal: "",
+        project_id: ""
+    });
 
     function handleOpenSelectIType() {
         setIsSelectITypeOpen(true);
@@ -21,7 +33,7 @@ function Backlog() {
 
     function handleInputChange(event) {
         const { name, value } = event.target;
-        
+
         setNewIssue((prevIssue) => {
             let newValue = value;
 
@@ -36,17 +48,33 @@ function Backlog() {
         });
     }
 
+    function handleOpenSprintForm() {
+        setIsSprintFormOpen(true);
+    }
+
+    function handleSprintInputChange(event) {
+        const { name, value } = event.target;
+        setNewSprint((prevSprint) => ({
+            ...prevSprint,
+            [name]: value
+        }));
+    }
+
+    function handleCloseSprintForm() {
+        setIsSprintFormOpen(false);
+        setNewSprint({ name: "", start_date: "", end_date: "", goal: "" });
+    }
+
     function handleCloseSelectIType() {
         setIsSelectITypeOpen(false);
-        setNewIssue({ 
-            issueType: "", 
-            name: "", 
-            category: "", 
-            sprint_id: "", 
-            responsible_user_id: "", 
-            priority_id: "", 
-            description: "", 
-            story_points: "" 
+        setNewIssue({
+            issueType: "",
+            name: "",
+            sprint_id: "",
+            responsible_id: "",
+            priority_id: "",
+            description: "",
+            story_points: ""
         });
     }
 
@@ -61,23 +89,58 @@ function Backlog() {
 
     function handleCloseIssueForm() {
         setIsIssueFormOpen(false);
-        setNewIssue({ 
-            issueType: "", 
-            name: "", 
-            category_id: "", 
-            sprint_id: "", 
-            responsible_user_id: "", 
-            priority_id: "", 
-            description: "", 
-            story_points: "" 
+        setNewIssue({
+            issueType: "",
+            name: "",
+            sprint_id: "",
+            responsible_id: "",
+            priority_id: "",
+            description: "",
+            story_points: ""
         });
+    }
+
+    async function handleSubmitSprintForm() {
+        const { name, start_date, end_date, goal, project_id } = newSprint;
+
+        if (!name || !start_date || !end_date || !goal || !project_id ) {
+            alert("Please fill in all sprint fields including goal.");
+            return;
+        }
+        const token = localStorage.getItem("jwt");
+        const response = await fetch("http://localhost:8000/api/v1/sprints/create", {
+        
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`, // <<< wichtig!
+            },
+            body: JSON.stringify({
+                name,
+                start_date,
+                end_date,
+                goal,
+                project_id,
+            })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fehler beim Erstellen des Sprints:", response.status, errorText);
+            alert("Fehler beim Erstellen des Sprints. Siehe Konsole.");
+            return;
+        }    
+
+        const data = await response.json();
+        console.log("Sprint created:", data);
+        handleCloseSprintForm();
     }
 
     async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description.");
             return;
-        }   
+        }
 
         const response = await fetch("http://localhost:8000/api/v1/issues/create", {
             method: "POST",
@@ -95,29 +158,19 @@ function Backlog() {
                 project_id: 1
             })
         });
-        
+
         const data = await response.json();
         console.log(data);
-        console.log(JSON.stringify({
-            name: newIssue.name,
-            category: newIssue.issueType,
-            sprint_id: newIssue.sprint_id || null,
-            responsible_id: newIssue.responsible_id || null,
-            priority_id: newIssue.priority_id || null,
-            description: newIssue.description,
-            story_points: newIssue.story_points || null,
-            project_id: null
-        }));
 
         setIsIssueFormOpen(false);
-        setNewIssue({ 
-            issueType: "", 
-            name: "", 
-            sprint_id: "", 
-            responsible_id: "", 
-            priority_id: "", 
-            description: "", 
-            story_points: "" 
+        setNewIssue({
+            issueType: "",
+            name: "",
+            sprint_id: "",
+            responsible_id: "",
+            priority_id: "",
+            description: "",
+            story_points: ""
         });
     }
 
@@ -127,38 +180,25 @@ function Backlog() {
                 Create Issue
             </button>
 
-            {/* Tabelle mit allen Issues */}
-            <table className="issue-table">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Priority</th>
-                        <th>Story Points</th>
-                        <th>Responsible</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {issues.map(issue => (
-                        <tr key={issue.id}>
-                            <td>{issue.name}</td>
-                            <td>{issue.priority}</td>
-                            <td>{issue.story_points}</td>
-                            <td>{issue.responsible_user_id}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+            <button className="add-sprint-btn" onClick={handleOpenSprintForm}>
+                Create Sprint
+            </button>
 
             {isSelectITypeOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">
                         <h2>Select Issue Type</h2>
                         <select
-                            className='issue-dropdown' 
-                            name="issueType" 
-                            value={newIssue.issueType} 
+                            className='issue-dropdown'
+                            name="issueType"
+                            value={newIssue.issueType}
                             onChange={handleInputChange}
                         >
+                            <option value="">Select...</option>
+                            <option value="Bug">Bug</option>
+                            <option value="Epic">Epic</option>
+                            <option value="User Story">Story</option>
+                            <option value="Subtask">Subtask</option>
                         </select>
                         <div className="modal-buttons">
                             <button onClick={handleSubmitIssueType}>Submit</button>
@@ -173,18 +213,29 @@ function Backlog() {
                     <div className="issue-modal-content">
                         <h2>Create new {newIssue.issueType}</h2>
 
-                        <input 
-                            type="text" 
-                            name="name" 
-                            placeholder="Name" 
-                            value={newIssue.name} 
-                            onChange={handleInputChange} 
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            value={newIssue.name}
+                            onChange={handleInputChange}
                         />
 
                         <select
-                            className='issue-dropdown' 
-                            name="responsible_user_id" 
-                            value={newIssue.responsible_user_id} 
+                            className='issue-dropdown'
+                            name="sprint_id"
+                            value={newIssue.sprint_id}
+                            onChange={handleInputChange}
+                        >
+                            <option value="">Sprint ↓</option>
+                            <option value="1">Sprint 1</option>
+                            <option value="2">Sprint 2</option>
+                        </select>
+
+                        <select
+                            className='issue-dropdown'
+                            name="responsible_id"
+                            value={newIssue.responsible_id}
                             onChange={handleInputChange}
                         >
                             <option value="">Responsible ↓</option>
@@ -193,24 +244,47 @@ function Backlog() {
                         </select>
 
                         <select
-                            className='issue-dropdown' 
-                            name="priority_id" 
-                            value={newIssue.priority_id} 
+                            className='issue-dropdown'
+                            name="priority_id"
+                            value={newIssue.priority_id}
                             onChange={handleInputChange}
                         >
                             <option value="">Priority ↓</option>
-                            <option value="1">Low</option>
-                            <option value="2">Medium</option>
-                            <option value="3">High</option>
+                            <option value="Very high">Very high</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                            <option value="Very low">Very low</option>
                         </select>
 
-                        {["story", "subtask"].includes(newIssue.issueType) && (
-                            <input 
+                        <input
+                            type="text"
+                            name="description"
+                            placeholder="Description"
+                            value={newIssue.description}
+                            onChange={handleInputChange}
+                        />
+
+                        {newIssue.issueType === "subtask" && (
+                            <select
+                                className='issue-dropdown'
+                                name="parent_issue_id"
+                                value={newIssue.parent_issue_id}
+                                onChange={handleInputChange}
+                            >
+                                <option value="">Parent Issue</option>
+                                <option value="1">Parent Issue 1</option>
+                                <option value="2">Parent Issue 2</option>
+                            </select>
+                        )}
+
+                        {["story", "subtask"].includes(newIssue.issueType.toLowerCase()) && (
+                            <input
                                 type="text"
-                                name="story_points" 
-                                placeholder="Story Points (optional)" 
-                                value={newIssue.story_points} 
-                                onChange={handleInputChange} 
+                                name="story_points"
+                                placeholder="Story Points (optional)"
+                                value={newIssue.story_points}
+                                onChange={handleInputChange}
                             />
                         )}
 
@@ -221,7 +295,59 @@ function Backlog() {
                     </div>
                 </div>
             )}
-        </div>  
+
+            {isSprintFormOpen && (
+                <div className="issue-modal">
+                    <div className="issue-modal-content">
+                        <h2>Create Sprint</h2>
+
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Sprint Name"
+                            value={newSprint.name}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="date"
+                            name="start_date"
+                            value={newSprint.start_date}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="date"
+                            name="end_date"
+                            value={newSprint.end_date}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="text"
+                            name="goal"
+                            placeholder="Sprint Goal"
+                            value={newSprint.goal}
+                            onChange={handleSprintInputChange}
+                        />
+
+                        <input
+                            type="text"
+                            name="project_id"
+                            placeholder="Project ID"
+                            value={newSprint.project_id}
+                            onChange={handleSprintInputChange}
+                        />
+
+
+                        <div className="modal-buttons">
+                            <button onClick={handleSubmitSprintForm}>Create Sprint</button>
+                            <button onClick={handleCloseSprintForm}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 }
 
