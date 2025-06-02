@@ -30,7 +30,6 @@ function LoginPage({ setIsAuthenticated }) {
             const data = await response.json();
             localStorage.setItem('jwt', data.access_token);
             setIsAuthenticated(true);
-            navigate('/');
         } catch (error) {
             setError(error.message);
         }

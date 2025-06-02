@@ -90,13 +90,12 @@ function SignUpPage({ setIsAuthenticated }) {
                 // Account created but login failed - redirect to login page
                 alert('Account created successfully! Please log in.');
                 navigate('/login');
-                return;
+                return; 
             }
 
             const loginData = await loginResponse.json();
             localStorage.setItem('jwt', loginData.access_token);
             setIsAuthenticated(true);
-            navigate('/');
 
         } catch (error) {
             setError(error.message);
@@ -110,7 +109,7 @@ function SignUpPage({ setIsAuthenticated }) {
     };
 
     return (
-        <div className='content'>
+        <div className='signup-content'>
             <div className='signup-card'>
                 <h1>Create Account</h1>
 
