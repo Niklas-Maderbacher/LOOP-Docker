@@ -161,5 +161,12 @@ cython_debug/
 # image server
 file_server/attachments/*
 
-# uv
-uv.lock
+# Python
+__pycache__
+app.egg-info
+*.pyc
+.mypy_cache
+.coverage
+htmlcov
+.venv
+**/uv.lock
