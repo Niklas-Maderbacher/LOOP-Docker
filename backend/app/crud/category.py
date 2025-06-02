@@ -1,6 +1,5 @@
 from sqlmodel import Session
-from app.db.models import Category
-
+from app.enums.issueType import Type 
 # LOOP-124
-def get_categories(db: Session, skip: int = 0, limit: int = 50) -> list[Category]:
-    return db.query(Category).offset(skip).limit(limit).all()
+def get_categories():
+    return [Type.BUG, Type.EPIC, Type.USERSTORY, Type.SUBTASK]

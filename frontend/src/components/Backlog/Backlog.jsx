@@ -133,6 +133,7 @@ function Backlog() {
                             <option value="Epic">Epic</option>
                             <option value="User Story">Story</option>
                             <option value="Subtask">Subtask</option>
+                        </select>
                         <select
                             className='issue-dropdown' 
                             name="issueType" 

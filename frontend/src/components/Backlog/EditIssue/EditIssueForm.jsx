@@ -22,6 +22,8 @@ const EditIssueForm = ({ issueId, onClose }) => {
         ])
       );
 
+      console.log("Sending cleanedIssue:", cleanedIssue);
+
       await axios.put(`http://localhost:8000/api/v1/issues/${issueId}`, cleanedIssue);
       console.log("Issue updated successfully!");
       onClose(); 
@@ -136,18 +138,18 @@ const EditIssueForm = ({ issueId, onClose }) => {
             <h3 className="section-title">Zuordnungen</h3>
             <div className="form-grid">
               <div className="form-group">
-                <label htmlFor="category_id">Category</label>
+                <label htmlFor="category">Category</label>
                 <select
-                  id="category_id"
-                  name="category_id"
-                  value={issue.category_id || ""}
+                  id="category"
+                  name="category"
+                  value={issue.category || ""}
                   onChange={handleChange}
                   className="form-input"
                 >
-                  <option value="">-- None --</option> 
+                  <option value="">-- Select Category --</option>
                   {options.categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
+                    <option key={cat} value={cat}>
+                      {cat}
                     </option>
                   ))}
                 </select>
@@ -172,54 +174,54 @@ const EditIssueForm = ({ issueId, onClose }) => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="state_id">State</label>
+                <label htmlFor="state">State</label>
                 <select
-                  id="state_id"
-                  name="state_id"
-                  value={issue.state_id || ""}
+                  id="state"
+                  name="state"
+                  value={issue.state || ""}
                   onChange={handleChange}
                   className="form-input"
                 >
-                  <option value="">-- None --</option> 
-                  {options.states.map((state) => (
-                    <option key={state.id} value={state.id}>
-                      {state.name}
+                  <option value="">-- Select State --</option>
+                  {options.states.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="form-group">
-                <label htmlFor="priority_id">Priority</label>
+                <label htmlFor="priority">Priority</label>
                 <select
-                  id="priority_id"
-                  name="priority_id"
-                  value={issue.priority_id || ""}
+                  id="priority"
+                  name="priority"
+                  value={issue.priority || ""}
                   onChange={handleChange}
                   className="form-input"
                 >
-                  <option value="">-- None --</option> 
-                  {options.priorities.map((priority) => (
-                    <option key={priority.id} value={priority.id}>
-                      {priority.name}
+                  <option value="">-- Select Priority --</option>
+                  {options.priorities.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="form-group form-full-width">
+              <div className="form-group">
                 <label htmlFor="responsible_user_id">Responsible User</label>
                 <select
                   id="responsible_user_id"
                   name="responsible_user_id"
                   value={issue.responsible_user_id || ""}
                   onChange={handleChange}
-                  className="form-input"
+                  className="form-input text-black bg-white"
                 >
                   <option value="">-- None --</option>
-                  {options.users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.name}
+                  {options.users.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.display_name}
                     </option>
                   ))}
                 </select>

@@ -1,9 +1,11 @@
 from app.db.models import Priority, Issue, User
 from sqlmodel import Session
+from app.enums.priority import Priority
+
 
 # LOOP-124
-def get_priorities(db: Session, skip: int = 0, limit: int = 50) -> list[Priority]:
-    return db.query(Priority).offset(skip).limit(limit).all()
+def get_priorities():
+    return [Priority.HIGH, Priority.LOW, Priority.MEDIUM, Priority.VHIGH, Priority.VLOW]
 
 
 def update_priority(session: Session, issue_id: int, user_id: int, new_priority: str):

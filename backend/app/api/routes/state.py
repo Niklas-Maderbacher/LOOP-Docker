@@ -12,4 +12,4 @@ async def get_states_api(session: SessionDep):
     Returns:
         List[State]: the list of states
     """
-    return get_states(session)
+    return get_states()

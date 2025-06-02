@@ -12,4 +12,4 @@ async def get_priorities_api(session: SessionDep):
     Returns:
         List[Priority]: the list of priorities
     """
-    return get_priorities(session)
+    return get_priorities()

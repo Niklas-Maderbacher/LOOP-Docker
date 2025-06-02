@@ -6,10 +6,10 @@ router = APIRouter(prefix="/categories", tags=["Categories"])
 
 # LOOP-124
 @router.get("/")
-async def get_categories_api(session: SessionDep):
+async def get_categories_api():
     """api call to get all categories from the database
 
     Returns:
         List[Category]: the list of categories
     """
-    return get_categories(session)
+    return get_categories()
