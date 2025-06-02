@@ -20,9 +20,9 @@ def create_superuser_if_not_exists():
     with Session(engine) as session:
         superuser_exists = session.exec(select(User).where(User.is_admin == True)).first()
         if not superuser_exists:
-            email = FIRST_SUPERUSER  # Ändere die E-Mail nach Bedarf
-            display_name = FIRST_SUPERUSER_NAME
-            password = FIRST_SUPERUSER_PASSWORD  # Sicherstellen, dass das Passwort sicher ist
+            email = settings.FIRST_SUPERUSER  # Ändere die E-Mail nach Bedarf
+            display_name = settings.FIRST_SUPERUSER_NAME
+            password = settings.FIRST_SUPERUSER_PASSWORD  # Sicherstellen, dass das Passwort sicher ist
             hashed_password = get_password_hash(password)
             
             superuser_data = User(
