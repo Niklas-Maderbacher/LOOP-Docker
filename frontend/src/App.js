@@ -1,4 +1,4 @@
-// LOOP-115 Thomas Sommerauer
+// Updated App.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, BrowserRouter, Navigate } from 'react-router-dom';
 import './App.css';
@@ -8,6 +8,7 @@ import Content from './components/Content/Content.jsx';
 import Backlog from './components/Backlog/Backlog.jsx';
 import Projects from './components/Projects/Projects.jsx';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
+import SignUpPage from './components/SignUpPage/SignUpPage.jsx'; // Import the new SignUpPage
 
 function App() {
   const [isSidebarShrunk, setIsSidebarShrunk] = useState(false);
@@ -40,11 +41,14 @@ function App() {
             <Route path="/tasks" element={<h1>In progress</h1>} />
             <Route path="/reports" element={<h1>In progress</h1>} />
             <Route path="/login" element={<Navigate to="/" />} />
+            <Route path="/signup" element={<Navigate to="/" />} />
           </Routes>
         </>
       ) : (
         <Routes>
-          <Route path="*" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="/signup" element={<SignUpPage setIsAuthenticated={setIsAuthenticated} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       )}
     </BrowserRouter>
