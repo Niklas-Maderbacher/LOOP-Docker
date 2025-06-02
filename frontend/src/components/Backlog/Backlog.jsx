@@ -9,6 +9,8 @@ function Backlog() {
     const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
     const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
     const [project, setProject] = useState(null);
+    const [isSprintFormOpen, setIsSprintFormOpen] = useState(false);
+
 
     const [newIssue, setNewIssue] = useState({
         issueType: "",

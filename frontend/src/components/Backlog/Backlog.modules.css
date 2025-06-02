@@ -136,14 +136,14 @@
 
 
 
-    .issue-modal-content {
-        width: 90%;
-    }
-
-    .add-issue-btn {
-        width: 100%;
-    }
+.issue-modal-content {
+    width: 90%;
 }
+
+.add-issue-btn {
+    width: 100%;
+}
+
 
 .message {
     margin-top: 50px;

@@ -109,7 +109,7 @@ function SignUpPage({ setIsAuthenticated }) {
     };
 
     return (
-        <div className='content'>
+        <div className='signup-content'>
             <div className='signup-card'>
                 <h1>Create Account</h1>
 
