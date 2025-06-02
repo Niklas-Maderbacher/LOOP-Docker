@@ -28,6 +28,7 @@ function Backlog() {
         end_date: "",
         goal: "",
         project_id: ""
+    });
 
     // Initializes state for the new issue
     const [newIssue, setNewIssue] = useState({ 
