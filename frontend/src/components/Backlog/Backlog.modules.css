@@ -1,13 +1,16 @@
-.Backlog {
-    margin: 50px auto;
-    padding: 16px;
+.backlog {
+    margin-top: 50px;
+    margin-left: 250px;
+    padding: 16px 100px 70px 100px;
     background-color: hsl(0, 0%, 7%);
+    height: 100%;
     color: white;
-    max-width: 1000px;
-    border-radius: 8px;
+    transition: margin-left 0.3s ease, color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
-/* Button zum Erstellen eines Issues */
 .add-issue-btn {
     font-family: "Chivo Mono", monospace, Arial, sans-serif;
     font-weight: 600;
@@ -17,8 +20,8 @@
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 20px;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    align-self: flex-end;
 }
 
 .add-issue-btn:hover {
@@ -26,7 +29,6 @@
     color: black;
 }
 
-/* Tabelle für Issues */
 .issue-table {
     width: 100%;
     border-collapse: collapse;
@@ -35,8 +37,8 @@
 
 .issue-table th,
 .issue-table td {
-    padding: 12px;
-    border: 1px solid hsl(0, 0%, 20%);
+    padding: 10px;
+    border-bottom: 1px solid #333;
     text-align: left;
 }
 
@@ -67,7 +69,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 350px;
+    width: 300px;
 }
 
 .issue-modal-content input,
@@ -88,7 +90,7 @@
 .modal-buttons {
     display: flex;
     justify-content: space-around;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .modal-buttons button {
@@ -113,17 +115,30 @@
     opacity: 0.8;
 }
 
+.message-box {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: coral;
+    color: black;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 300px;
+    text-align: center;
+    font-weight: bold;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
-    .Backlog {
-        padding: 12px;
-    }
-
-    .issue-modal-content {
-        width: 90%;
+    .backlog {
+        margin-left: 0;
+        padding: 16px;
     }
 
     .add-issue-btn {
         width: 100%;
+        align-self: stretch;
     }
 }
