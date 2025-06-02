@@ -12,8 +12,12 @@
 }
 
 .add-issue-btn {
+    margin-left: 300px;
+    margin-top: 50px;
     font-family: "Chivo Mono", monospace, Arial, sans-serif;
+    font-optical-sizing: auto;
     font-weight: 600;
+    font-style: normal;
     padding: 10px 20px;
     background-color: hsl(0, 0%, 13%);
     color: white;
@@ -57,8 +61,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10;
 }
+
 
 .issue-modal-content {
     background: hsl(0, 0%, 20%);
@@ -70,43 +74,45 @@
     flex-direction: column;
     gap: 10px;
     width: 300px;
+    width: 300px;
 }
 
-.issue-modal-content input,
-.issue-modal-content select {
+.SelectIssueType-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.issue-modal-content input {
     padding: 8px;
     border: 1px solid hsl(0, 0%, 50%);
     border-radius: 5px;
     background: hsl(0, 0%, 15%);
     color: white;
-    font-size: 14px;
 }
 
-.issue-dropdown {
-    margin-top: 8px;
-}
-
-/* Modal Buttons */
-.modal-buttons {
+.issue-modal-buttons {
     display: flex;
     justify-content: space-around;
     margin-top: 10px;
+    margin-top: 10px;
 }
 
-.modal-buttons button {
+
+.issue-modal-buttons button {
     padding: 8px 12px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    min-width: 100px;
 }
 
-.modal-buttons button:first-child {
+.issue-modal-buttons button:first-child {
     background-color: coral;
     color: black;
 }
 
-.modal-buttons button:last-child {
+.issue-modal-buttons button:last-child {
     background-color: gray;
     color: white;
 }
