@@ -9,6 +9,7 @@ import Backlog from './components/Backlog/Backlog.jsx';
 import Projects from './components/Projects/Projects.jsx';
 import LoginPage from './components/LoginPage/LoginPage.jsx';
 import SignUpPage from './components/SignUpPage/SignUpPage.jsx';
+import ProjectsDashboard from './components/Content/ProjectsDashboard/ProjectsDashboard.jsx';
 
 function App() {
   const [isSidebarShrunk, setIsSidebarShrunk] = useState(false);
