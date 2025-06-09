@@ -13,6 +13,8 @@ from logging_helper import get_cur_time
 app = Flask(__name__)
 CORS(app)
 
+if not os.path.exists(SAVE_DIR):
+    os.makedirs(SAVE_DIR)
 
 @app.route("/dump", methods=["POST"])
 def insert_file():
