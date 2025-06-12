@@ -1,6 +1,6 @@
-/* LoginPage.modules.css */
+/* SignUpPage.modules.css */
 
-.login-content {
+.signup-content {
     font-family: "Chivo Mono", monospace, Arial, sans-serif;
     font-optical-sizing: auto;
     font-weight: 400;
@@ -16,7 +16,7 @@
     margin: 0;
 }
 
-.login-card {
+.signup-card {
     background-color: hsl(0, 0%, 13%);
     border-radius: 12px;
     padding: 40px;
@@ -24,9 +24,11 @@
     width: 100%;
     max-width: 420px;
     border: 1px solid hsl(0, 0%, 20%);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-.login-card h1 {
+.signup-card h1 {
     color: hsl(0, 0%, 100%);
     text-align: center;
     margin: 0 0 30px 0;
@@ -35,7 +37,7 @@
     letter-spacing: -0.5px;
 }
 
-.login-form {
+.signup-form {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -81,7 +83,7 @@
     border-color: hsl(0, 0%, 35%);
 }
 
-.login-button {
+.signup-button {
     background-color: coral;
     color: black;
     border: none;
@@ -95,15 +97,23 @@
     margin-top: 10px;
 }
 
-.login-button:hover {
+.signup-button:hover:not(:disabled) {
     background-color: hsl(16, 100%, 60%);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
 }
 
-.login-button:active {
+.signup-button:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: 0 2px 6px rgba(255, 127, 80, 0.2);
+}
+
+.signup-button:disabled {
+    background-color: hsl(0, 0%, 30%);
+    color: hsl(0, 0%, 60%);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 .error {
@@ -117,20 +127,20 @@
     font-weight: 500;
 }
 
-.signup-section {
+.login-section {
     margin-top: 32px;
     text-align: center;
     padding-top: 24px;
     border-top: 1px solid hsl(0, 0%, 20%);
 }
 
-.signup-text {
+.login-text {
     color: hsl(0, 0%, 65%);
     margin: 0 0 16px 0;
     font-size: 14px;
 }
 
-.signup-button {
+.login-link-button {
     background-color: transparent;
     color: coral;
     border: 2px solid coral;
@@ -143,14 +153,14 @@
     transition: all 0.3s ease;
 }
 
-.signup-button:hover {
+.login-link-button:hover {
     background-color: coral;
     color: black;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 127, 80, 0.2);
 }
 
-.signup-button:active {
+.login-link-button:active {
     transform: translateY(0);
 }
 
@@ -160,11 +170,20 @@
         padding: 16px;
     }
     
-    .login-card {
+    .signup-card {
         padding: 24px;
+        max-height: 95vh;
     }
     
-    .login-card h1 {
+    .signup-card h1 {
         font-size: 24px;
+    }
+    
+    .form-group {
+        gap: 6px;
+    }
+    
+    .signup-form {
+        gap: 16px;
     }
 }

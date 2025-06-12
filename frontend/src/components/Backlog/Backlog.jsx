@@ -1,13 +1,16 @@
 //Leo Tandl
 import './Backlog.modules.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 
 
 function Backlog() {
-    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);
-    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);
+    // State variables to control opening and closing of modals and to store new issue data
+    const [isSelectITypeOpen, setIsSelectITypeOpen] = useState(false);  // Controls whether the issue type selection modal is open
+    const [isIssueFormOpen, setIsIssueFormOpen] = useState(false);  // Controls whether the issue creation form modal is open
+    const [project, setProject] = useState(null);
     const [isSprintFormOpen, setIsSprintFormOpen] = useState(false);
+
 
     const [newIssue, setNewIssue] = useState({
         issueType: "",
@@ -26,6 +29,17 @@ function Backlog() {
         goal: "",
         project_id: ""
     });
+
+    useEffect(() => {
+        const stored = localStorage.getItem("selectedProject");
+        if (stored) {
+        setProject(JSON.parse(stored));
+        }
+    }, []);
+
+    if (!project) {
+        return <h1 className='message'>Kein Projekt ausgewählt.</h1>;
+    }
 
     function handleOpenSelectIType() {
         setIsSelectITypeOpen(true);
@@ -136,6 +150,7 @@ function Backlog() {
         handleCloseSprintForm();
     }
 
+
     async function handleSubmitIssueForm() {
         if (!newIssue.name.trim() || !newIssue.description.trim()) {
             alert("Please fill in all required fields: name and description.");
@@ -184,6 +199,9 @@ function Backlog() {
                 Create Sprint
             </button>
 
+            <h1 className='message'>Project {localStorage.getItem("selectedProject")} selected</h1>
+
+            {/* Modal for selecting the issue type */}
             {isSelectITypeOpen && (
                 <div className="issue-modal">
                     <div className="issue-modal-content">

@@ -10,8 +10,10 @@ from datetime import datetime
 from app.api.routes import FastApiAuthorization
 from app.api.deps import SessionDep
 from app.db.models import Project
+from app.db.models import UserAtProject
 import app.crud.project as crud_project
 from app.api.schemas.project import ProjectCreate
+from app.db.models import User
 
 from app.enums.role import Role
 
@@ -31,7 +33,7 @@ async def get_all_projects(session: SessionDep):
     return list(crud_project.get_all_projects(session))
 
 @router.post("/", response_model=Project, dependencies=[Depends(FastApiAuthorization.is_admin)], status_code=201)
-async def create_project(session: SessionDep, project: ProjectCreate):
+async def create_project(session: SessionDep, project: ProjectCreate, current_user: User = Depends(FastApiAuthorization.get_current_user)):
     """adds a new project to the db based on the Project model, requires admin permissions
 
     Args:
@@ -44,7 +46,7 @@ async def create_project(session: SessionDep, project: ProjectCreate):
     Returns:
         HTTPException: status code 201 (success)
     """
-    db_project = crud_project.create_project(session, project)
+    db_project = crud_project.create_project(session, project, current_user.id)
     if not db_project:
         raise HTTPException(status_code=400, detail="Failed to create project")
     return db_project
@@ -71,7 +73,7 @@ async def unarchive_project(session: SessionDep, project_id: int):
     return result
 
 
-@router.put("/{project_id}/users/{user_id}/role", dependencies=[Depends(FastApiAuthorization.is_product_owner)], status_code=200)
+@router.put("/{project_id}/users/{user_id}/role", dependencies=[Depends(FastApiAuthorization.is_product_owner)], status_code=201)
 async def update_user_role(session: SessionDep, project_id: int, user_id: int, new_role: Role):
     """
     updates user role
@@ -111,3 +113,9 @@ async def archive_project(session: SessionDep, project_id: int):
     
     return updated_project
 
+# Loop-125
+@router.get("/me", response_model=List[Project])
+def get_my_projects(db: SessionDep, current_user=Depends(FastApiAuthorization.get_current_user)):
+    db_projects = crud_project.get_my_projects(db, current_user.id)
+
+    return db_projects

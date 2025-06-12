@@ -2,8 +2,11 @@ import './Sidebar.modules.css';
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faFolder, faTasks, faClipboard, faChartBar } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 
 const Sidebar = ({ isSidebarShrunk, toggleSidebar }) => {
+  const [isAdmin, setIsAdmin] = useState(false);
+  
   useEffect(() => {
     const updateSidebarHeight = () => {
       document.querySelector('.sidebar').style.height = `${window.innerHeight}px`;
@@ -11,6 +14,23 @@ const Sidebar = ({ isSidebarShrunk, toggleSidebar }) => {
 
     updateSidebarHeight();
     window.addEventListener('resize', updateSidebarHeight);
+
+    const fetchAdminStatus = async () => {
+      try {
+        const token = localStorage.getItem("jwt");
+        const response = await axios.get("http://localhost:8000/api/v1/security/users/check/admin", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const adminState = response.data[0]?.admin_state === true;
+        setIsAdmin(adminState);
+      } catch (error) {
+        console.error("Fehler beim Prüfen des Admin-Status:", error);
+      }
+    };
+  
+    fetchAdminStatus();
 
     return () => window.removeEventListener('resize', updateSidebarHeight);
   }, []);
@@ -24,12 +44,14 @@ const Sidebar = ({ isSidebarShrunk, toggleSidebar }) => {
                 <span className="text">Dashboard</span>
             </a>
         </li>
-        <li>
+        {isAdmin && (
+          <li>
             <a href='/projects'>
-                <FontAwesomeIcon icon={faFolder} className="icon" />
-                <span className="text">Projects</span>
+              <FontAwesomeIcon icon={faFolder} className="icon" />
+              <span className="text">Projects</span>
             </a>
-        </li>
+          </li>
+        )}
         <li>
             <a href='/backlog'>
                 <FontAwesomeIcon icon={faClipboard} className="icon" />
